@@ -1,9 +1,7 @@
-= Never Ending Splendor
+= Gizz Tapes
 
-A Open Source Phish music player, utilizing the Phish.in API for streaming 
-audio.
-
-Install From the https://play.google.com/store/apps/details?id=never.ending.splendor[Play Store]
+A Open Source King Gizzard and the Lizard Wizard music player, utilizing the
+https://tapes.kglw.net/[Gizz Tapes] API for streaming audio.
 
 == Building
 
@@ -14,14 +12,13 @@ Standard gradle commands.
 
 === Build Scans
 
-Add to gradle.properties with `systemProp.NEVER_ENDING_SPLENDOR_ACCEPT_BUILD_SCAN_AGREEMENT=yes`
+Add to gradle.properties with `systemProp.GIZZ_TAPES_ACCEPT_BUILD_SCAN_AGREEMENT=yes`
 to enable build scans on every build.
 
-= License
+== License
 
 ....
-Copyright 2020 Andrew Reitz
-Copyright 2014 The Android Open Source Project, Inc.
+Copyright 2024 Andrew Reitz
 
 Licensed to the Apache Software Foundation (ASF) under one or more contributor
 license agreements.  See the NOTICE file distributed with this work for

@@ -1,5 +1,5 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import nes.gradle.isNonStable
+import gizz.gradle.isNonStable
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {

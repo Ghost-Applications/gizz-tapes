@@ -1,30 +1,3 @@
 = Changelog
 
-== Ghost
-
-== First Tube 8/23/2024
-
-- Including Compose to develop a new better UI
-- Updating android sdk from 34 to 35
-- Support for Android Auto
-- Updated support for chromecast to media3's CastPlayer
-- Using media3 / exoplayer for media playback
-
-== Esther 7/17/2024
-
-- Updated to Android 34
-- Increased HTTP cache size
-- Update HTTP client to have no built in time out, allowing images to load in background for as long as they need
-- Fix api change causing shows to not load
-- Update libraries to their latest versions.
-
-== Down with Disease 12/24/2022
-
-- Upgraded dependencies to latest versions
-- Updated to Android 31
-- Fixed back stack icon being the incorrect icon. Is now the same as the launcher icon.
-- Add 5 Seconds timeout to all network calls [#26](https://github.com/AndrewReitz/never-ending-splendor/issues/26)
-- Update to phish.net api version 5
-- Wrapped image downloading in try catch to ensure it won't crash the app if an image can't be downloaded.
-
-== Carini 2/12/2022
+== Antarctica

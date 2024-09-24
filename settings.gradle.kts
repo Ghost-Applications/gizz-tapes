@@ -9,7 +9,6 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -20,9 +19,13 @@ plugins {
     id("com.gradle.develocity") version "3.17.6"
 }
 
-include(":mobile", ":networking")
+include(
+    ":mobile",
+    ":networking",
+    ":networking-integration"
+)
 
-rootProject.name = "never-ending-splendor"
+rootProject.name = "gizz-tapes"
 
 rootProject.children.forEach {
     it.buildFileName = "${it.name}.gradle.kts"
@@ -30,8 +33,8 @@ rootProject.children.forEach {
 
 develocity {
     buildScan {
-        publishing.onlyIf { System.getProperty("NEVER_ENDING_SPLENDOR_ACCEPT_BUILD_SCAN_AGREEMENT") != null }
+        publishing.onlyIf { System.getProperty("GIZZ_TAPES_ACCEPT_BUILD_SCAN_AGREEMENT") != null }
         termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
-        termsOfUseAgree.set(System.getProperty("NEVER_ENDING_SPLENDOR_ACCEPT_BUILD_SCAN_AGREEMENT", "no"))
+        termsOfUseAgree.set(System.getProperty("GIZZ_TAPES_ACCEPT_BUILD_SCAN_AGREEMENT", "no"))
     }
 }

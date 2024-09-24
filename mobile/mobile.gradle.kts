@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
 
-    id("api-key-provider")
     id("signing-config")
     id("build-number")
 
@@ -25,14 +24,14 @@ kotlin {
 
 play {
     serviceAccountCredentials.set(
-        rootProject.file(properties["never.ending.splendor.publish-key"] ?: "keys/publish-key.json")
+        rootProject.file(properties["gizz.tapes.publish-key"] ?: "keys/publish-key.json")
     )
     track.set("internal")
     defaultToAppBundles.set(true)
 }
 
 android {
-    namespace = "nes.app"
+    namespace = "gizz.tapes"
     compileSdk = libs.versions.android.sdk.get().toInt()
 
     signingConfigs {
@@ -57,11 +56,10 @@ android {
 
     defaultConfig {
         val buildNumber: String by project
-        applicationId = "never.ending.splendor"
         minSdk = 23
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
-        versionName = "Ghost"
+        versionName = "Antarctica"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -93,7 +91,7 @@ android {
     }
     testOptions.unitTests.isReturnDefaultValues = true
     buildFeatures {
-        viewBinding = true
+        viewBinding = false
         aidl = false
         buildConfig = false
         compose = true
@@ -136,7 +134,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.coil)
-    implementation(libs.okhttp.logging.interceptor)
     implementation(libs.timber)
     implementation(libs.byteunits)
 
