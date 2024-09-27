@@ -1,17 +1,19 @@
 [versions]
 android-sdk = "34"
 kotlin = "2.0.10"
-firebase-bom = "33.1.2"
+firebase-bom = "33.3.0"
 androidx-media2 = "1.3.0"
 flipper = "0.261.0"
 coroutines = "1.8.1"
-compose-bom = "2024.06.00"
+okhttp = "4.12.0"
+compose-bom = "2024.09.02"
 compose-compiler = "1.5.15"
-navigation = "2.7.7"
+navigation = "2.8.1"
 hilt = "2.52"
 hiltNavigationCompose = "1.2.0"
-media3 = "1.4.0"
+media3 = "1.4.1"
 ktor = "2.3.12"
+arrow = "1.2.4"
 
 [libraries]
 android-build-gradle = { module = "com.android.tools.build:gradle", version = "8.5.2"}
@@ -19,11 +21,12 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 kotlin-poet = { module = "com.squareup:kotlinpoet", version = "1.18.1" }
 java-poet = "com.squareup:javapoet:1.13.0"
 
-kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2"
+kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1"
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test",  version.ref = "coroutines" }
 kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava",  version.ref = "coroutines" }
+kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.1"
 
 android-material = { module = "com.google.android.material:material", version = "1.12.0" }
 
@@ -36,6 +39,9 @@ androidx-media2-widget = { module = "androidx.media2:media2-widget", version.ref
 androidx-media2-player = { module = "androidx.media2:media2-player", version.ref = "androidx-media2" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.1.4" }
 androidx-compose-nav = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 
 flipper = { module = "com.facebook.flipper:flipper", version.ref = "flipper" }
 flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "flipper" }
@@ -61,7 +67,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-material-icons = "androidx.compose.material:material-icons-extended:1.7.1"
+androidx-material-icons = "androidx.compose.material:material-icons-extended:1.7.2"
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}
 firbase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
@@ -83,11 +89,13 @@ dagger-compiler = "com.google.dagger:dagger-compiler:2.52"
 
 coil = "io.coil-kt:coil-compose:2.7.0"
 
-arrow-core = "io.arrow-kt:arrow-core:1.2.4"
-arrow-resilience = "io.arrow-kt:arrow-resilience:1.2.4"
-arrow-fx = "io.arrow-kt:arrow-fx-coroutines:1.2.4"
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-resilience = { module = "io.arrow-kt:arrow-resilience", version.ref = "arrow" }
+arrow-fx = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
+arrow-core-serialization = { module = "io.arrow-kt:arrow-core-serialization", version.ref = "arrow" }
 
 ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
@@ -172,7 +180,7 @@ version-check = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 play-publisher = { id = "com.github.triplet.play", version = "3.10.1"}
 google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }
-serialization = "org.jetbrains.kotlin.plugin.serialization:2.0.10"
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = "com.google.devtools.ksp:2.0.10-1.0.24"
 paparazzi = "app.cash.paparazzi:1.3.4"

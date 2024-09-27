@@ -1,5 +1,8 @@
 package gizz.tapes.api.data
 
+import arrow.core.NonEmptyList
+import arrow.core.serialization.NonEmptyListSerializer
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -7,7 +10,7 @@ import kotlinx.serialization.Serializable
 data class Show(
     val id: String,
     val order: UShort,
-    val date: String,
+    val date: LocalDate,
     @SerialName("poster_url")
     val posterUrl: String?,
     val notes: String?,
@@ -18,5 +21,6 @@ data class Show(
     val venueId: UInt,
     @SerialName("tour_id")
     val tourId: UInt,
-    val recordings: List<Recording>
+    @Serializable(NonEmptyListSerializer::class)
+    val recordings: NonEmptyList<Recording>
 )

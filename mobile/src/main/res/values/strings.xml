@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Never Ending Splendor</string>
-    <string name="app_label">Never Ending Splendor (Phish.in)</string>
+    <string name="app_name">Gizz Tapes</string>
+    <string name="app_label">Gizz Tapes</string>
 
     <string name="navigate_back">Navigate Back</string>
     <string name="pause">Pause</string>

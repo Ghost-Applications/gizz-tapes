@@ -4,20 +4,16 @@ import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.ShowsData
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
-import kotlin.test.assertTrue
 
 class GizzTapesApiClientTest {
 
@@ -33,8 +29,8 @@ class GizzTapesApiClientTest {
 
         val client = GizzTapesApiClient(HttpClient(mockEngine))
 
-        val result = client.getShows()
-        assertIs<List<ShowsData>>(result)
+        val result = client.shows()
+        assertIs<List<ShowsData>>(result.getOrNull())
     }
 
     @Test
@@ -49,39 +45,38 @@ class GizzTapesApiClientTest {
 
         val client = GizzTapesApiClient(HttpClient(mockEngine))
 
-        val result = client.getShow("123")
-        assertIs<Show>(result)
+        val result = client.show("123")
+        result.onLeft { throw it }
+        assertIs<Show>(result.getOrNull())
     }
 
     @Test
     fun should_fail_when_default_config_is_overridden_to_not_allow_unknown_keys() = runTest {
-        assertFailsWith<JsonConvertException>("Default http client is overriding the provided client") {
-            val mockEngine = MockEngine {
-                respond(
-                    content = """
-                    [{
-                        "unknown_field": "shouldn't error",
-                        "id": "2024-09-08",
-                        "date": "2024-09-08",
-                        "venuename": "Red Rocks Amphitheatre",
-                        "location": "Morrison, CO, USA",
-                        "title": "",
-                        "order": 1,
-                        "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg"
-                    }]
-                """.trimIndent(),
-                    status = HttpStatusCode.OK,
-                    headers = headersOf(HttpHeaders.ContentType, "application/json")
-                )
-            }
-
-            val client = GizzTapesApiClient(HttpClient(mockEngine) {
-                install(ContentNegotiation) {
-                    json()
-                }
-            })
-            client.getShows()
+        val mockEngine = MockEngine {
+            respond(
+                content = """
+                [{
+                    "unknown_field": "shouldn't error",
+                    "id": "2024-09-08",
+                    "date": "2024-09-08",
+                    "venuename": "Red Rocks Amphitheatre",
+                    "location": "Morrison, CO, USA",
+                    "title": "",
+                    "order": 1,
+                    "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg"
+                }]
+            """.trimIndent(),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
         }
+
+        val client = GizzTapesApiClient(HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json()
+            }
+        })
+        assertIs<Throwable>(client.shows().leftOrNull(), "Default http client is overriding the provided client")
     }
 
 
@@ -107,8 +102,8 @@ class GizzTapesApiClientTest {
         }
 
         val client = GizzTapesApiClient(HttpClient(mockEngine))
-        val result = client.getShows()
-        assertIs<List<ShowsData>>(result)
+        val result = client.shows()
+        assertIs<List<ShowsData>>(result.getOrNull())
     }
 
     @Test
@@ -138,11 +133,11 @@ class GizzTapesApiClientTest {
         }
 
         val client = GizzTapesApiClient(HttpClient(mockEngine))
-        val result = client.getShows()
-        assertIs<List<ShowsData>>(result)
+        val result = client.shows()
+        assertIs<List<ShowsData>>(result.getOrNull())
 
-        val result2 = client.getShows()
-        assertIs<List<ShowsData>>(result2)
+        val result2 = client.shows()
+        assertIs<List<ShowsData>>(result2.getOrNull())
 
         assertEquals(1, networkCalls)
     }

@@ -17,12 +17,14 @@ fun main() = runBlocking {
         }
     )
 
-    val shows = api.getShows()
-
-    shows.parMap { show ->
-        println()
-        val showContent = api.getShow(show.id)
-        println(showContent)
-        println()
+    api.shows().onRight { shows ->
+        shows.parMap { show ->
+            println()
+            val showContent = api.show(show.id)
+            println(showContent)
+            println()
+        }
+    }.onLeft {
+        throw it
     }
 }

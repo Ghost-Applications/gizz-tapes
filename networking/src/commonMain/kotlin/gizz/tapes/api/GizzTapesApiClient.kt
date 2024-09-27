@@ -1,5 +1,6 @@
 package gizz.tapes.api
 
+import arrow.core.Either
 import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.ShowsData
 import io.ktor.client.HttpClient
@@ -11,7 +12,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class GizzTapesApiClient(
-    client: HttpClient = HttpClient()
+    client: HttpClient = HttpClient(),
 ) {
     private val client = client.config {
         // default in memory cache, clients can override with disk cache.
@@ -23,11 +24,11 @@ class GizzTapesApiClient(
         }
     }
 
-    suspend fun getShows(): List<ShowsData> {
-        return client.get("https://tapes.kglw.net/api/v1/shows.json").body()
+    suspend fun shows(): Either<Throwable, List<ShowsData>> = Either.catch {
+        client.get("https://tapes.kglw.net/api/v1/shows.json").body()
     }
 
-    suspend fun getShow(id: String): Show {
-        return client.get("https://tapes.kglw.net/api/v1/shows/$id.json").body()
+    suspend fun show(id: String): Either<Throwable, Show> = Either.catch {
+        client.get("https://tapes.kglw.net/api/v1/shows/$id.json").body()
     }
 }

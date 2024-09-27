@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
-        android:name="nes.app.NesApplication"
+        android:name="gizz.tapes.GizzTapesApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_label"
@@ -36,7 +36,7 @@
 
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="nes.app.playback.CastOptionsProvider"
+            android:value="gizz.tapes.playback.CastOptionsProvider"
             />
 
         <meta-data android:name="com.google.android.gms.car.application"

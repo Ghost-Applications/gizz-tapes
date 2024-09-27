@@ -17,12 +17,16 @@ kotlin {
         nodejs()
     }
 
+    jvmToolchain(17)
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlinx.serialization)
-
             api(libs.ktor.client)
+            api(libs.kotlinx.datetime)
+            api(libs.arrow.core)
+
+            implementation(libs.kotlinx.serialization)
+            implementation(libs.arrow.core.serialization)
             implementation(libs.ktor.json)
             implementation(libs.ktor.content.negotiation)
         }

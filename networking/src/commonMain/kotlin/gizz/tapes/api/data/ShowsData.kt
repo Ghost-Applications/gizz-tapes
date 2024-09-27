@@ -1,12 +1,13 @@
 package gizz.tapes.api.data
 
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ShowsData(
     val id: String,
-    val date: String,
+    val date: LocalDate,
     @SerialName("venuename")
     val venueName: String,
     val location: String,

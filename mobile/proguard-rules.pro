@@ -18,10 +18,6 @@
 # Keep kotlin metadata annotations
 -keep class kotlin.Metadata
 
-# Keep generic signature of Call, Response (R8 full mode strips signatures from non-kept items).
--keep, allowobfuscation, allowshrinking interface retrofit2.Call
--keep, allowobfuscation, allowshrinking class retrofit2.Response
-
 # With R8 full mode generic signatures are stripped for classes that are not
 # kept. Suspend functions are wrapped in continuations where the type argument
 # is used.
@@ -29,10 +25,3 @@
 
 -keepattributes SourceFile,LineNumberTable        # Keep file names and line numbers.
 -keep public class * extends java.lang.Exception  # Optional: Keep custom exceptions.
-
-# Kodein Specifics
--keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference
--keep, allowobfuscation, allowoptimization class org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
-
--keep, allowobfuscation, allowoptimization class * extends org.kodein.type.TypeReference
--keep, allowobfuscation, allowoptimization class * extends org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
