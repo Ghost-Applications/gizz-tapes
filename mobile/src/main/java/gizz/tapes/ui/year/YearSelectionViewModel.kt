@@ -8,14 +8,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import gizz.tapes.ui.ApiErrorMessage
+import gizz.tapes.ui.data.PosterUrl
+import gizz.tapes.ui.data.Year
 import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
 import timber.log.Timber
 import javax.inject.Inject
 
-data class YearRenderModel(
-    val year: String,
-    val showCount: Int
+data class YearSelectionData(
+    val year: Year,
+    val showCount: Int,
+    val randomShowPoster: PosterUrl?,
 )
 
 @HiltViewModel
@@ -24,9 +27,9 @@ class YearSelectionViewModel @Inject constructor(
     private val apiErrorMessage: ApiErrorMessage
 ): ViewModel() {
 
-    private val _years: MutableStateFlow<LCE<List<YearRenderModel>, Throwable>> =
+    private val _years: MutableStateFlow<LCE<List<YearSelectionData>, Throwable>> =
         MutableStateFlow(LCE.Loading)
-    val years: StateFlow<LCE<List<YearRenderModel>, Throwable>> = _years
+    val years: StateFlow<LCE<List<YearSelectionData>, Throwable>> = _years
 
     init {
         loadYears()
@@ -36,8 +39,16 @@ class YearSelectionViewModel @Inject constructor(
         viewModelScope.launch {
             val state = retryUntilSuccessful(
                 action = { apiClient.shows().map {
-                    it.groupBy { it.date.year }
-                        .map { (year, shows) -> YearRenderModel(year.toString(), shows.count()) }
+                    it.groupBy { show -> show.date.year }
+                        .map { (year, shows) ->
+                            YearSelectionData(
+                                year = Year(year),
+                                showCount = shows.count(),
+                                randomShowPoster = shows.random()
+                                    .posterUrl?.let { url -> PosterUrl(url) }
+                            )
+                        }
+                        .reversed()
                 } },
                 onErrorAfter3SecondsAction = { error ->
                     Timber.d(error, "Error loading years.")

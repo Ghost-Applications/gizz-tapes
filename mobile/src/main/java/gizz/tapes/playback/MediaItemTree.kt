@@ -1,5 +1,7 @@
 package gizz.tapes.playback
 
+import android.net.Uri
+import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -10,19 +12,26 @@ import arrow.core.getOrElse
 import arrow.resilience.Schedule
 import arrow.resilience.retryEither
 import com.google.common.collect.ImmutableList
+import gizz.tapes.api.GizzTapesApiClient
+import gizz.tapes.ui.data.PosterUrl
+import gizz.tapes.ui.data.Year
+import gizz.tapes.util.bestRecording
+import gizz.tapes.util.showTitle
+import gizz.tapes.util.title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import gizz.tapes.util.showTitle
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class MediaItemTree @Inject constructor() {
+class MediaItemTree @Inject constructor(
+    private val apiClient: GizzTapesApiClient
+) {
 
     private data class MediaItemNode(
         val item: MediaItem,
@@ -54,32 +63,36 @@ class MediaItemTree @Inject constructor() {
     private lateinit var mediaTree: Deferred<MediaItemNode>
 
     init {
-//        scope.launch {
-//            mediaTree = async {
-//                val years: List<YearData> = retryForever { phishInRepository.years() }
-//                val children = years.map {
-//                    MediaItemNode(
-//                        MediaItem.Builder()
-//                            .setMediaMetadata(
-//                                MediaMetadata.Builder()
-//                                    .setTitle(it.date)
-//                                    .setIsPlayable(false)
-//                                    .setIsBrowsable(true)
-//                                    .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
-//                                    .setArtworkUri(images.randomImageUrl.toUri())
-//                                    .build()
-//                            )
-//                            .setMediaId(it.date)
-//                            .build()
-//                    )
-//                }
-//                root.children.addAll(children)
-//                children.forEach {
-//                    this@MediaItemTree.years[it.id] = it
-//                }
-//                root
-//            }
-//        }
+        scope.launch {
+            mediaTree = async {
+                val years: List<Pair<Year, PosterUrl?>> = retryForever { apiClient.shows() }
+                    .groupBy { it.date }
+                    .map { (key, value) ->
+                        Year(key.year) to value.random().posterUrl?.let { PosterUrl(it) }
+                    }
+                val children = years.map { (year, posterUrl) ->
+                    MediaItemNode(
+                        MediaItem.Builder()
+                            .setMediaMetadata(
+                                MediaMetadata.Builder()
+                                    .setTitle(year.value)
+                                    .setIsPlayable(false)
+                                    .setIsBrowsable(true)
+                                    .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
+                                    .setArtworkUri(posterUrl?.toUri())
+                                    .build()
+                            )
+                            .setMediaId(year.value)
+                            .build()
+                    )
+                }
+                root.children.addAll(children)
+                children.forEach {
+                    this@MediaItemTree.years[it.id] = it
+                }
+                root
+            }
+        }
     }
 
     suspend fun getRoot(): MediaItem {
@@ -97,65 +110,73 @@ class MediaItemTree @Inject constructor() {
         val year = years[parentId]
 
         if (year != null) {
-//            if (year.children.isEmpty()) {
+            if (year.children.isEmpty()) {
                 // get shows for year add to the
-//                val shows = retryForever { phishInRepository.shows(year.id) }
-//                    .map {
-//                        MediaItem.Builder()
-//                            .setMediaMetadata(
-//                                MediaMetadata.Builder()
-//                                    .setTitle(it.showTitle)
-//                                    .setIsPlayable(true)
-//                                    .setIsBrowsable(true)
-//                                    .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
-//                                    .setArtworkUri(images.randomImageUrl.toUri())
-//                                    .build()
-//                            )
-//                            .setMediaId(it.id.toString())
-//                            .build()
-//                    }.map { MediaItemNode(item = it) }
-//
-//                shows.forEach {
-//                    this@MediaItemTree.shows[it.id] = it
-//                }
-//                year.children.addAll(shows)
-//            }
-//
-//            return ImmutableList.copyOf(year.children.map { it.item })
+                val shows = retryForever { apiClient.shows() }
+                    .filter { it.date.year.toString() == year.id }
+                    .map {
+                        MediaItem.Builder()
+                            .setMediaMetadata(
+                                MediaMetadata.Builder()
+                                    .setTitle(it.showTitle)
+                                    .setIsPlayable(true)
+                                    .setIsBrowsable(true)
+                                    .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
+                                    .setArtworkUri(PosterUrl(it.posterUrl)?.toUri())
+                                    .build()
+                            )
+                            .setMediaId(it.id)
+                            .build()
+                    }.map { MediaItemNode(item = it) }
+
+                shows.forEach {
+                    this@MediaItemTree.shows[it.id] = it
+                }
+                year.children.addAll(shows)
+            }
+
+            return ImmutableList.copyOf(year.children.map { it.item })
         }
 
         val show = shows[parentId]
 
         if (show != null) {
             if (show.children.isEmpty()) {
-//                val showData = retryForever { phishInRepository.show(show.id) }
-//                val showChildren = showData.tracks.map { track ->
-//                    MediaItem.Builder()
-//                        .setUri(track.mp3)
-//                        .setMediaId(track.mp3)
-//                        .setMimeType(MimeTypes.AUDIO_MPEG)
-//                        .setMediaMetadata(
-//                            MediaMetadata.Builder()
-//                                .setExtras(showData.toMetadataExtras())
-//                                .setArtist("Phish")
-//                                .setAlbumArtist("Phish")
-//                                .setAlbumTitle(showData.showTitle)
-//                                .setTitle(track.title)
-//                                .setRecordingYear(showData.date.yearString.toInt())
-//                                .setArtworkUri(images.randomImageUrl.toUri())
-//                                .setDurationMs(track.duration)
-//                                .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
-//                                .setIsPlayable(true)
-//                                .setIsBrowsable(false)
-//                                .build()
-//                        )
-//                        .build()
-//                }.map { mi -> MediaItemNode(mi) }
-//
-//                showChildren.forEach {
-//                    tracks[it.id] = it
-//                }
-//                show.children.addAll(showChildren)
+                val showData = retryForever { apiClient.show(show.id) }
+                val recording = showData.recordings.bestRecording
+
+                val showChildren = recording.files.map { track ->
+                    MediaItem.Builder()
+                        .setUri(recording.filesPathPrefix + track.filename)
+                        .setMediaId(track.filename)
+                        .setMimeType(MimeTypes.AUDIO_MPEG)
+                        .setMediaMetadata(
+                            MediaMetadata.Builder()
+                                .setExtras(
+                                    Bundle().apply {
+                                        putString("showId", show.id)
+                                        putString("showTitle", show.item.title)
+                                    }
+                                )
+                                .setArtist("King Gizzard & The Lizard Wizard")
+                                .setAlbumArtist("King Gizzard & The Lizard Wizard")
+                                .setAlbumTitle(show.item.title)
+                                .setTitle(track.title)
+                                .setRecordingYear(showData.date.year)
+                                .setArtworkUri(PosterUrl(showData.posterUrl)?.toUri())
+                                .setDurationMs(track.length.inWholeMilliseconds)
+                                .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
+                                .setIsPlayable(true)
+                                .setIsBrowsable(false)
+                                .build()
+                        )
+                        .build()
+                }.map { mi -> MediaItemNode(mi) }
+
+                showChildren.forEach {
+                    tracks[it.id] = it
+                }
+                show.children.addAll(showChildren)
             }
 
             return ImmutableList.copyOf(show.children.map { c -> c.item })

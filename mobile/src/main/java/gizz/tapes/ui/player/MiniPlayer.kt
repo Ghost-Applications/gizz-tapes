@@ -28,11 +28,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.R
+import gizz.tapes.ui.data.Title
 
 @Composable
 fun MiniPlayer(
     playerState: PlayerState,
-    onClick: (title: String) -> Unit,
+    onClick: (Title) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
 ) {
@@ -52,7 +53,7 @@ fun MiniPlayer(
                         .shadow(2.dp)
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .clickable {
-                            onClick(playerState.albumTitle)
+                            onClick(Title(playerState.albumTitle))
                         },
                 ) {
 

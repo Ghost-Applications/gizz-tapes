@@ -8,6 +8,21 @@ sealed interface LCE<out CONTENT, out ERROR> {
     data class Error<E>(val userDisplayedMessage: String, val error: E): LCE<Nothing, E>
 }
 
+fun <CONTENT, E> LCE<CONTENT, E>.contentOrNull(): CONTENT? = when (this) {
+    is LCE.Content -> value
+    else -> null
+}
+
+fun <CONTENT, E> LCE<CONTENT, E>.onContent(action: (CONTENT) -> Unit): LCE<CONTENT, E> = apply {
+    when (this) {
+        is LCE.Content -> {
+            action(value)
+        }
+
+        else -> Unit
+    }
+}
+
 fun <IN, OUT, E> LCE<IN, E>.map(transform: (IN) -> OUT): LCE<OUT, E> =
     when(this) {
         is LCE.Error -> this

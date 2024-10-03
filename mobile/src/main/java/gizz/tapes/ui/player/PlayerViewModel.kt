@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,11 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import gizz.tapes.playback.MediaPlayerContainer
+import gizz.tapes.ui.data.Title
 import gizz.tapes.ui.player.PlayerState.NoMedia
 import gizz.tapes.util.formatedElapsedTime
 import gizz.tapes.util.mediaExtras
-import okio.ByteString.Companion.decodeBase64
-import timber.log.Timber
 import javax.inject.Inject
 
 @UnstableApi
@@ -30,6 +30,10 @@ class PlayerViewModel @Inject constructor(
     private lateinit var player: Player
 
     private val playerListener = object : Player.Listener {
+        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+            super.onMediaMetadataChanged(mediaMetadata)
+        }
+
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             viewModelScope.launch {
                 _playerState.emit(newState())
@@ -46,8 +50,7 @@ class PlayerViewModel @Inject constructor(
     private val _playerState: MutableStateFlow<PlayerState> = MutableStateFlow(NoMedia)
     val playerState: StateFlow<PlayerState> = _playerState
 
-    private val _title: String? = savedStateHandle["title"]
-    val title: String? = _title?.decodeBase64()?.utf8()
+    val title: Title? = savedStateHandle.get<String>("title")?.let { Title.fromEncodedString(it) }
 
     init {
         viewModelScope.launch {
@@ -111,7 +114,7 @@ class PlayerViewModel @Inject constructor(
                     duration = player.duration,
                     currentPosition = player.currentPosition,
                     showId = showId,
-                    venueName = venueName,
+                    showTitle = venueName,
                     artworkUri = metadata.artworkUri,
                     title = metadata.title.toString(),
                     albumTitle = metadata.albumTitle.toString(),

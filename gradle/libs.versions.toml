@@ -88,6 +88,7 @@ dagger = "com.google.dagger:dagger:2.52"
 dagger-compiler = "com.google.dagger:dagger-compiler:2.52"
 
 coil = "io.coil-kt:coil-compose:2.7.0"
+coil-svg = "io.coil-kt:coil-svg:2.7.0"
 
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 arrow-resilience = { module = "io.arrow-kt:arrow-resilience", version.ref = "arrow" }

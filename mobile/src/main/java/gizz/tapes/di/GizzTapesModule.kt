@@ -2,6 +2,7 @@ package gizz.tapes.di
 
 import android.content.Context
 import coil.ImageLoader
+import coil.decode.SvgDecoder
 import com.jakewharton.byteunits.DecimalByteUnit.MEGABYTES
 import dagger.Binds
 import dagger.Module
@@ -56,6 +57,7 @@ interface GizzTapesModule {
             okHttpClient: OkHttpClient
         ) = ImageLoader.Builder(context)
             .okHttpClient(okHttpClient)
+            .components { add(SvgDecoder.Factory()) }
             .crossfade(true)
             .build()
 

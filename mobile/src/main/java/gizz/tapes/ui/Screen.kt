@@ -3,7 +3,9 @@ package gizz.tapes.ui
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import okio.ByteString.Companion.encodeUtf8
+import gizz.tapes.ui.data.ShowId
+import gizz.tapes.ui.data.Title
+import gizz.tapes.ui.data.Year
 
 sealed class Screen(
     val route: String,
@@ -15,17 +17,17 @@ sealed class Screen(
         route = "shows/{year}",
         navArguments = listOf(navArgument("year") { type = NavType.StringType })
     ) {
-        fun createRoute(year: String) = "shows/$year"
+        fun createRoute(year: Year) = "shows/${year.value}"
     }
 
     data object Show : Screen(
-        route = "show/{id}/{venue}",
+        route = "show/{id}/{title}",
         navArguments = listOf(
-            navArgument("id") { type = NavType.LongType },
-            navArgument("venue") { type = NavType.StringType }
+            navArgument("id") { type = NavType.StringType },
+            navArgument("title") { type = NavType.StringType }
         )
     ) {
-        fun createRoute(showId: Long, venue: String) = "show/$showId/$venue"
+        fun createRoute(showId: ShowId, title: Title) = "show/${showId.value}/${title.encodedTitle}"
     }
 
     data object Player : Screen(
@@ -34,6 +36,6 @@ sealed class Screen(
             navArgument("title") { type = NavType.StringType }
         )
     ) {
-        fun createRoute(title: String) = "player/${title.encodeUtf8().base64Url()}"
+        fun createRoute(title: Title) = "player/${title.encodedTitle}"
     }
 }

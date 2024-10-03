@@ -1,8 +1,7 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package gizz.tapes.ui.player
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +50,8 @@ import gizz.tapes.R
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.TopAppBarText
+import gizz.tapes.ui.data.ShowId
+import gizz.tapes.ui.data.Title
 import gizz.tapes.util.formatedElapsedTime
 import kotlin.math.max
 
@@ -58,7 +59,7 @@ import kotlin.math.max
 @Composable
 fun FullPlayer(
     viewModel: PlayerViewModel = hiltViewModel(),
-    navigateToShow: (showId: Long, venueName: String) -> Unit,
+    navigateToShow: (ShowId, Title) -> Unit,
     upClick: () -> Unit,
 ) {
     val playerState by viewModel.playerState.collectAsState()
@@ -81,8 +82,8 @@ fun FullPlayer(
 @Composable
 fun FullPlayer(
     playerState: PlayerState,
-    title: String,
-    navigateToShow: (showId: Long, venueName: String) -> Unit,
+    title: Title,
+    navigateToShow: (ShowId, Title) -> Unit,
     upClick: () -> Unit,
     seekTo: (Long) -> Unit,
     seekToPreviousMediaItem: () -> Unit,
@@ -119,7 +120,7 @@ fun FullPlayer(
                     Box(modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = {
-                                navigateToShow(playerState.showId, playerState.venueName)
+                                navigateToShow(playerState.showId, playerState.showTitle)
                             },
                             modifier = Modifier.align(Alignment.Center)
                         ) {

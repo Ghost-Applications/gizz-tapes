@@ -49,9 +49,9 @@ data class Recording(
 
             private val delegatingSerializer: KSerializer<String?> = String.serializer().nullable
 
-            override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
+            override val descriptor = PrimitiveSerialDescriptor(
                 serialName = "gizz.tapes.api.data.Recording.Type",
-                PrimitiveKind.STRING
+                kind = PrimitiveKind.STRING
             )
 
             override fun deserialize(decoder: Decoder): Type {

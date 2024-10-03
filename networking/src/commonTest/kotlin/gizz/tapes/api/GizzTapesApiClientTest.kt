@@ -1,7 +1,7 @@
 package gizz.tapes.api
 
 import gizz.tapes.api.data.Show
-import gizz.tapes.api.data.ShowsData
+import gizz.tapes.api.data.PartialShowData
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -30,7 +30,7 @@ class GizzTapesApiClientTest {
         val client = GizzTapesApiClient(HttpClient(mockEngine))
 
         val result = client.shows()
-        assertIs<List<ShowsData>>(result.getOrNull())
+        assertIs<List<PartialShowData>>(result.getOrNull())
     }
 
     @Test
@@ -103,7 +103,7 @@ class GizzTapesApiClientTest {
 
         val client = GizzTapesApiClient(HttpClient(mockEngine))
         val result = client.shows()
-        assertIs<List<ShowsData>>(result.getOrNull())
+        assertIs<List<PartialShowData>>(result.getOrNull())
     }
 
     @Test
@@ -134,10 +134,10 @@ class GizzTapesApiClientTest {
 
         val client = GizzTapesApiClient(HttpClient(mockEngine))
         val result = client.shows()
-        assertIs<List<ShowsData>>(result.getOrNull())
+        assertIs<List<PartialShowData>>(result.getOrNull())
 
         val result2 = client.shows()
-        assertIs<List<ShowsData>>(result2.getOrNull())
+        assertIs<List<PartialShowData>>(result2.getOrNull())
 
         assertEquals(1, networkCalls)
     }

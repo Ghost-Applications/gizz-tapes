@@ -2,6 +2,7 @@ package gizz.tapes.ui.show
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -29,27 +31,35 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.BlendModeColorFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import coil.compose.AsyncImage
 import gizz.tapes.R
-import gizz.tapes.api.data.Show
-import gizz.tapes.ui.components.NesScaffold
+import gizz.tapes.ui.components.GizzScaffold
 import gizz.tapes.ui.player.PlayerViewModel
 import gizz.tapes.ui.theme.GizzTheme
 import gizz.tapes.ui.components.CastButton
+import gizz.tapes.ui.components.ErrorScreen
 import gizz.tapes.ui.components.LoadingScreen
+import gizz.tapes.ui.data.PosterUrl
+import gizz.tapes.ui.data.Title
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerState.MediaLoaded
 import gizz.tapes.ui.player.PlayerState.NoMedia
 import gizz.tapes.util.LCE
-import gizz.tapes.util.map
+import gizz.tapes.util.contentOrNull
+import kotlin.time.Duration.Companion.seconds
 
 @UnstableApi
 @Composable
@@ -57,10 +67,9 @@ fun ShowScreen(
     viewModel: ShowViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
     upClick: () -> Unit,
-    onMiniPlayerClick: (title: String) -> Unit
+    onMiniPlayerClick: (Title) -> Unit
 ) {
     val showState by viewModel.show.collectAsState()
-    val appBarTitle by viewModel.appBarTitle.collectAsState()
     val playerState: PlayerState by playerViewModel.playerState.collectAsState()
 
     var firstLoad by remember { mutableStateOf(true) }
@@ -68,36 +77,30 @@ fun ShowScreen(
     ShowScreen(
         state = showState,
         playerState = playerState,
-        appBarTitle = appBarTitle,
+        appBarTitle = viewModel.title,
         upClick = upClick,
         onMiniPlayerClick = onMiniPlayerClick,
         onPauseAction = playerViewModel::pause,
         onPlayAction = playerViewModel::play,
         actions = { CastButton() },
         onRowClick = { index, isPlaying ->
-            when(val ps = playerState) {
-                is NoMedia -> {}
-                is MediaLoaded -> {
-                    if (!isPlaying) {
-                        if (firstLoad) {
-                            firstLoad = false
-                            showState.map { show ->
-                                for (ic in 0 until playerViewModel.mediaItemCount) {
-                                    val m = playerViewModel.getMediaItemAt(ic)
-//                                    if (m.mediaId == show.tracks.first().mp3) {
-//                                        playerViewModel.removeMediaItems(0, ic)
-//                                        break
-//                                    }
-                                }
+            if (firstLoad) {
+                firstLoad = false
+                val content = checkNotNull(showState.contentOrNull())
+                content.removeOldMediaItemsAndAddNew()
+                playerViewModel.play()
+            } else {
+                when (val ps = playerState) {
+                    is NoMedia -> {}
+                    is MediaLoaded -> {
+                        if (!isPlaying) {
+                            if (ps.mediaId != playerViewModel.getMediaItemAt(index).mediaId) {
+                                playerViewModel.seekTo(index, 0)
                             }
+                            playerViewModel.play()
+                        } else {
+                            playerViewModel.pause()
                         }
-
-                        if (ps.mediaId != playerViewModel.getMediaItemAt(index).mediaId) {
-                            playerViewModel.seekTo(index, 0)
-                        }
-                        playerViewModel.play()
-                    } else {
-                        playerViewModel.pause()
                     }
                 }
             }
@@ -107,64 +110,66 @@ fun ShowScreen(
 
 @Composable
 fun ShowScreen(
-    state: LCE<Show, Throwable>,
+    state: LCE<ShowScreenData, Throwable>,
     playerState: PlayerState,
-    appBarTitle: String,
+    appBarTitle: Title,
     upClick: () -> Unit,
     onRowClick: (index: Int, isPlaying: Boolean) -> Unit,
-    onMiniPlayerClick: (title: String) -> Unit,
+    onMiniPlayerClick: (Title) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
-    NesScaffold(
+    GizzScaffold(
         title = appBarTitle,
         state = state,
         upClick = upClick,
         actions = actions
     ) { value ->
-        when (playerState) {
-            is NoMedia -> LoadingScreen()
-            is MediaLoaded -> ShowListWithPlayer(
-                show = value,
+        when(state) {
+            is LCE.Content -> ShowListWithPlayer(
+                showData = value,
                 onMiniPlayerClick = onMiniPlayerClick,
-                mediaLoaded = playerState,
                 onRowClick = onRowClick,
                 onPauseAction = onPauseAction,
                 onPlayAction = onPlayAction,
                 playerState = playerState
             )
+            is LCE.Error -> ErrorScreen(state.userDisplayedMessage)
+            LCE.Loading -> LoadingScreen()
         }
     }
 }
 
 @Composable
 fun ShowListWithPlayer(
-    show: Show,
+    showData: ShowScreenData,
     playerState: PlayerState,
-    mediaLoaded: MediaLoaded,
     onRowClick: (index: Int, isPlaying: Boolean) -> Unit,
-    onMiniPlayerClick: (title: String) -> Unit,
+    onMiniPlayerClick: (Title) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
 ) {
-    val currentlyPlayingMediaId = mediaLoaded.mediaId
-    val playing = mediaLoaded.isPlaying
+    val (currentlyPlayingMediaId, playing) = when(playerState) {
+        is MediaLoaded -> playerState.mediaId to playerState.isPlaying
+        NoMedia -> "" to false
+    }
 
     Column {
         LazyColumn(modifier = Modifier
             .fillMaxSize()
             .weight(1f)) {
-//            itemsIndexed(show.tracks) { i, track ->
-//                val isPlaying = track.mp3 == currentlyPlayingMediaId && playing
-//
-//                TrackRow(
-//                    trackTitle = track.title,
-//                    duration = track.formatedDuration,
-//                    playing = isPlaying,
-//                    onClick = { onRowClick(i, isPlaying) }
-//                )
-//            }
+            itemsIndexed(showData.tracks) { i, track ->
+                val isPlaying = track.id.id == currentlyPlayingMediaId && playing
+
+                TrackRow(
+                    trackTitle = track.title,
+                    duration = track.duration,
+                    posterUrl = showData.showPosterUrl,
+                    playing = isPlaying,
+                    onClick = { onRowClick(i, isPlaying) }
+                )
+            }
         }
 
         MiniPlayer(
@@ -178,8 +183,9 @@ fun ShowListWithPlayer(
 
 @Composable
 fun TrackRow(
-    trackTitle: String,
-    duration: String,
+    trackTitle: TrackTitle,
+    duration: TrackDuration,
+    posterUrl: PosterUrl?,
     playing: Boolean,
     onClick: () -> Unit
 ) {
@@ -195,35 +201,48 @@ fun TrackRow(
                 onClick()
             }
     ) {
-        IconButton(
+        Box(
             modifier = Modifier
                 .width(80.dp)
-                .fillMaxHeight(),
-            onClick = {
-                onClick()
-            }
+                .fillMaxHeight()
         ) {
-            val (imageVector, contentDescription) = if (playing) {
-                Icons.Default.Pause to stringResource(R.string.pause)
-            } else {
-                Icons.Default.PlayArrow to stringResource(R.string.play)
-            }
-
-            Icon(
-                imageVector = imageVector,
-                contentDescription = contentDescription
+            AsyncImage(
+                model = posterUrl?.value,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.fillMaxSize()
             )
+
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.Center),
+                onClick = {
+                    onClick()
+                }
+            ) {
+                val (imageVector, contentDescription) = if (playing) {
+                    Icons.Default.Pause to stringResource(R.string.pause)
+                } else {
+                    Icons.Default.PlayArrow to stringResource(R.string.play)
+                }
+
+                Icon(
+                    imageVector = imageVector,
+                    contentDescription = contentDescription,
+                    tint = Color.White
+                )
+            }
         }
 
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = trackTitle,
+                text = trackTitle.title,
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                text = duration,
+                text = duration.formatedDuration,
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -235,8 +254,9 @@ fun TrackRow(
 fun TrackRowPreview() {
     GizzTheme {
         TrackRow(
-            trackTitle = "The Lizzards",
-            duration = "10:00",
+            trackTitle = TrackTitle("The Lizzards"),
+            duration = TrackDuration((10 * 60).seconds),
+            posterUrl = null,
             playing = false
         ) {
 

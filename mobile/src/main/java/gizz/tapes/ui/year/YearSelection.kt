@@ -7,9 +7,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import gizz.tapes.ui.data.Title
+import gizz.tapes.ui.data.Year
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.SelectionData
 import gizz.tapes.ui.components.SelectionScreen
+import gizz.tapes.ui.data.Subtitle
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerViewModel
 import gizz.tapes.util.LCE
@@ -20,10 +23,10 @@ import gizz.tapes.util.mapCollection
 fun YearSelectionScreen(
     viewModel: YearSelectionViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
-    onYearClicked: (year: String) -> Unit,
-    onMiniPlayerClick: (title: String) -> Unit,
+    onYearClicked: (year: Year) -> Unit,
+    onMiniPlayerClick: (Title) -> Unit,
 ) {
-    val state: LCE<List<YearRenderModel>, Throwable> by viewModel.years.collectAsState()
+    val state: LCE<List<YearSelectionData>, Throwable> by viewModel.years.collectAsState()
     val playerState by playerViewModel.playerState.collectAsState()
 
     YearSelectionScreen(
@@ -39,16 +42,20 @@ fun YearSelectionScreen(
 
 @Composable
 fun YearSelectionScreen(
-    yearData: LCE<List<YearRenderModel>, Throwable>,
-    onYearClicked: (year: String) -> Unit,
-    onMiniPlayerClick: (title: String) -> Unit,
+    yearData: LCE<List<YearSelectionData>, Throwable>,
+    onYearClicked: (year: Year) -> Unit,
+    onMiniPlayerClick: (title: Title) -> Unit,
     playerState: PlayerState,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
     val selectionData = yearData.mapCollection {
-        SelectionData(title = it.year, subtitle = "${it.showCount} shows") {
+        SelectionData(
+            title = Title(it.year.value),
+            subtitle = Subtitle("${it.showCount} shows"),
+            posterUrl = it.randomShowPoster,
+        ) {
             onYearClicked(it.year)
         }
     }

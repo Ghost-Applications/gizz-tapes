@@ -2,7 +2,7 @@ package gizz.tapes.api
 
 import arrow.core.Either
 import gizz.tapes.api.data.Show
-import gizz.tapes.api.data.ShowsData
+import gizz.tapes.api.data.PartialShowData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.cache.HttpCache
@@ -24,7 +24,7 @@ class GizzTapesApiClient(
         }
     }
 
-    suspend fun shows(): Either<Throwable, List<ShowsData>> = Either.catch {
+    suspend fun shows(): Either<Throwable, List<PartialShowData>> = Either.catch {
         client.get("https://tapes.kglw.net/api/v1/shows.json").body()
     }
 

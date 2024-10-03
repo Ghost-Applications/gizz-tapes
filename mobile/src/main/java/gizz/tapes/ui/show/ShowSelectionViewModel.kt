@@ -3,21 +3,31 @@ package gizz.tapes.ui.show
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import arrow.core.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
-import gizz.tapes.api.data.Show
-import gizz.tapes.api.data.ShowsData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import gizz.tapes.ui.ApiErrorMessage
+import gizz.tapes.ui.data.FullShowTitle
+import gizz.tapes.ui.data.PosterUrl
+import gizz.tapes.ui.data.ShowId
+import gizz.tapes.ui.data.Subtitle
+import gizz.tapes.ui.data.Title
 import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
-import kotlinx.coroutines.withTimeout
+import gizz.tapes.util.showTitle
+import gizz.tapes.util.toSimpleFormat
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
+
+data class ShowSelectionData(
+    val showId: ShowId,
+    val fullShowTitle: FullShowTitle,
+    val showTitle: Title,
+    val showSubTitle: Subtitle,
+    val posterUrl: PosterUrl?,
+)
 
 @HiltViewModel
 class ShowSelectionViewModel @Inject constructor(
@@ -28,8 +38,8 @@ class ShowSelectionViewModel @Inject constructor(
 
     val showYear: String = checkNotNull(savedStateHandle["year"])
 
-    private val _shows: MutableStateFlow<LCE<List<ShowsData>, Throwable>> = MutableStateFlow(LCE.Loading)
-    val shows: StateFlow<LCE<List<ShowsData>, Throwable>> = _shows
+    private val _shows: MutableStateFlow<LCE<List<ShowSelectionData>, Throwable>> = MutableStateFlow(LCE.Loading)
+    val shows: StateFlow<LCE<List<ShowSelectionData>, Throwable>> = _shows
 
     init {
         loadShows()
@@ -37,10 +47,22 @@ class ShowSelectionViewModel @Inject constructor(
 
     private fun loadShows() {
         viewModelScope.launch {
-            val state: LCE.Content<List<ShowsData>> = retryUntilSuccessful(
+            val state = retryUntilSuccessful(
                 action = {
                     apiClient.shows().map { shows ->
                         shows.filter { it.date.year.toString() == showYear }
+                            .map { show ->
+
+                                val showTitle = Title(show.showTitle)
+
+                                ShowSelectionData(
+                                    showId = ShowId(show.id),
+                                    fullShowTitle = FullShowTitle(show.date, showTitle),
+                                    showTitle = showTitle,
+                                    showSubTitle = Subtitle(show.date.toSimpleFormat()),
+                                    posterUrl = show.posterUrl?.let { PosterUrl(it) }
+                                )
+                            }
                     }
                 },
                 onErrorAfter3SecondsAction = { error ->

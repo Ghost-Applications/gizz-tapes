@@ -6,6 +6,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import gizz.tapes.ui.data.Title
 import gizz.tapes.ui.player.FullPlayer
 import gizz.tapes.ui.show.ShowScreen
 import gizz.tapes.ui.show.ShowSelectionScreen
@@ -18,7 +19,7 @@ fun GizzNavController(
     navController: NavHostController
 ) {
     NavHost(navController = navController, startDestination = Screen.YearSelection.route) {
-        val miniPlayerClicked = { title: String -> navController.navigate(
+        val miniPlayerClicked = { title: Title -> navController.navigate(
             Screen.Player.createRoute(
                 title
             )
@@ -36,10 +37,10 @@ fun GizzNavController(
         ) {
             ShowSelectionScreen(
                 navigateUpClick = { navController.navigateUp() },
-                onShowClicked = { id, venue -> navController.navigate(
+                onShowClicked = { id, title -> navController.navigate(
                     Screen.Show.createRoute(
-                        id,
-                        venue
+                        showId = id,
+                        title = title
                     )
                 ) },
                 onMiniPlayerClick = miniPlayerClicked

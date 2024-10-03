@@ -134,11 +134,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.coil)
+    implementation(libs.coil.svg)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.timber)
     implementation(libs.byteunits)
+    implementation(libs.okio)
 
     implementation(libs.bundles.arrow)
 
