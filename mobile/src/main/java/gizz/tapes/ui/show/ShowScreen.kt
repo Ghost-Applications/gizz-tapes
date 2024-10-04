@@ -51,8 +51,8 @@ import gizz.tapes.ui.theme.GizzTheme
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.ErrorScreen
 import gizz.tapes.ui.components.LoadingScreen
-import gizz.tapes.ui.data.PosterUrl
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Title
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerState.MediaLoaded

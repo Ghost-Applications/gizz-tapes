@@ -4,7 +4,7 @@ import gizz.tapes.api.data.PartialShowData
 
 val PartialShowData.showTitle: String
     get() = if (title.isNotBlank()) {
-        "$venueName - $title"
+        "$venueName - $title - $location"
     } else {
-        venueName
+        "$venueName - $location"
     }

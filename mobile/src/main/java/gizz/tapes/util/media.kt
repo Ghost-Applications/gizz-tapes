@@ -3,8 +3,8 @@ package gizz.tapes.util
 import android.text.format.DateUtils
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import gizz.tapes.ui.data.ShowId
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 
 val Long.formatedElapsedTime: String get() = DateUtils.formatElapsedTime(this / 1000L)
 val Player.formatedElapsedTime: String get() = DateUtils.formatElapsedTime(currentPosition / 1000L)

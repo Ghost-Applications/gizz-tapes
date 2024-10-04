@@ -9,8 +9,8 @@ import androidx.media3.common.util.UnstableApi
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.SelectionData
 import gizz.tapes.ui.components.SelectionScreen
-import gizz.tapes.ui.data.ShowId
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerViewModel
 import gizz.tapes.util.LCE

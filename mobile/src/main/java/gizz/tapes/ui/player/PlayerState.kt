@@ -1,8 +1,8 @@
 package gizz.tapes.ui.player
 
 import android.net.Uri
-import gizz.tapes.ui.data.ShowId
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 
 sealed interface PlayerState {
 

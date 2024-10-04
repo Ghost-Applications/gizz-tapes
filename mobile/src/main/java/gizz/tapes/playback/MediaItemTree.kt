@@ -1,8 +1,6 @@
 package gizz.tapes.playback
 
-import android.net.Uri
 import android.os.Bundle
-import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
@@ -13,8 +11,8 @@ import arrow.resilience.Schedule
 import arrow.resilience.retryEither
 import com.google.common.collect.ImmutableList
 import gizz.tapes.api.GizzTapesApiClient
-import gizz.tapes.ui.data.PosterUrl
-import gizz.tapes.ui.data.Year
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Year
 import gizz.tapes.util.bestRecording
 import gizz.tapes.util.showTitle
 import gizz.tapes.util.title
@@ -50,7 +48,7 @@ class MediaItemTree @Inject constructor(
         MediaItem.Builder()
             .setMediaMetadata(
                 MediaMetadata.Builder()
-                    .setTitle("Phish.in Shows!")
+                    .setTitle("Gizz Tape Shows!")
                     .setIsPlayable(false)
                     .setIsBrowsable(true)
                     .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_YEARS)

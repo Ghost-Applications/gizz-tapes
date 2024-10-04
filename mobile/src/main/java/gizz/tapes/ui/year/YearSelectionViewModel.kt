@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import gizz.tapes.ui.ApiErrorMessage
-import gizz.tapes.ui.data.PosterUrl
-import gizz.tapes.ui.data.Year
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Year
 import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
 import timber.log.Timber

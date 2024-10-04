@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.util.LCE
 import gizz.tapes.R
-import gizz.tapes.ui.data.PosterUrl
-import gizz.tapes.ui.data.Subtitle
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Subtitle
+import gizz.tapes.data.Title
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerState
 

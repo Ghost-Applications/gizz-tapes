@@ -6,7 +6,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.Title
 import gizz.tapes.ui.player.FullPlayer
 import gizz.tapes.ui.show.ShowScreen
 import gizz.tapes.ui.show.ShowSelectionScreen

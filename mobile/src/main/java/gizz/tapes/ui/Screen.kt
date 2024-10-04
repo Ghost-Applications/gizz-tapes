@@ -3,9 +3,9 @@ package gizz.tapes.ui
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import gizz.tapes.ui.data.ShowId
-import gizz.tapes.ui.data.Title
-import gizz.tapes.ui.data.Year
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
+import gizz.tapes.data.Year
 
 sealed class Screen(
     val route: String,

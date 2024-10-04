@@ -50,8 +50,8 @@ import gizz.tapes.R
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.TopAppBarText
-import gizz.tapes.ui.data.ShowId
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 import gizz.tapes.util.formatedElapsedTime
 import kotlin.math.max
 

@@ -1,4 +1,4 @@
-//import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
     id("com.android.application")
@@ -8,8 +8,8 @@ plugins {
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-//    alias(libs.plugins.google.services)
-//    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 
     id("signing-config")
     id("build-number")
@@ -74,9 +74,9 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             isShrinkResources = false
-//            (this as ExtensionAware).configure<CrashlyticsExtension> {
-//                mappingFileUploadEnabled = false
-//            }
+            (this as ExtensionAware).configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
         val release by getting {

@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import gizz.tapes.ui.ApiErrorMessage
-import gizz.tapes.ui.data.FullShowTitle
-import gizz.tapes.ui.data.PosterUrl
-import gizz.tapes.ui.data.ShowId
-import gizz.tapes.ui.data.Subtitle
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Subtitle
+import gizz.tapes.data.Title
 import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
 import gizz.tapes.util.showTitle

@@ -9,6 +9,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
+import arrow.core.NonEmptyList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.ui.ApiErrorMessage
-import gizz.tapes.ui.data.PosterUrl
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Title
 import gizz.tapes.ui.show.ShowScreenData.Track
 import gizz.tapes.util.LCE
 import gizz.tapes.util.bestRecording
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.minutes
 data class ShowScreenData(
     val removeOldMediaItemsAndAddNew: () -> Unit,
     val showPosterUrl: PosterUrl?,
-    val tracks: List<Track>
+    val tracks: NonEmptyList<Track>
 ) {
     data class Track(
         val id: TrackId,

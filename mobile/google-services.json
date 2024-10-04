@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "804853979533",
+    "project_id": "gizz-tapes",
+    "storage_bucket": "gizz-tapes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804853979533:android:9c4d50e763118209f005c4",
+        "android_client_info": {
+          "package_name": "gizz.tapes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXforw-nPEb_iMbEw7j-leIgGJpRt8TBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804853979533:android:39db61befd17712af005c4",
+        "android_client_info": {
+          "package_name": "gizz.tapes.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXforw-nPEb_iMbEw7j-leIgGJpRt8TBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

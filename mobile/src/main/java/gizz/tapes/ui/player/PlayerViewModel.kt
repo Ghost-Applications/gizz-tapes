@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import gizz.tapes.playback.MediaPlayerContainer
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.Title
 import gizz.tapes.ui.player.PlayerState.NoMedia
 import gizz.tapes.util.formatedElapsedTime
 import gizz.tapes.util.mediaExtras

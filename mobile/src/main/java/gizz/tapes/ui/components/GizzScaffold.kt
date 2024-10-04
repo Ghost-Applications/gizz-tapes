@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.R
-import gizz.tapes.ui.data.Title
+import gizz.tapes.data.Title
 import gizz.tapes.util.LCE
 
 @OptIn(ExperimentalMaterial3Api::class)
