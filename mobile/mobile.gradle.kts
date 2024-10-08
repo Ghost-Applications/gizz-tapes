@@ -22,13 +22,13 @@ kotlin {
     jvmToolchain(17)
 }
 
-//play {
-//    serviceAccountCredentials.set(
-//        rootProject.file(properties["gizz.tapes.publish-key"] ?: "keys/publish-key.json")
-//    )
-//    track.set("internal")
-//    defaultToAppBundles.set(true)
-//}
+play {
+    serviceAccountCredentials.set(
+        rootProject.file(properties["gizz.tapes.publish-key"] ?: "keys/publish-key.json")
+    )
+    track.set("internal")
+    defaultToAppBundles.set(true)
+}
 
 android {
     namespace = "gizz.tapes"

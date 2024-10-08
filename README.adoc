@@ -1,7 +1,7 @@
 = Gizz Tapes
 
 A Open Source King Gizzard and the Lizard Wizard music player, utilizing the
-https://tapes.kglw.net/[Gizz Tapes] API for streaming audio.
+https://tapes.kglw.net/[Gizz Tapes] API.
 
 == Building
 
@@ -12,7 +12,7 @@ Standard gradle commands.
 
 === Build Scans
 
-Add to gradle.properties with `systemProp.GIZZ_TAPES_ACCEPT_BUILD_SCAN_AGREEMENT=yes`
+Add `systemProp.GIZZ_TAPES_ACCEPT_BUILD_SCAN_AGREEMENT=yes` gradle.properties
 to enable build scans on every build.
 
 == License

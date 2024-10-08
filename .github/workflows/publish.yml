@@ -27,17 +27,12 @@ jobs:
           NEVER_ENDING_SPLENDOR_KEYSTORE_PASSWORD: ${{ secrets.NEVER_ENDING_SPLENDOR_KEYSTORE_PASSWORD }}
           NEVER_ENDING_SPLENDOR_KEY_ALIAS: ${{ secrets.NEVER_ENDING_SPLENDOR_KEY_ALIAS }}
           NEVER_ENDING_SPLENDOR_KEY_PASSWORD: ${{ secrets.NEVER_ENDING_SPLENDOR_KEY_PASSWORD }}
-          NEVER_ENDING_SPLENDOR_PHISHIN_API_KEY: ${{ secrets.NEVER_ENDING_SPLENDOR_PHISHIN_API_KEY }}
-          NEVER_ENDING_SPLENDOR_PHISH_NET_API_KEY: ${{ secrets.NEVER_ENDING_SPLENDOR_PHISH_NET_API_KEY }}
-          BUILD_NUMBER: ${{ github.event.number }}
         run: >
           ./gradlew build publishReleaseBundle --no-daemon
           -DNEVER_ENDING_SPLENDOR_ACCEPT_BUILD_SCAN_AGREEMENT=yes
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-          -Pnever.ending.splendor.buildNumber=$(($GITHUB_RUN_NUMBER + 2000357766))
-          -Pnever.ending.splendor.keystoreLocation=./keys/release.jks
-          -Pnever.ending.splendor.keystorePassword=$NEVER_ENDING_SPLENDOR_KEYSTORE_PASSWORD
-          -Pnever.ending.splendor.aliasKeyPassword=$NEVER_ENDING_SPLENDOR_KEY_PASSWORD
-          -Pnever.ending.splendor.storeKeyAlias=$NEVER_ENDING_SPLENDOR_KEY_ALIAS
-          -Pnever.ending.splendor.phishinApiKey=$NEVER_ENDING_SPLENDOR_PHISHIN_API_KEY
-          -Pnever.ending.splendor.phishNetApiKey=$NEVER_ENDING_SPLENDOR_PHISH_NET_API_KEY
+          -Pgizz.tapes.buildNumber=$GITHUB_RUN_NUMBER
+          -Pgizz.tapes.keystoreLocation=./keys/release.jks
+          -Pgizz.tapes.keystorePassword=$NEVER_ENDING_SPLENDOR_KEYSTORE_PASSWORD
+          -Pgizz.tapes.aliasKeyPassword=$NEVER_ENDING_SPLENDOR_KEY_PASSWORD
+          -Pgizz.tapes.storeKeyAlias=$NEVER_ENDING_SPLENDOR_KEY_ALIAS

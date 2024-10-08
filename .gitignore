@@ -226,3 +226,7 @@ fabric.properties
 
 # not sure this should be checked in or not...
 kotlin-js-store
+
+# signed outputs that don't need to be included in play store.
+mobile/release/*
+keys/release.keystore

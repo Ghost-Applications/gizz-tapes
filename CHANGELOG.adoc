@@ -1,3 +1,5 @@
 = Changelog
 
 == Antarctica
+
+- Got the app up and running!

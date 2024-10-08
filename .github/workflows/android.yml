@@ -12,12 +12,6 @@ jobs:
         distribution: 'zulu'
         cache: 'gradle'
     - name: Build with Gradle
-      env:
-        NEVER_ENDING_SPLENDOR_PHISHIN_API_KEY: ${{ secrets.NEVER_ENDING_SPLENDOR_PHISHIN_API_KEY }}
-        NEVER_ENDING_SPLENDOR_PHISH_NET_API_KEY: ${{ secrets.NEVER_ENDING_SPLENDOR_PHISH_NET_API_KEY }}
-        BUILD_NUMBER: ${{ github.event.number }}
       run: >
-        ./gradlew build --no-daemon -DNEVER_ENDING_SPLENDOR_ACCEPT_BUILD_SCAN_AGREEMENT=yes
+        ./gradlew build --no-daemon -DGIZZ_TAPES_ACCEPT_BUILD_SCAN_AGREEMENT=yes
         -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-        -Pnever.ending.splendor.phishinApiKey=$NEVER_ENDING_SPLENDOR_PHISHIN_API_KEY
-        -Pnever.ending.splendor.phishNetApiKey=$NEVER_ENDING_SPLENDOR_PHISH_NET_API_KEY

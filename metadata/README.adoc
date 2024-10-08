@@ -1,0 +1,3 @@
+= Metadata
+
+Directory for publishing this app to https://f-droid.org/[F-Droid]
