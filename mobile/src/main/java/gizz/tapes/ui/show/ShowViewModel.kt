@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.minutes
 
 data class ShowScreenData(
     val removeOldMediaItemsAndAddNew: () -> Unit,
-    val showPosterUrl: PosterUrl?,
+    val showPosterUrl: PosterUrl,
     val tracks: NonEmptyList<Track>
 ) {
     data class Track(
@@ -125,7 +125,7 @@ class ShowViewModel @Inject constructor(
                 }
 
                 ShowScreenData(
-                    showPosterUrl = show.posterUrl?.let { PosterUrl(it) },
+                    showPosterUrl = PosterUrl(show.posterUrl),
                     removeOldMediaItemsAndAddNew = {
                         checkNotNull(mediaPlayerContainer.mediaPlayer).apply {
                             clearMediaItems()

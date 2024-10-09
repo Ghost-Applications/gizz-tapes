@@ -86,6 +86,22 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+
+    flavorDimensions += "version"
+    productFlavors {
+        // no firebase and no cast framework because these are no foss
+        // this release is sent to f-droid
+        create("foss") {
+            dimension = "version"
+            versionNameSuffix = "-foss"
+        }
+
+        // contains cast and firebase
+        create("full") {
+            dimension = "version"
+        }
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
@@ -111,8 +127,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.guava)
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.bundles.firebase)
+    "fullImplementation"(platform(libs.firebase.bom))
+    "fullImplementation"(libs.bundles.firebase)
+    "fullImplementation"(libs.media3.cast)
+    compileOnly(libs.media3.cast)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
@@ -153,5 +171,5 @@ dependencies {
 }
 
 tasks.named("build") {
-    dependsOn("verifyPaparazziRelease")
+    dependsOn("verifyPaparazziFullRelease")
 }

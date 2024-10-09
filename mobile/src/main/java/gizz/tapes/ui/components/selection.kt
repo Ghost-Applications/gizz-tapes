@@ -37,7 +37,7 @@ import gizz.tapes.ui.player.PlayerState
 data class SelectionData(
     val title: Title,
     val subtitle: Subtitle,
-    val posterUrl: PosterUrl?,
+    val posterUrl: PosterUrl,
     val onClick: () -> Unit
 )
 
@@ -96,7 +96,7 @@ fun SelectionList(
 fun SelectionRow(
     title: Title,
     subtitle: Subtitle,
-    posterUrl: PosterUrl?,
+    posterUrl: PosterUrl,
     onClick: () -> Unit
 ) {
     Row(
@@ -112,7 +112,7 @@ fun SelectionRow(
             }
     ) {
         AsyncImage(
-            model = posterUrl?.value,
+            model = posterUrl.value,
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
             modifier = Modifier

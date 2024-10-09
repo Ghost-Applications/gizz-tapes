@@ -6,7 +6,11 @@ import android.net.Uri
 value class PosterUrl(val value: String) {
 
     companion object {
-        operator fun invoke(value: String?): PosterUrl? = value?.let { PosterUrl(it) }
+        private val POSTER_MISSING = PosterUrl("https://tapes.kglw.net/assets/img/missing.png")
+
+        operator fun invoke(value: String?): PosterUrl = if (value.isNullOrBlank())
+            POSTER_MISSING
+        else PosterUrl(value)
     }
 
     override fun toString(): String = value

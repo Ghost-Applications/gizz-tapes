@@ -1,0 +1,16 @@
+= Releasing Steps
+
+== Requirements
+
+- Have access to play store console
+- Have release signing key and passwords setup in gradle.properties, see `signing-config.gradle.kts`
+
+== Tasks
+
+1. Promote Play Store to Release
+2. Run `gradle build`
+3. Tag release with the same name as seen in `mobile/mobile.gradle.kts`
+4. Push tag to github
+5. Create release and attach apk build in the `mobile/build/apk/release/mobile-release.apk`
+6. Update release name in `mobile/mobile.gradle.kts` to the new name, change the default
+value `build-number.gradle.kts` and update the `CHANGELOG.adoc`

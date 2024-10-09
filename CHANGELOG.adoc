@@ -1,5 +1,9 @@
 = Changelog
 
-== Antarctica
+== Big Fig Wasp
+
+- Setup for f-droid release
+
+== Antarctica 10/7/2024
 
 - Got the app up and running!

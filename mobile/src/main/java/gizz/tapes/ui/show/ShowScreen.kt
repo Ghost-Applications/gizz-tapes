@@ -185,7 +185,7 @@ fun ShowListWithPlayer(
 fun TrackRow(
     trackTitle: TrackTitle,
     duration: TrackDuration,
-    posterUrl: PosterUrl?,
+    posterUrl: PosterUrl,
     playing: Boolean,
     onClick: () -> Unit
 ) {
@@ -207,7 +207,7 @@ fun TrackRow(
                 .fillMaxHeight()
         ) {
             AsyncImage(
-                model = posterUrl?.value,
+                model = posterUrl.value,
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize()
@@ -256,7 +256,7 @@ fun TrackRowPreview() {
         TrackRow(
             trackTitle = TrackTitle("The Lizzards"),
             duration = TrackDuration((10 * 60).seconds),
-            posterUrl = null,
+            posterUrl = PosterUrl(null),
             playing = false
         ) {
 

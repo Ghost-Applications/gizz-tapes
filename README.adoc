@@ -3,6 +3,12 @@
 A Open Source King Gizzard and the Lizard Wizard music player, utilizing the
 https://tapes.kglw.net/[Gizz Tapes] API.
 
+== Installation
+
+image:https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png[alt="Get it on GitHub", height=80, link=https://github.com/Ghost-Applications/gizz-tapes/releases]
+//image:https://fdroid.gitlab.io/artwork/badge/get-it-on.png[alt="Get it on F-Droid", height=80]
+// todo add google play
+
 == Building
 
 Standard gradle commands. 

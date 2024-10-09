@@ -18,7 +18,7 @@ import javax.inject.Inject
 data class YearSelectionData(
     val year: Year,
     val showCount: Int,
-    val randomShowPoster: PosterUrl?,
+    val randomShowPoster: PosterUrl,
 )
 
 @HiltViewModel
@@ -44,8 +44,7 @@ class YearSelectionViewModel @Inject constructor(
                             YearSelectionData(
                                 year = Year(year),
                                 showCount = shows.count(),
-                                randomShowPoster = shows.random()
-                                    .posterUrl?.let { url -> PosterUrl(url) }
+                                randomShowPoster = PosterUrl(shows.random().posterUrl)
                             )
                         }
                         .reversed()

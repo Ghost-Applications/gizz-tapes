@@ -1,7 +1,6 @@
-package gizz.tapes.utils
+package gizz.tapes.util
 
 import com.google.common.truth.Truth.assertThat
-import gizz.tapes.util.toSimpleFormat
 import kotlinx.datetime.LocalDate
 import org.junit.Test
 

@@ -26,7 +26,7 @@ data class ShowSelectionData(
     val fullShowTitle: FullShowTitle,
     val showTitle: Title,
     val showSubTitle: Subtitle,
-    val posterUrl: PosterUrl?,
+    val posterUrl: PosterUrl,
 )
 
 @HiltViewModel
@@ -60,7 +60,7 @@ class ShowSelectionViewModel @Inject constructor(
                                     fullShowTitle = FullShowTitle(show.date, showTitle),
                                     showTitle = showTitle,
                                     showSubTitle = Subtitle(show.date.toSimpleFormat()),
-                                    posterUrl = show.posterUrl?.let { PosterUrl(it) }
+                                    posterUrl = PosterUrl(show.posterUrl)
                                 )
                             }
                     }

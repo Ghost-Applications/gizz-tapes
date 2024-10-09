@@ -63,10 +63,10 @@ class MediaItemTree @Inject constructor(
     init {
         scope.launch {
             mediaTree = async {
-                val years: List<Pair<Year, PosterUrl?>> = retryForever { apiClient.shows() }
+                val years: List<Pair<Year, PosterUrl>> = retryForever { apiClient.shows() }
                     .groupBy { it.date }
                     .map { (key, value) ->
-                        Year(key.year) to value.random().posterUrl?.let { PosterUrl(it) }
+                        Year(key.year) to PosterUrl(value.random().posterUrl)
                     }
                 val children = years.map { (year, posterUrl) ->
                     MediaItemNode(
@@ -77,7 +77,7 @@ class MediaItemTree @Inject constructor(
                                     .setIsPlayable(false)
                                     .setIsBrowsable(true)
                                     .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
-                                    .setArtworkUri(posterUrl?.toUri())
+                                    .setArtworkUri(posterUrl.toUri())
                                     .build()
                             )
                             .setMediaId(year.value)

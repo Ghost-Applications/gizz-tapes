@@ -9,7 +9,6 @@ import android.content.Intent
 import androidx.annotation.OptIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.media3.cast.CastPlayer
-import androidx.media3.cast.SessionAvailabilityListener
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -28,19 +27,20 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.AndroidEntryPoint
+import gizz.tapes.MainActivity
+import gizz.tapes.util.CastAvailabilityChecker
+import gizz.tapes.util.MediaItemsWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.guava.future
-import gizz.tapes.MainActivity
-import gizz.tapes.util.MediaItemsWrapper
 import timber.log.Timber
 import javax.inject.Inject
 
 @UnstableApi
 @AndroidEntryPoint
-class PlaybackService : MediaLibraryService(), SessionAvailabilityListener,
+class PlaybackService : MediaLibraryService(),
     MediaLibraryService.MediaLibrarySession.Callback {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -69,14 +69,30 @@ class PlaybackService : MediaLibraryService(), SessionAvailabilityListener,
             .setSkipSilenceEnabled(true)
             .build()
 
-        val castContext = CastContext.getSharedInstance(this, MoreExecutors.directExecutor())
-            .addOnFailureListener {
-                Timber.e(it, "Error getting the cast session")
-            }
-            .result
+        if (CastAvailabilityChecker.isAvailable) {
+            val castContext = CastContext.getSharedInstance(this, MoreExecutors.directExecutor())
+                .addOnFailureListener {
+                    Timber.e(it, "Error getting the cast session")
+                }
+                .result
 
-        castPlayer = CastPlayer(castContext).apply {
-            setSessionAvailabilityListener(this@PlaybackService)
+            castPlayer = CastPlayer(castContext).apply {
+                setSessionAvailabilityListener(
+                    object : androidx.media3.cast.SessionAvailabilityListener {
+                        override fun onCastSessionAvailable() {
+                            castPlayer?.let {
+                                player?.setPlayer(it)
+                            }
+                        }
+
+                        override fun onCastSessionUnavailable() {
+                            exoPlayer.let {
+                                player?.setPlayer(it)
+                            }
+                        }
+                    }
+                )
+            }
         }
 
         val player = ReplaceableForwardingPlayer(exoPlayer)
@@ -118,19 +134,6 @@ class PlaybackService : MediaLibraryService(), SessionAvailabilityListener,
             }
         }
     }
-
-    override fun onCastSessionAvailable() {
-        castPlayer?.let {
-            player?.setPlayer(it)
-        }
-    }
-
-    override fun onCastSessionUnavailable() {
-        exoPlayer?.let {
-            player?.setPlayer(it)
-        }
-    }
-
 
     override fun onPlaybackResumption(
         mediaSession: MediaSession,
