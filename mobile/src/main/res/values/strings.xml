@@ -9,4 +9,6 @@
     <string name="play">Play</string>
 
     <string name="api_error_message">There was an error getting data from kglw.net. We are continually attempting to get data, and this page will automatically update when we get a connection, in the meantime please check your network connection.</string>
+
+    <string name="player_error">There was an issue loading the current track. Try a different track or maybe archive.org is having issues.</string>
 </resources>

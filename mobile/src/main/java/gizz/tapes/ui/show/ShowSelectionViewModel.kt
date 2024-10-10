@@ -8,7 +8,7 @@ import gizz.tapes.api.GizzTapesApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import gizz.tapes.ui.ApiErrorMessage
+import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.ShowId

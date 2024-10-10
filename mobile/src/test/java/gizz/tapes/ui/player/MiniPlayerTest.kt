@@ -37,7 +37,8 @@ class MiniPlayerTest : PaparazziTest() {
                     playerState = state,
                     onClick = {},
                     onPlayAction = {},
-                    onPauseAction = {}
+                    onPauseAction = {},
+                    playerError = {}
                 )
             }
         }

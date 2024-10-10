@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.R
 import gizz.tapes.data.Title
+import gizz.tapes.ui.player.PlayerState.MediaLoaded.Error
 
 @Composable
 fun MiniPlayer(
@@ -36,12 +38,17 @@ fun MiniPlayer(
     onClick: (Title) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
+    playerError: (PlayerError) -> Unit,
 ) {
     when (playerState) {
         is PlayerState.NoMedia -> return
         is PlayerState.MediaLoaded -> {
             val playing = playerState.isPlaying
-            val elapsedTime = playerState.formatedElapsedTime
+            val elapsedTime = playerState.durationInfo.elapsedTimeString
+
+            if (playerState is Error) {
+                playerError(playerState.playerError)
+            }
 
             Surface(
                 shadowElevation = 8.dp

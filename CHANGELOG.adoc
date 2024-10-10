@@ -2,7 +2,10 @@
 
 == Big Fig Wasp
 
-- Setup for f-droid release
+- Setup Foss and Full Variants for f-droid release
+- Added media player error state and cleaned up the PlayerState
+- Display media player errors to the UI in a snackbar
+- Added no poster url
 
 == Antarctica 10/7/2024
 

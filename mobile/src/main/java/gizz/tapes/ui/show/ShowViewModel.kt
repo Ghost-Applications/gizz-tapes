@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import gizz.tapes.playback.MediaPlayerContainer
-import gizz.tapes.ui.ApiErrorMessage
+import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Title
 import gizz.tapes.ui.show.ShowScreenData.Track

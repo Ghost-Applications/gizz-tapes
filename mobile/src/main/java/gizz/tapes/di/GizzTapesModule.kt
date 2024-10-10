@@ -14,7 +14,8 @@ import gizz.tapes.R
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.playback.RealMediaPlayerContainer
-import gizz.tapes.ui.ApiErrorMessage
+import gizz.tapes.data.ApiErrorMessage
+import gizz.tapes.data.PlayerErrorMessage
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -77,6 +78,14 @@ interface GizzTapesModule {
             @ApplicationContext context: Context
         ): ApiErrorMessage = ApiErrorMessage(
             context.getString(R.string.api_error_message)
+        )
+
+        @Provides
+        @Singleton
+        fun providePlayerErrorMessage(
+            @ApplicationContext context: Context
+        ): PlayerErrorMessage = PlayerErrorMessage(
+            context.getString(R.string.player_error)
         )
 
         @Provides

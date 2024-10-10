@@ -36,7 +36,7 @@ class DelegatingPlayerListener(
     }
 
     override fun onPlayerError(error: PlaybackException) {
-        Timber.e(error, "onPlayerError")
+        Timber.e(error, "onPlayerError: ${error.errorCodeName}")
         delegates.forEach { it.onPlayerError(error) }
     }
 
