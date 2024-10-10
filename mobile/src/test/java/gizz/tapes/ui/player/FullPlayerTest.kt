@@ -20,7 +20,7 @@ class FullPlayerTest : PaparazziTest() {
 
     @Test
     fun paused() {
-        snapshot(showingPlayerState.copy(isPlaying = false))
+        snapshot(showingPlayerState)
     }
 
     private fun snapshot(state: PlayerState) {

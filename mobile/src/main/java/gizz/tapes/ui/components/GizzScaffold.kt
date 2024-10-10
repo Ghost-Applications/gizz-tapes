@@ -11,15 +11,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.R
 import gizz.tapes.data.Title
+import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.util.LCE
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,10 +35,16 @@ fun <T> GizzScaffold(
     state: LCE<T, Any>,
     upClick: (() -> Unit)?,
     actions: @Composable RowScope.() -> Unit,
-    content: @Composable (value: T) -> Unit
+    content: @Composable (value: T, playerError: (PlayerError) -> Unit) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = { TopAppBarText(title) },
@@ -63,7 +76,14 @@ fun <T> GizzScaffold(
         ) {
             when(state) {
                 is LCE.Error -> ErrorScreen(state.userDisplayedMessage)
-                is LCE.Content -> content(state.value)
+                is LCE.Content -> content(state.value) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            it.message,
+                            duration = SnackbarDuration.Long
+                        )
+                    }
+                }
                 LCE.Loading -> LoadingScreen()
             }
         }

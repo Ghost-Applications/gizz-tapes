@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -54,6 +55,7 @@ import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Title
 import gizz.tapes.ui.player.MiniPlayer
+import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerState.MediaLoaded
 import gizz.tapes.ui.player.PlayerState.NoMedia
@@ -125,7 +127,7 @@ fun ShowScreen(
         state = state,
         upClick = upClick,
         actions = actions
-    ) { value ->
+    ) { value, playerError ->
         when(state) {
             is LCE.Content -> ShowListWithPlayer(
                 showData = value,
@@ -133,7 +135,8 @@ fun ShowScreen(
                 onRowClick = onRowClick,
                 onPauseAction = onPauseAction,
                 onPlayAction = onPlayAction,
-                playerState = playerState
+                playerState = playerState,
+                playerError = playerError
             )
             is LCE.Error -> ErrorScreen(state.userDisplayedMessage)
             LCE.Loading -> LoadingScreen()
@@ -149,6 +152,7 @@ fun ShowListWithPlayer(
     onMiniPlayerClick: (Title) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
+    playerError: (PlayerError) -> Unit,
 ) {
     val (currentlyPlayingMediaId, playing) = when(playerState) {
         is MediaLoaded -> playerState.mediaId to playerState.isPlaying
@@ -176,7 +180,8 @@ fun ShowListWithPlayer(
             onClick = onMiniPlayerClick,
             playerState = playerState,
             onPauseAction = onPauseAction,
-            onPlayAction = onPlayAction
+            onPlayAction = onPlayAction,
+            playerError = playerError
         )
     }
 }

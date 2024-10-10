@@ -5,6 +5,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import com.google.common.truth.Truth.assertThat
 import gizz.tapes.MainDispatcherRule
+import gizz.tapes.data.PlayerErrorMessage
 import gizz.tapes.data.Title
 import gizz.tapes.mediaItem
 import gizz.tapes.playback.MediaPlayerContainer
@@ -22,7 +23,8 @@ class PlayerViewModelTest {
     fun `title should be null when one is not in savedStateHandle`() {
         val classUnderTest = PlayerViewModel(
             mediaPlayerContainer = unimportantMediaPlayerContainer,
-            savedStateHandle = SavedStateHandle()
+            savedStateHandle = SavedStateHandle(),
+            playerErrorMessage = PlayerErrorMessage("There was an error!")
         )
 
         assertThat(classUnderTest.title).isNull()
@@ -34,7 +36,8 @@ class PlayerViewModelTest {
             mediaPlayerContainer = unimportantMediaPlayerContainer,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf("title" to "Alpine Valley".encodeUtf8().base64Url())
-            )
+            ),
+            playerErrorMessage = PlayerErrorMessage("There was an error!")
         )
 
         assertThat(classUnderTest.title).isEqualTo(

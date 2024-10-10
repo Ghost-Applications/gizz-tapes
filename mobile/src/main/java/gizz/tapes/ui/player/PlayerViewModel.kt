@@ -4,10 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import gizz.tapes.data.PlayerErrorMessage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,6 @@ import kotlinx.coroutines.launch
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.data.Title
 import gizz.tapes.ui.player.PlayerState.NoMedia
-import gizz.tapes.util.formatedElapsedTime
 import gizz.tapes.util.mediaExtras
 import javax.inject.Inject
 
@@ -24,16 +24,13 @@ import javax.inject.Inject
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val mediaPlayerContainer: MediaPlayerContainer,
+    private val playerErrorMessage: PlayerErrorMessage,
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
 
     private lateinit var player: Player
 
     private val playerListener = object : Player.Listener {
-        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-            super.onMediaMetadataChanged(mediaMetadata)
-        }
-
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             viewModelScope.launch {
                 _playerState.emit(newState())
@@ -43,6 +40,12 @@ class PlayerViewModel @Inject constructor(
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             viewModelScope.launch {
                 _playerState.emit(newState())
+            }
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            viewModelScope.launch {
+                _playerState.emit(newState(PlayerError(playerErrorMessage.value)))
             }
         }
     }
@@ -62,6 +65,7 @@ class PlayerViewModel @Inject constructor(
             }.collect {
                 player = it
                 it.addListener(playerListener)
+                _playerState.emit(newState())
 
                 while (true) {
                     delay(1000)
@@ -97,29 +101,45 @@ class PlayerViewModel @Inject constructor(
         player.removeListener(playerListener)
     }
 
-    private fun newState(): PlayerState {
+    private fun newState(playerError: PlayerError? = null): PlayerState {
         val cmi = player.currentMediaItem
         return when {
             cmi == null -> NoMedia
-            // somehow when working with the cast player we can media items we didn't queue
+            // somehow when working with the cast player we can see media items we didn't queue
             cmi.mediaId.isEmpty() -> NoMedia
             else -> {
                 val metadata = cmi.mediaMetadata
                 val (showId, venueName) = cmi.mediaExtras
 
-                PlayerState.MediaLoaded(
-                    isPlaying = player.isPlaying,
-                    formatedElapsedTime = player.formatedElapsedTime,
-                    formatedDurationTime = metadata.durationMs?.formatedElapsedTime.orEmpty(),
-                    duration = player.duration,
-                    currentPosition = player.currentPosition,
-                    showId = showId,
-                    showTitle = venueName,
-                    artworkUri = metadata.artworkUri,
-                    title = metadata.title.toString(),
-                    albumTitle = metadata.albumTitle.toString(),
-                    mediaId = cmi.mediaId,
-                )
+                if (playerError == null) {
+                    PlayerState.MediaLoaded(
+                        isPlaying = player.isPlaying,
+                        durationInfo = MediaDurationInfo(
+                            currentPosition = player.currentPosition,
+                            duration = player.duration
+                        ),
+                        showId = showId,
+                        showTitle = venueName,
+                        artworkUri = metadata.artworkUri,
+                        title = metadata.title.toString(),
+                        albumTitle = metadata.albumTitle.toString(),
+                        mediaId = cmi.mediaId,
+                    )
+                } else {
+                    PlayerState.MediaLoaded.Error(
+                        playerError = playerError,
+                        durationInfo = MediaDurationInfo(
+                            currentPosition = player.currentPosition,
+                            duration = player.duration
+                        ),
+                        showId = showId,
+                        showTitle = venueName,
+                        artworkUri = metadata.artworkUri,
+                        title = metadata.title.toString(),
+                        albumTitle = metadata.albumTitle.toString(),
+                        mediaId = cmi.mediaId,
+                    )
+                }
             }
         }
     }

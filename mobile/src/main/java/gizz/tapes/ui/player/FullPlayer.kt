@@ -147,11 +147,11 @@ fun FullPlayer(
                     )
 
                     var sliderValue by remember {
-                        mutableFloatStateOf(playerState.currentPosition.toFloat())
+                        mutableFloatStateOf(playerState.durationInfo.currentPositionFloat)
                     }
 
-                    LaunchedEffect(playerState.currentPosition) {
-                        sliderValue = playerState.currentPosition.toFloat()
+                    LaunchedEffect(playerState.durationInfo.currentPosition) {
+                        sliderValue = playerState.durationInfo.currentPositionFloat
                     }
 
                     Slider(
@@ -162,7 +162,7 @@ fun FullPlayer(
                         onValueChangeFinished = {
                             seekTo(sliderValue.toLong())
                         },
-                        valueRange = 0f .. max(playerState.duration.toFloat(), 0f),
+                        valueRange = 0f .. max(playerState.durationInfo.duration.toFloat(), 0f),
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
 
@@ -175,13 +175,12 @@ fun FullPlayer(
                         Text(
                             text = sliderValue.toLong().formatedElapsedTime,
                             style = MaterialTheme.typography.labelSmall,
-
                         )
 
                         Spacer(modifier = Modifier.weight(1f))
 
                         Text(
-                            text = playerState.formatedDurationTime,
+                            text = playerState.durationInfo.durationTimeString,
                             style = MaterialTheme.typography.labelSmall
                         )
                     }

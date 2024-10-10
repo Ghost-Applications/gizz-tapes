@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -57,7 +58,7 @@ fun SelectionScreen(
         state = state,
         upClick = upClick,
         actions = actions
-    ) { value ->
+    ) { value, playerError ->
         Column {
             SelectionList(
                 Modifier.weight(1f),
@@ -67,7 +68,8 @@ fun SelectionScreen(
                 playerState = playerState,
                 onClick = onMiniPlayerClick,
                 onPauseAction = onPauseAction,
-                onPlayAction = onPlayAction
+                onPlayAction = onPlayAction,
+                playerError = playerError
             )
         }
     }

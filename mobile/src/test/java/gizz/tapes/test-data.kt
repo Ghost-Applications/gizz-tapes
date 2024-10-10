@@ -16,6 +16,7 @@ import gizz.tapes.data.ShowId
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.data.Year
+import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.show.ShowScreenData
 import gizz.tapes.ui.show.ShowScreenData.Track
@@ -48,10 +49,10 @@ val noShowPlayerState = PlayerState.NoMedia
 
 val showingPlayerState = PlayerState.MediaLoaded(
     isPlaying = true,
-    formatedDurationTime = "13:37",
-    formatedElapsedTime = "1:23",
-    duration = 7.minutes.inWholeMilliseconds,
-    currentPosition = 1.minutes.inWholeMilliseconds,
+    durationInfo = MediaDurationInfo(
+        currentPosition = 1.minutes.inWholeMilliseconds,
+        duration = 7.minutes.inWholeMilliseconds
+    ),
     showId = ShowId("showId"),
     artworkUri = "https://kglw.net/i/poster-art-1699403482.jpeg".toUri(),
     albumTitle = "2024-09-11 : Edgefield Amphitheater - Troutdale, OR, USA",
@@ -75,17 +76,17 @@ val yearData = LCE.Content(
         YearSelectionData(
             year = Year("2022"),
             showCount = 5,
-            randomShowPoster = null
+            randomShowPoster = PosterUrl(null)
         ),
         YearSelectionData(
             year = Year("2021"),
             showCount = 32,
-            randomShowPoster = null
+            randomShowPoster = PosterUrl(null)
         ),
         YearSelectionData(
             year = Year("2020"),
             showCount = 32,
-            randomShowPoster = null
+            randomShowPoster = PosterUrl(null)
         )
     )
 )
