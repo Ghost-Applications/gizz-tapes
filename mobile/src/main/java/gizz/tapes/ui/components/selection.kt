@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.util.LCE
@@ -34,6 +36,7 @@ import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerState
+import gizz.tapes.ui.theme.GizzTheme
 
 data class SelectionData(
     val title: Title,
@@ -107,7 +110,7 @@ fun SelectionRow(
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .fillMaxWidth()
-            .requiredHeight(96.dp)
+            .defaultMinSize(minHeight = 96.dp)
             .height(IntrinsicSize.Max)
             .clickable {
                 onClick()
@@ -129,12 +132,24 @@ fun SelectionRow(
         ) {
             Text(
                 text = title.value,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.bodyLarge
             )
             Text(
                 text = subtitle.value,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.bodySmall
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun SelectionRowPreview() {
+    GizzTheme {
+        SelectionRow(
+            title = Title("Great State Park - Bonnaroo Music & Arts Festival Manchester, TN, USA"),
+            subtitle = Subtitle("Subtitle"),
+            posterUrl = PosterUrl(null)
+        ) { }
     }
 }

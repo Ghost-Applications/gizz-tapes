@@ -6,6 +6,7 @@
 - Added media player error state and cleaned up the PlayerState
 - Display media player errors to the UI in a snackbar
 - Added no poster url
+- Update Rows Font and Spacing
 
 == Antarctica 10/7/2024
 
