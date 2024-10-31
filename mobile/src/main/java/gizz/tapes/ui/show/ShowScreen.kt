@@ -241,14 +241,15 @@ fun TrackRow(
 
         Column(
             modifier = Modifier.padding(8.dp)
+                .align(Alignment.CenterVertically)
         ) {
             Text(
                 text = trackTitle.title,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.bodyLarge
             )
             Text(
                 text = duration.formatedDuration,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
