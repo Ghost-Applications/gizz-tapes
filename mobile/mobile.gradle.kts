@@ -59,7 +59,7 @@ android {
         minSdk = 23
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
-        versionName = "Big Fig Wasp"
+        versionName = "Converge"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
