@@ -59,7 +59,7 @@ android {
         minSdk = 23
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
-        versionName = "Antarctica"
+        versionName = "Big Fig Wasp"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
