@@ -1,13 +1,16 @@
 = Changelog
 
-== Big Fig Wasp
+== Converge
+
+== Big Fig Wasp 2024-11-07
 
 - Setup Foss and Full Variants for f-droid release
 - Added media player error state and cleaned up the PlayerState
 - Display media player errors to the UI in a snackbar
 - Added no poster url
 - Update Rows Font and Spacing
+- Added About Page
 
-== Antarctica 10/7/2024
+== Antarctica 2024-10-07
 
 - Got the app up and running!
