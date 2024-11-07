@@ -2,23 +2,18 @@ package gizz.tapes.ui
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import gizz.tapes.data.Title
+import gizz.tapes.ui.menu.AboutScreen
 import gizz.tapes.ui.player.FullPlayer
 import gizz.tapes.ui.show.ShowScreen
 import gizz.tapes.ui.show.ShowSelectionScreen
@@ -45,7 +40,8 @@ fun GizzNavController(
         composable(route = Screen.YearSelection.route) {
             YearSelectionScreen(
                 onMiniPlayerClick = miniPlayerClicked,
-                onYearClicked = { navController.navigate(Screen.ShowSelection.createRoute(it)) }
+                onYearClicked = { navController.navigate(Screen.ShowSelection.createRoute(it)) },
+                navigateToAboutPage = { navController.navigate(Screen.About.route) }
             )
         }
         composable(
@@ -76,6 +72,10 @@ fun GizzNavController(
         }
 
         fullPlayerNavigation(navController)
+
+        composable(route = Screen.About.route) {
+            AboutScreen { navController.navigateUp() }
+        }
     }
 }
 

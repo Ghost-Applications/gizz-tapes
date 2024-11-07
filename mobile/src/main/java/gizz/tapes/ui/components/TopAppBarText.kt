@@ -15,6 +15,6 @@ fun TopAppBarText(title: Title) {
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier.basicMarquee(
             iterations = Int.MAX_VALUE
-        )
+        ),
     )
 }
