@@ -38,4 +38,6 @@ sealed class Screen(
     ) {
         fun createRoute(title: Title) = "player/${title.encodedTitle}"
     }
+
+    data object About: Screen("about")
 }

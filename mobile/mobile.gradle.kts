@@ -160,6 +160,7 @@ dependencies {
     implementation(libs.byteunits)
     implementation(libs.okio)
 
+    implementation(libs.markwon)
     implementation(libs.bundles.arrow)
 
     debugImplementation(libs.bundles.android.debug.libs)

@@ -7,6 +7,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,35 +44,30 @@ fun <T> GizzScaffold(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val titleComposable: @Composable () -> Unit = { TopAppBarText(title) }
+
+    val appBar: @Composable () -> Unit = {
+        if (upClick == null) {
+            CenterAlignedTopAppBar(
+                title = titleComposable,
+                navigationIcon = gizzIcon(),
+                actions = actions
+            )
+        } else {
+            TopAppBar(
+                title = titleComposable,
+                navigationIcon = navigationUpIcon(upClick),
+                actions = actions
+            )
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = {
             SnackbarHost(snackbarHostState)
         },
-        topBar = {
-            TopAppBar(
-                title = { TopAppBarText(title) },
-                navigationIcon = {
-                    upClick?.let {
-                        IconButton(onClick = upClick) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.navigate_back)
-                            )
-                        }
-
-                    } ?: run {
-                        AsyncImage(
-                            model = R.raw.gizz_tapes_logo,
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp),
-                        )
-                    }
-                },
-                actions = actions
-            )
-        }
+        topBar = appBar
     ) { innerPadding ->
         Box(
             modifier = Modifier
