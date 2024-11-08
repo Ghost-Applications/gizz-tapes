@@ -130,7 +130,6 @@ dependencies {
     "fullImplementation"(platform(libs.firebase.bom))
     "fullImplementation"(libs.bundles.firebase)
     "fullImplementation"(libs.media3.cast)
-    compileOnly(libs.media3.cast)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
