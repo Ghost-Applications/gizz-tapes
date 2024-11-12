@@ -1,6 +1,7 @@
 package gizz.tapes.playback
 
 import android.os.Bundle
+import androidx.datastore.core.DataStore
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
@@ -12,15 +13,18 @@ import arrow.resilience.retryEither
 import com.google.common.collect.ImmutableList
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Settings
 import gizz.tapes.data.Year
-import gizz.tapes.util.bestRecording
 import gizz.tapes.util.showTitle
 import gizz.tapes.util.title
+import gizz.tapes.util.tryAndGetPreferredRecordingType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,9 +32,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class MediaItemTree @Inject constructor(
-    private val apiClient: GizzTapesApiClient
+    private val apiClient: GizzTapesApiClient,
+    private val dataStore: DataStore<Settings>,
 ) {
-
     private data class MediaItemNode(
         val item: MediaItem,
         val children: MutableList<MediaItemNode> = mutableListOf()
@@ -120,7 +124,7 @@ class MediaItemTree @Inject constructor(
                                     .setIsPlayable(true)
                                     .setIsBrowsable(true)
                                     .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
-                                    .setArtworkUri(PosterUrl(it.posterUrl)?.toUri())
+                                    .setArtworkUri(PosterUrl(it.posterUrl).toUri())
                                     .build()
                             )
                             .setMediaId(it.id)
@@ -141,7 +145,9 @@ class MediaItemTree @Inject constructor(
         if (show != null) {
             if (show.children.isEmpty()) {
                 val showData = retryForever { apiClient.show(show.id) }
-                val recording = showData.recordings.bestRecording
+
+                val preferredRecordingType = dataStore.data.map { it.preferredRecordingType }.first()
+                val recording = showData.recordings.tryAndGetPreferredRecordingType(preferredRecordingType)
 
                 val showChildren = recording.files.map { track ->
                     MediaItem.Builder()
@@ -161,7 +167,7 @@ class MediaItemTree @Inject constructor(
                                 .setAlbumTitle(show.item.title)
                                 .setTitle(track.title)
                                 .setRecordingYear(showData.date.year)
-                                .setArtworkUri(PosterUrl(showData.posterUrl)?.toUri())
+                                .setArtworkUri(PosterUrl(showData.posterUrl).toUri())
                                 .setDurationMs(track.length.inWholeMilliseconds)
                                 .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
                                 .setIsPlayable(true)

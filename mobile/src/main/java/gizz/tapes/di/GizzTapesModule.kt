@@ -1,6 +1,16 @@
 package gizz.tapes.di
 
 import android.content.Context
+import android.preference.PreferenceDataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.preferencesDataStoreFile
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import com.jakewharton.byteunits.DecimalByteUnit.MEGABYTES
@@ -12,10 +22,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import gizz.tapes.R
 import gizz.tapes.api.GizzTapesApiClient
+import gizz.tapes.api.data.Recording
+import gizz.tapes.api.data.Recording.Type
+import gizz.tapes.api.data.Recording.Type.SBD
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.playback.RealMediaPlayerContainer
 import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.PlayerErrorMessage
+import gizz.tapes.data.Settings
+import gizz.tapes.data.SettingsSerializer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -97,6 +112,17 @@ interface GizzTapesModule {
             .apply { interceptors.forEach { addInterceptor(it) } }
             .cache(cache)
             .build()
+
+        @Provides
+        @Singleton
+        fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Settings> {
+            return DataStoreFactory.create(
+                serializer = SettingsSerializer(),
+                corruptionHandler = ReplaceFileCorruptionHandler { Settings(preferredRecordingType = SBD) }
+            ) {
+                context.preferencesDataStoreFile("kglw")
+            }
+        }
     }
 
     @Binds

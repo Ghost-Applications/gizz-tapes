@@ -33,12 +33,15 @@ data class Recording(
 ) {
     @Serializable(with = Type.RecordingTypeSerializer::class)
     enum class Type {
+        /** Sound Board */
         SBD,
+        /** Audience Recording */
         AUD,
+        /** Matrix recording; are usually a combination of various AUDs or AUDs and SBD's */
         MTX,
         /** Set if there is a value in the json but we don't recognize it in code yet. */
         UnknownType,
-        /** null / empty in json */
+        /** null / empty in json, shouldn't happen but here just in case */
         None;
 
         internal object RecordingTypeSerializer: KSerializer<Type> {

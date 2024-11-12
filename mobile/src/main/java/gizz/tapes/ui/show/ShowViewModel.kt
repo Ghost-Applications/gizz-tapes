@@ -2,6 +2,7 @@ package gizz.tapes.ui.show
 
 import android.os.Bundle
 import androidx.annotation.OptIn
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,18 +19,21 @@ import kotlinx.coroutines.launch
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Settings
 import gizz.tapes.data.Title
-import gizz.tapes.ui.show.ShowScreenData.Track
+import gizz.tapes.ui.show.ShowScreenState.Track
 import gizz.tapes.util.LCE
-import gizz.tapes.util.bestRecording
 import gizz.tapes.util.map
 import gizz.tapes.util.retryUntilSuccessful
+import gizz.tapes.util.tryAndGetPreferredRecordingType
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
-data class ShowScreenData(
+data class ShowScreenState(
     val removeOldMediaItemsAndAddNew: () -> Unit,
     val showPosterUrl: PosterUrl,
     val tracks: NonEmptyList<Track>
@@ -62,6 +66,7 @@ class ShowViewModel @Inject constructor(
     private val apiClient: GizzTapesApiClient,
     private val mediaPlayerContainer: MediaPlayerContainer,
     private val apiErrorMessage: ApiErrorMessage,
+    private val datastore: DataStore<Settings>,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -71,8 +76,8 @@ class ShowViewModel @Inject constructor(
         checkNotNull(savedStateHandle.get<String>("title"))
     )
 
-    private val _show: MutableStateFlow<LCE<ShowScreenData, Throwable>> = MutableStateFlow(LCE.Loading)
-    val show: StateFlow<LCE<ShowScreenData, Throwable>> = _show
+    private val _show: MutableStateFlow<LCE<ShowScreenState, Throwable>> = MutableStateFlow(LCE.Loading)
+    val show: StateFlow<LCE<ShowScreenState, Throwable>> = _show
 
     init {
         loadShow()
@@ -81,7 +86,11 @@ class ShowViewModel @Inject constructor(
     @OptIn(UnstableApi::class)
     private fun loadShow() {
         viewModelScope.launch {
-            val state: LCE<ShowScreenData, Nothing> = retryUntilSuccessful(
+            val preferredRecording = datastore.data
+                .map { it.preferredRecordingType }
+                .first()
+
+            val state: LCE<ShowScreenState, Nothing> = retryUntilSuccessful(
                 action = {
                     apiClient.show(showId)
                 },
@@ -95,7 +104,7 @@ class ShowViewModel @Inject constructor(
                     )
                 }
             ).map { show ->
-                val recording = show.recordings.bestRecording
+                val recording = show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
                 val items = recording.files.map { track ->
                     MediaItem.Builder()
                         .setUri(recording.filesPathPrefix + track.filename)
@@ -114,7 +123,7 @@ class ShowViewModel @Inject constructor(
                                 .setAlbumTitle(title.value)
                                 .setTitle(track.title)
                                 .setRecordingYear(show.date.year)
-                                .setArtworkUri(PosterUrl(show.posterUrl)?.toUri())
+                                .setArtworkUri(PosterUrl(show.posterUrl).toUri())
                                 .setDurationMs(track.length.inWholeMilliseconds)
                                 .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
                                 .setIsPlayable(true)
@@ -124,7 +133,7 @@ class ShowViewModel @Inject constructor(
                         .build()
                 }
 
-                ShowScreenData(
+                ShowScreenState(
                     showPosterUrl = PosterUrl(show.posterUrl),
                     removeOldMediaItemsAndAddNew = {
                         checkNotNull(mediaPlayerContainer.mediaPlayer).apply {

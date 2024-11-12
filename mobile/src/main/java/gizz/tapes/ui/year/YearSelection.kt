@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -37,6 +38,7 @@ fun YearSelectionScreen(
     onYearClicked: (year: Year) -> Unit,
     onMiniPlayerClick: (Title) -> Unit,
     navigateToAboutPage: () -> Unit,
+    navigateToSettingsPage: () -> Unit,
 ) {
     val state: LCE<List<YearSelectionData>, Throwable> by viewModel.years.collectAsState()
     val playerState by playerViewModel.playerState.collectAsState()
@@ -69,6 +71,14 @@ fun YearSelectionScreen(
                         navigateToAboutPage()
                     },
                     text = { Text("About") }
+                )
+                DropdownMenuItem(
+                    leadingIcon = { Icon(Icons.Default.Settings, null) },
+                    onClick = {
+                        showMenu = false
+                        navigateToSettingsPage()
+                    },
+                    text = { Text("Settings") }
                 )
             }
         }

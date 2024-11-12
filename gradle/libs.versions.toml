@@ -65,9 +65,9 @@ androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons = "androidx.compose.material:material-icons-extended:1.7.5"
+androidx-datastore = "androidx.datastore:datastore-preferences:1.1.1"
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}
 firbase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
@@ -83,9 +83,6 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3-common = { module = "androidx.media3:media3-common", version.ref = "media3"}
 media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3"}
-
-dagger = "com.google.dagger:dagger:2.52"
-dagger-compiler = "com.google.dagger:dagger-compiler:2.52"
 
 coil = "io.coil-kt:coil-compose:2.7.0"
 coil-svg = "io.coil-kt:coil-svg:2.7.0"
@@ -122,6 +119,7 @@ androidx = [
     "androidx-media2-widget",
     "androidx-media2-player",
     "androidx-constraintlayout",
+    "androidx-datastore",
 ]
 
 android-debug-libs = [
@@ -138,7 +136,7 @@ android-release-libs = [ "flipper-noop" ]
 android-test-libs = [
     "junit",
     "truth",
-    "kotlinx-coroutines-test"
+    "kotlinx-coroutines-test",
 ]
 
 firebase = [
