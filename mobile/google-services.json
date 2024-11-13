@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:804853979533:android:9c4d50e763118209f005c4",
         "android_client_info": {
-          "package_name": "gizz.tapes"
+          "package_name": "gizz.tapes.full"
         }
       },
       "oauth_client": [],
@@ -28,7 +28,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:804853979533:android:39db61befd17712af005c4",
         "android_client_info": {
-          "package_name": "gizz.tapes.debug"
+          "package_name": "gizz.tapes.full.debug"
         }
       },
       "oauth_client": [],

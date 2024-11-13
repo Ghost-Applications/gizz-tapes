@@ -2,6 +2,9 @@
 
 == Converge
 
+- Release for new play store listing
+- Updates for f-droid release
+
 == Big Fig Wasp 2024-11-07
 
 - Setup Foss and Full Variants for f-droid release

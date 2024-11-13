@@ -1,4 +1,5 @@
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+import com.google.gms.googleservices.GoogleServicesTask
 
 plugins {
     id("com.android.application")
@@ -14,20 +15,11 @@ plugins {
     id("signing-config")
     id("build-number")
 
-    alias(libs.plugins.play.publisher)
     alias(libs.plugins.paparazzi)
 }
 
 kotlin {
     jvmToolchain(17)
-}
-
-play {
-    serviceAccountCredentials.set(
-        rootProject.file(properties["gizz.tapes.publish-key"] ?: "keys/publish-key.json")
-    )
-    track.set("internal")
-    defaultToAppBundles.set(true)
 }
 
 android {
@@ -92,12 +84,17 @@ android {
         // no firebase and no cast framework because these are no foss
         // this release is sent to f-droid
         create("foss") {
+            applicationIdSuffix = ".foss"
             dimension = "version"
             versionNameSuffix = "-foss"
+            (this as ExtensionAware).configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
         }
 
         // contains cast and firebase
         create("full") {
+            applicationIdSuffix = ".full"
             dimension = "version"
         }
     }
@@ -172,4 +169,8 @@ dependencies {
 
 tasks.named("build") {
     dependsOn("verifyPaparazziFullRelease")
+}
+
+tasks.withType<GoogleServicesTask> {
+    enabled = name.contains("full", ignoreCase = true)
 }
