@@ -179,7 +179,6 @@ arrow = [
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 version-check = { id = "com.github.ben-manes.versions", version = "0.51.0" }
-play-publisher = { id = "com.github.triplet.play", version = "3.10.1"}
 google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

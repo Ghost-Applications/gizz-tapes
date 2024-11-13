@@ -5,8 +5,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
+import kotlin.math.max
 
-val Long.formatedElapsedTime: String get() = DateUtils.formatElapsedTime(this / 1000L)
+val Long.formatedElapsedTime: String get() = DateUtils.formatElapsedTime(max(this, 0) / 1000L)
 val MediaItem?.title: String get() = this?.mediaMetadata?.title?.toString() ?: "--"
 
 /** Must be called on metadata with extras **/
