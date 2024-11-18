@@ -1,6 +1,10 @@
 = Changelog
 
-== Converge
+== Converge-Patch1 2024-11-18
+
+- Removes dependenciesInfo from bundle and apk for f-droid release
+
+== Converge 2024-11-13
 
 - Release for new play store listing
 - Updates for f-droid release

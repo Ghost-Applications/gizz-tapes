@@ -51,7 +51,7 @@ android {
         minSdk = 23
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
-        versionName = "Converge"
+        versionName = "Converge-Patch1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -86,7 +86,6 @@ android {
         create("foss") {
             applicationIdSuffix = ".foss"
             dimension = "version"
-            versionNameSuffix = "-foss"
             (this as ExtensionAware).configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
             }
@@ -112,6 +111,11 @@ android {
         renderScript = false
         resValues = false
         shaders = false
+    }
+
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 
