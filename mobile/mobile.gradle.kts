@@ -51,7 +51,7 @@ android {
         minSdk = 23
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
-        versionName = "Dawn of Eternal Night"
+        versionName = "DawnOfEternalNight"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
