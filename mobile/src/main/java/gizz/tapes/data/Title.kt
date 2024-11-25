@@ -17,4 +17,3 @@ value class Title(val value: String) {
 
     override fun toString(): String = value
 }
-
