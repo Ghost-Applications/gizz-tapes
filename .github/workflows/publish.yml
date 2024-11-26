@@ -2,7 +2,7 @@ name: Publish to Playstore
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,25 +14,24 @@ jobs:
           java-version: 17
           distribution: 'zulu'
           cache: 'gradle'
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.6'
+          bundler-cache: true
       - name: Retrieve Key File
         env:
-          NEVER_ENDING_SPLENDOR_ENCODED_KEY: ${{ secrets.NEVER_ENDING_SPLENDOR_ENCODED_KEY }}
-        run: echo -n $NEVER_ENDING_SPLENDOR_ENCODED_KEY | base64 --decode > ./keys/release.jks
+          GIZZ_TAPES_ENCODED_KEY: ${{ secrets.GIZZ_TAPES_ENCODED_KEY }}
+        run: echo -n $GIZZ_TAPES_ENCODED_KEY | base64 --decode > ./keys/release.jks
       - name: Provide Publish Key
         env:
-          NEVER_ENDING_SPLENDOR_PUBLISH_KEY: ${{ secrets.NEVER_ENDING_SPLENDOR_PUBLISH_KEY }}
-        run: echo $NEVER_ENDING_SPLENDOR_PUBLISH_KEY > ./keys/publish-key.json
+          GIZZ_TAPES_PUBLISH_KEY: ${{ secrets.GIZZ_TAPES_PUBLISH_KEY }}
+        run: echo $GIZZ_TAPES_PUBLISH_KEY > ./keys/publish-key.json
       - name: Build with Gradle
         env:
-          NEVER_ENDING_SPLENDOR_KEYSTORE_PASSWORD: ${{ secrets.NEVER_ENDING_SPLENDOR_KEYSTORE_PASSWORD }}
-          NEVER_ENDING_SPLENDOR_KEY_ALIAS: ${{ secrets.NEVER_ENDING_SPLENDOR_KEY_ALIAS }}
-          NEVER_ENDING_SPLENDOR_KEY_PASSWORD: ${{ secrets.NEVER_ENDING_SPLENDOR_KEY_PASSWORD }}
-        run: >
-          ./gradlew build publishReleaseBundle --no-daemon
-          -DNEVER_ENDING_SPLENDOR_ACCEPT_BUILD_SCAN_AGREEMENT=yes
-          -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-          -Pgizz.tapes.buildNumber=$GITHUB_RUN_NUMBER
-          -Pgizz.tapes.keystoreLocation=./keys/release.jks
-          -Pgizz.tapes.keystorePassword=$NEVER_ENDING_SPLENDOR_KEYSTORE_PASSWORD
-          -Pgizz.tapes.aliasKeyPassword=$NEVER_ENDING_SPLENDOR_KEY_PASSWORD
-          -Pgizz.tapes.storeKeyAlias=$NEVER_ENDING_SPLENDOR_KEY_ALIAS
+          GIZZ_TAPES_KEYSTORE_PASSWORD: ${{ secrets.GIZZ_TAPES_KEYSTORE_PASSWORD }}
+          GIZZ_TAPES_KEY_ALIAS: ${{ secrets.GIZZ_TAPES_KEY_ALIAS }}
+          GIZZ_TAPES_KEY_PASSWORD: ${{ secrets.GIZZ_TAPES_KEY_PASSWORD }}
+          GIZZ_TAPES_KEYSTORE_LOCATION: ./keys/release.jks
+          GIZZ_TAPES_BUILD_NUMBER: ${{ github.run_number }}
+        run: bundle exe fastlane beta

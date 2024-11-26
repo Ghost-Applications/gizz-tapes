@@ -1,0 +1,109 @@
+default_platform(:android)
+
+platform :android do
+
+  desc 'Publish a new build to open testing on Play Store'
+  lane :beta do
+    gradle(
+      tasks: ['build', 'bundle']
+    )
+    upload_to_play_store(track: 'beta', skip_upload_apk: true)
+  end
+
+  desc 'Release app to production and create github release'
+  lane :release do
+    # Get the current version from Google Play
+    current_version = google_play_track_version_codes(track: 'beta')[0]
+
+    upload_to_play_store(
+      track: 'beta',
+      track_promote_to: 'production'
+    )
+
+    gradle(
+      task: 'build',
+      properties: {
+        'gizz.tapes.buildNumber' => current_version
+      }
+    )
+
+    # Read properties from gradle.properties
+    properties = {}
+    gradle_properties_lines = File.readlines('../gradle.properties')
+    gradle_properties_lines.each do |line|
+      # Skip empty lines and comments
+      next if line.strip.empty? || line.strip.start_with?("#")
+
+      # Split into key and value
+      key, value = line.strip.split("=", 2)
+      properties[key] = value.strip if key && value
+    end
+
+    version_name = properties['gizz.tapes.versionName']
+
+    keys_properties = {}
+    File.foreach('../keys/keys.properties') do |line|
+      next if line.strip.start_with?("#") || line.strip.empty?
+
+      key, value = line.strip.split("=", 2)
+      keys_properties[key] = value.strip if key && value
+    end
+
+    github_token = keys_properties['github_token']
+
+    content = File.read('../CHANGELOG.adoc')
+    sections = content.split(/^== .*/)
+    description = sections[1].strip
+
+    set_github_release(
+      repository_name: 'Ghost-Applications/gizz-tapes',
+      api_token: keys_properties['github_token'],
+      upload_assets: [
+        'mobile/build/outputs/apk/foss/release/mobile-foss-release.apk',
+        'mobile/build/outputs/apk/full/release/mobile-full-release.apk'
+      ],
+      name: version_name,
+      tag_name: version_name,
+      description: description
+    )
+
+    next_release_name = prompt(
+      text: "Enter the name of the next release:"
+    )
+
+    # Find the first occurrence of `==` and insert text after it
+    updated_content = content.sub(/^== .*/) do |match|
+      "#{match} #{Date.today.iso8601}"
+    end
+
+    # Insert the new header after the title (the first line starting with `=`)
+    updated_content = updated_content.sub(/^= .*/) do |match|
+      "#{match}\n\n== #{next_release_name}"
+    end
+
+    # Write the updated content back to the file
+    File.write('../CHANGELOG.adoc', updated_content)
+
+    properties['gizz.tapes.versionName'] = next_release_name
+    properties['gizz.tapes.defaultBuildNumber'] = current_version + 1
+
+    gradle_properties_lines = gradle_properties_lines.map do |line|
+      # Skip comments and empty lines
+      if line.strip.start_with?("#") || line.strip.empty?
+        line
+      else
+        # Split the line into key and value
+        key, value = line.strip.split("=", 2)
+
+        # Check if this key needs to be updated
+        if properties.key?(key)
+          "#{key}=#{properties[key]}\n" # Replace with the new value
+        else
+          line # Keep the line unchanged
+        end
+      end
+    end
+
+    File.write('../gradle.properties', gradle_properties_lines.join)
+  end
+end

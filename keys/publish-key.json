@@ -1,2 +1,0 @@
-This is where the publishing key will be placed on CI
-and only exists to make sure gradle does not fail for not being able to find a file.
