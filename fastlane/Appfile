@@ -1,0 +1,2 @@
+json_key_file(ENV['GIZZ_TAPES_SUPPLY_KEY'] || 'keys/gizz-tapes-supply-key.json')
+package_name('gizz.tapes.full')

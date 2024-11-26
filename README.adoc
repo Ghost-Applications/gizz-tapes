@@ -7,13 +7,13 @@ https://tapes.kglw.net/[Gizz Tapes] API.
 
 image:https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png[alt="Get it on GitHub", height=80, link=https://github.com/Ghost-Applications/gizz-tapes/releases]
 //image:https://fdroid.gitlab.io/artwork/badge/get-it-on.png[alt="Get it on F-Droid", height=80]
-// todo add google play
+image:https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png[alt="Get it on Google Play", height=80, link=https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png]
 
 == Building
 
 Standard gradle commands. 
 
-`./gradlew installDebug` to install the test build
+`./gradlew installFullDebug` to install the test build
 `./gradlew build` will build release and debug builds as well as run all checks.
 
 === Build Scans
