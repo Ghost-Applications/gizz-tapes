@@ -7,7 +7,11 @@ platform :android do
     gradle(
       tasks: ['build', 'bundle']
     )
-    upload_to_play_store(track: 'beta', skip_upload_apk: true)
+    upload_to_play_store(
+      track: 'beta',
+      skip_upload_apk: true,
+      aab: 'mobile/build/outputs/bundle/fullRelease/mobile-full-release.aab'
+    )
   end
 
   desc 'Release app to production and create github release'
