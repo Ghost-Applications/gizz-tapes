@@ -30,7 +30,7 @@ jobs:
       - name: Provide Publish Key
         env:
           GIZZ_TAPES_PUBLISH_KEY: ${{ secrets.GIZZ_TAPES_PUBLISH_KEY }}
-        run: echo $GIZZ_TAPES_PUBLISH_KEY > ./keys/publish-key.json
+        run: echo $GIZZ_TAPES_PUBLISH_KEY > ./keys/gizz-tapes-supply-key.json
       - name: Build with Gradle
         env:
           GIZZ_TAPES_KEYSTORE_PASSWORD: ${{ secrets.GIZZ_TAPES_KEYSTORE_PASSWORD }}
