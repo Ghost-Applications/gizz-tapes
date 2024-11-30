@@ -13,4 +13,5 @@
     <string name="player_error">There was an issue loading the current track. Try a different track or maybe archive.org is having issues.</string>
 
     <string name="about">About</string>
+    <string name="settings">Settings</string>
 </resources>

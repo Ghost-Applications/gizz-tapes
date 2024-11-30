@@ -6,7 +6,6 @@ import gizz.tapes.showContent
 import gizz.tapes.showingPlayerState
 import gizz.tapes.ui.PaparazziNightTest
 import gizz.tapes.ui.PaparazziTest
-import gizz.tapes.ui.theme.GizzTheme
 import gizz.tapes.util.LCE
 import okio.IOException
 import org.junit.Test
@@ -56,7 +55,7 @@ class ShowScreenNightTest : PaparazziNightTest() {
 }
 
 private fun Paparazzi.snapshot(
-    state: LCE<ShowScreenData, Exception>,
+    state: LCE<ShowScreenState, Exception>,
 ) {
     snapshot {
         ShowScreen(

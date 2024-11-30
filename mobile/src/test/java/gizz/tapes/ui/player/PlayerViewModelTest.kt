@@ -46,7 +46,7 @@ class PlayerViewModelTest {
     }
 }
 
-val unimportantMediaPlayerContainer = object : MediaPlayerContainer {
+private val unimportantMediaPlayerContainer = object : MediaPlayerContainer {
     override val mediaPlayer: Player = object : Player by stub() {
         override fun addListener(listener: Player.Listener) {
 

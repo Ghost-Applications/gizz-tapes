@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,8 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.BlendModeColorFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -112,7 +108,7 @@ fun ShowScreen(
 
 @Composable
 fun ShowScreen(
-    state: LCE<ShowScreenData, Throwable>,
+    state: LCE<ShowScreenState, Throwable>,
     playerState: PlayerState,
     appBarTitle: Title,
     upClick: () -> Unit,
@@ -146,7 +142,7 @@ fun ShowScreen(
 
 @Composable
 fun ShowListWithPlayer(
-    showData: ShowScreenData,
+    showData: ShowScreenState,
     playerState: PlayerState,
     onRowClick: (index: Int, isPlaying: Boolean) -> Unit,
     onMiniPlayerClick: (Title) -> Unit,

@@ -18,8 +18,8 @@ import gizz.tapes.data.Title
 import gizz.tapes.data.Year
 import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerState
-import gizz.tapes.ui.show.ShowScreenData
-import gizz.tapes.ui.show.ShowScreenData.Track
+import gizz.tapes.ui.show.ShowScreenState
+import gizz.tapes.ui.show.ShowScreenState.Track
 import gizz.tapes.ui.show.ShowSelectionData
 import gizz.tapes.ui.show.TrackDuration
 import gizz.tapes.ui.show.TrackId
@@ -28,7 +28,6 @@ import gizz.tapes.ui.year.YearSelectionData
 import gizz.tapes.util.LCE
 import gizz.tapes.util.map
 import gizz.tapes.util.showTitle
-import gizz.tapes.util.toSimpleFormat
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlin.time.Duration.Companion.minutes
@@ -299,7 +298,7 @@ val show = Show(
 )
 
 val showContent = LCE.Content(
-    ShowScreenData(
+    ShowScreenState(
         removeOldMediaItemsAndAddNew = { },
         showPosterUrl = PosterUrl("https://kglw.net/i/poster-art-1699403482.jpeg"),
         tracks = show.recordings.first().files.map {

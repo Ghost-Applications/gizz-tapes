@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import gizz.tapes.data.Title
 import gizz.tapes.ui.menu.AboutScreen
+import gizz.tapes.ui.menu.settings.SettingsScreen
 import gizz.tapes.ui.player.FullPlayer
 import gizz.tapes.ui.show.ShowScreen
 import gizz.tapes.ui.show.ShowSelectionScreen
@@ -41,7 +42,8 @@ fun GizzNavController(
             YearSelectionScreen(
                 onMiniPlayerClick = miniPlayerClicked,
                 onYearClicked = { navController.navigate(Screen.ShowSelection.createRoute(it)) },
-                navigateToAboutPage = { navController.navigate(Screen.About.route) }
+                navigateToAboutPage = { navController.navigate(Screen.About.route) },
+                navigateToSettingsPage = { navController.navigate(Screen.Settings.route) }
             )
         }
         composable(
@@ -75,6 +77,10 @@ fun GizzNavController(
 
         composable(route = Screen.About.route) {
             AboutScreen { navController.navigateUp() }
+        }
+
+        composable(route = Screen.Settings.route) {
+            SettingsScreen { navController.navigateUp() }
         }
     }
 }

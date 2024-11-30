@@ -1,6 +1,8 @@
 package gizz.tapes.util
 
+import arrow.core.NonEmptyList
 import gizz.tapes.api.data.Recording
 
-val List<Recording>.bestRecording: Recording get() = firstOrNull { it.type == Recording.Type.SBD }
-    ?: first()
+fun NonEmptyList<Recording>.tryAndGetPreferredRecordingType(preferred: Recording.Type): Recording {
+    return firstOrNull { it.type == preferred } ?: first()
+}
