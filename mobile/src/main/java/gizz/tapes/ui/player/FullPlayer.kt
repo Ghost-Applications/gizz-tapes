@@ -47,11 +47,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import gizz.tapes.R
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.TopAppBarText
-import gizz.tapes.data.ShowId
-import gizz.tapes.data.Title
 import gizz.tapes.util.formatedElapsedTime
 import kotlin.math.max
 

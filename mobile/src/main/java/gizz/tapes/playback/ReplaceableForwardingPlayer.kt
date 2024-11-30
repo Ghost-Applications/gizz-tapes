@@ -20,7 +20,6 @@ import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.Size
 import androidx.media3.common.util.UnstableApi
-import gizz.tapes.util.MediaItemWrapper
 import gizz.tapes.util.MediaItemsWrapper
 import timber.log.Timber
 import kotlin.math.min

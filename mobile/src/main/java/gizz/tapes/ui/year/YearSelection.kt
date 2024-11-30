@@ -19,12 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.data.Year
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.SelectionData
 import gizz.tapes.ui.components.SelectionScreen
-import gizz.tapes.data.Subtitle
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerViewModel
 import gizz.tapes.util.LCE

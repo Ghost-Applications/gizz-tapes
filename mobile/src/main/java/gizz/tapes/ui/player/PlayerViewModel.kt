@@ -9,15 +9,15 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.data.PlayerErrorMessage
+import gizz.tapes.data.Title
+import gizz.tapes.playback.MediaPlayerContainer
+import gizz.tapes.ui.player.PlayerState.NoMedia
+import gizz.tapes.util.mediaExtras
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import gizz.tapes.playback.MediaPlayerContainer
-import gizz.tapes.data.Title
-import gizz.tapes.ui.player.PlayerState.NoMedia
-import gizz.tapes.util.mediaExtras
 import javax.inject.Inject
 
 @UnstableApi

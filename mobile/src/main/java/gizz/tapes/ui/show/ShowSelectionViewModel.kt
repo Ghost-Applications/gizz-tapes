@@ -5,9 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
@@ -18,6 +15,9 @@ import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
 import gizz.tapes.util.showTitle
 import gizz.tapes.util.toSimpleFormat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -1,8 +1,8 @@
 package gizz.tapes.api
 
 import arrow.core.Either
-import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.PartialShowData
+import gizz.tapes.api.data.Show
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.cache.HttpCache

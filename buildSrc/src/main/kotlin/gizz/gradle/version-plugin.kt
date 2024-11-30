@@ -1,6 +1,6 @@
 package gizz.gradle
 
-import java.util.*
+import java.util.Locale
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase(Locale.ROOT).contains(it) }

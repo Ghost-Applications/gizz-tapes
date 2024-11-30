@@ -10,7 +10,6 @@ import gizz.tapes.noShowPlayerState
 import gizz.tapes.showingPlayerState
 import gizz.tapes.ui.PaparazziNightTest
 import gizz.tapes.ui.PaparazziTest
-import gizz.tapes.ui.theme.GizzTheme
 import org.junit.Test
 
 class MiniPlayerTest : PaparazziTest() {
