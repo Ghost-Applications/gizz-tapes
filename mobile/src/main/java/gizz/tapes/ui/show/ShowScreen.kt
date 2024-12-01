@@ -86,6 +86,7 @@ fun ShowScreen(
                 firstLoad = false
                 val content = checkNotNull(showState.contentOrNull())
                 content.removeOldMediaItemsAndAddNew()
+                playerViewModel.seekTo(index, 0)
                 playerViewModel.play()
             } else {
                 when (val ps = playerState) {
