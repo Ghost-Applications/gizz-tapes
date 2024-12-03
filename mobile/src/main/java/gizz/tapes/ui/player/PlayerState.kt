@@ -24,6 +24,7 @@ sealed interface PlayerState {
         companion object {
             operator fun invoke(
                 isPlaying: Boolean,
+                isLoading: Boolean,
                 showId: ShowId,
                 showTitle: Title,
                 durationInfo: MediaDurationInfo,
@@ -31,8 +32,8 @@ sealed interface PlayerState {
                 title: String,
                 albumTitle: String,
                 mediaId: String,
-            ): MediaLoaded = when (isPlaying) {
-                true -> Playing(
+            ): MediaLoaded = when {
+                isPlaying -> Playing(
                     showId = showId,
                     showTitle = showTitle,
                     durationInfo = durationInfo,
@@ -42,7 +43,17 @@ sealed interface PlayerState {
                     mediaId = mediaId
                 )
 
-                false -> Paused(
+                isLoading -> Loading(
+                    showId = showId,
+                    showTitle = showTitle,
+                    durationInfo = durationInfo,
+                    artworkUri = artworkUri,
+                    title = title,
+                    albumTitle = albumTitle,
+                    mediaId = mediaId
+                )
+
+                else -> Paused(
                     showId = showId,
                     showTitle = showTitle,
                     durationInfo = durationInfo,
@@ -89,6 +100,18 @@ sealed interface PlayerState {
         }
 
         data class Paused(
+            override val showId: ShowId,
+            override val showTitle: Title,
+            override val durationInfo: MediaDurationInfo,
+            override val artworkUri: Uri?,
+            override val title: String,
+            override val albumTitle: String,
+            override val mediaId: String
+        ): MediaLoaded {
+            override val isPlaying = false
+        }
+
+        data class Loading(
             override val showId: ShowId,
             override val showTitle: Title,
             override val durationInfo: MediaDurationInfo,

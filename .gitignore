@@ -224,9 +224,6 @@ fabric.properties
 #ignore the weird .kotlin folder that keeps appearing
 .kotlin/
 
-# not sure this should be checked in or not...
-kotlin-js-store
-
 # signed outputs that don't need to be included in play store.
 mobile/release/*
 keys/

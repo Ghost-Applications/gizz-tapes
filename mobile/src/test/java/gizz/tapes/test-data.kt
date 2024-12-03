@@ -18,9 +18,9 @@ import gizz.tapes.data.Title
 import gizz.tapes.data.Year
 import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerState
+import gizz.tapes.ui.selection.ShowSelectionData
 import gizz.tapes.ui.show.ShowScreenState
 import gizz.tapes.ui.show.ShowScreenState.Track
-import gizz.tapes.ui.show.ShowSelectionData
 import gizz.tapes.ui.show.TrackDuration
 import gizz.tapes.ui.show.TrackId
 import gizz.tapes.ui.show.TrackTitle
@@ -57,7 +57,8 @@ val showingPlayerState = PlayerState.MediaLoaded(
     albumTitle = "2024-09-11 : Edgefield Amphitheater - Troutdale, OR, USA",
     title = "Free",
     mediaId = "https://phish.in/audio/000/032/562/32562.mp3",
-    showTitle = Title("Early Show - ")
+    showTitle = Title("Early Show - "),
+    isLoading = false,
 )
 
 val yearData = LCE.Content(

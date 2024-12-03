@@ -16,8 +16,8 @@ import gizz.tapes.data.Title
 import gizz.tapes.ui.menu.AboutScreen
 import gizz.tapes.ui.menu.settings.SettingsScreen
 import gizz.tapes.ui.player.FullPlayer
+import gizz.tapes.ui.selection.ShowSelectionScreen
 import gizz.tapes.ui.show.ShowScreen
-import gizz.tapes.ui.show.ShowSelectionScreen
 import gizz.tapes.ui.year.YearSelectionScreen
 
 @UnstableApi

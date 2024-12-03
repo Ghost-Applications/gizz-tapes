@@ -1,4 +1,4 @@
-package gizz.tapes.ui.show
+package gizz.tapes.ui.selection
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
