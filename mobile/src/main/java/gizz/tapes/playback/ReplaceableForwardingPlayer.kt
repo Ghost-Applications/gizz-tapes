@@ -236,16 +236,7 @@ class ReplaceableForwardingPlayer(
 
     override fun seekForward() = player.seekForward()
 
-    @Deprecated("Deprecated in Java")
-    override fun hasPrevious(): Boolean = player.hasPrevious()
-
-    @Deprecated("Deprecated in Java")
-    override fun hasPreviousWindow(): Boolean = player.hasPreviousWindow()
-
     override fun hasPreviousMediaItem(): Boolean = player.hasPreviousMediaItem()
-
-    @Deprecated("Deprecated in Java")
-    override fun previous() = player.previous()
 
     @Deprecated("Deprecated in Java")
     override fun seekToPreviousWindow() = player.seekToPreviousWindow()

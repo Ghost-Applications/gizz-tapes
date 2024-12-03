@@ -12,6 +12,7 @@ import arrow.resilience.Schedule
 import arrow.resilience.retryEither
 import com.google.common.collect.ImmutableList
 import gizz.tapes.api.GizzTapesApiClient
+import gizz.tapes.data.BandName
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Settings
 import gizz.tapes.data.Year
@@ -162,8 +163,8 @@ class MediaItemTree @Inject constructor(
                                         putString("showTitle", show.item.title)
                                     }
                                 )
-                                .setArtist("King Gizzard & The Lizard Wizard")
-                                .setAlbumArtist("King Gizzard & The Lizard Wizard")
+                                .setArtist(show.item.title)
+                                .setAlbumArtist(BandName)
                                 .setAlbumTitle(show.item.title)
                                 .setTitle(track.title)
                                 .setRecordingYear(showData.date.year)

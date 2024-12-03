@@ -14,6 +14,7 @@ import arrow.core.NonEmptyList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.data.ApiErrorMessage
+import gizz.tapes.data.BandName
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Settings
 import gizz.tapes.data.Title
@@ -118,8 +119,8 @@ class ShowViewModel @Inject constructor(
                                         putString("showTitle", title.value)
                                     }
                                 )
-                                .setArtist("King Gizzard & The Lizard Wizard")
-                                .setAlbumArtist("King Gizzard & The Lizard Wizard")
+                                .setArtist(BandName)
+                                .setAlbumArtist(BandName)
                                 .setAlbumTitle(title.value)
                                 .setTitle(track.title)
                                 .setRecordingYear(show.date.year)

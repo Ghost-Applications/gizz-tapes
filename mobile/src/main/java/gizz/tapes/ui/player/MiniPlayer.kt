@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -89,7 +90,7 @@ fun MiniPlayer(
                         Text(
                             text = elapsedTime,
                             style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.align(Alignment.Center)
+                            modifier = Modifier.align(Center)
                         )
                     }
 

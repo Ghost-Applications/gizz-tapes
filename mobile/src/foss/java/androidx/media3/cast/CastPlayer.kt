@@ -219,19 +219,7 @@ class CastPlayer : Player {
         error("Not implemented in FOSS variant")
     }
 
-    override fun hasPrevious(): Boolean {
-        error("Not implemented in FOSS variant")
-    }
-
-    override fun hasPreviousWindow(): Boolean {
-        error("Not implemented in FOSS variant")
-    }
-
     override fun hasPreviousMediaItem(): Boolean {
-        error("Not implemented in FOSS variant")
-    }
-
-    override fun previous() {
         error("Not implemented in FOSS variant")
     }
 

@@ -43,6 +43,12 @@ class PlayerViewModel @Inject constructor(
             }
         }
 
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            viewModelScope.launch {
+                _playerState.emit(newState())
+            }
+        }
+
         override fun onPlayerError(error: PlaybackException) {
             viewModelScope.launch {
                 _playerState.emit(newState(PlayerError(playerErrorMessage.value)))
@@ -114,6 +120,7 @@ class PlayerViewModel @Inject constructor(
                 if (playerError == null) {
                     PlayerState.MediaLoaded(
                         isPlaying = player.isPlaying,
+                        isLoading = player.isLoading,
                         durationInfo = MediaDurationInfo(
                             currentPosition = player.currentPosition,
                             duration = player.duration

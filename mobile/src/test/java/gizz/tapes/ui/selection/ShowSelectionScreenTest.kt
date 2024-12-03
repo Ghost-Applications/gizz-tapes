@@ -1,4 +1,4 @@
-package gizz.tapes.ui.show
+package gizz.tapes.ui.selection
 
 import app.cash.paparazzi.Paparazzi
 import gizz.tapes.data.Title
