@@ -49,6 +49,7 @@ import coil.compose.AsyncImage
 import gizz.tapes.R
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.TopAppBarText
@@ -60,7 +61,7 @@ import kotlin.math.max
 fun FullPlayer(
     viewModel: PlayerViewModel = hiltViewModel(),
     navigateToShow: (ShowId, Title) -> Unit,
-    upClick: () -> Unit,
+    navigateUp: NavigateUp
 ) {
     val playerState by viewModel.playerState.collectAsState()
 
@@ -68,7 +69,7 @@ fun FullPlayer(
         playerState = playerState,
         title = checkNotNull(viewModel.title),
         navigateToShow = navigateToShow,
-        upClick = upClick,
+        navigateUp = navigateUp,
         seekTo = viewModel::seekTo,
         seekToPreviousMediaItem = viewModel::seekToPreviousMediaItem,
         seekToNextMediaItem = viewModel::seekToNextMediaItem,
@@ -84,7 +85,7 @@ fun FullPlayer(
     playerState: PlayerState,
     title: Title,
     navigateToShow: (ShowId, Title) -> Unit,
-    upClick: () -> Unit,
+    navigateUp: NavigateUp,
     seekTo: (Long) -> Unit,
     seekToPreviousMediaItem: () -> Unit,
     seekToNextMediaItem: () -> Unit,
@@ -98,7 +99,7 @@ fun FullPlayer(
             TopAppBar(
                 title = { TopAppBarText(title) },
                 navigationIcon = {
-                    IconButton(onClick = upClick) {
+                    IconButton(onClick = { navigateUp() }) {
                         Icon(
                             Icons.Default.KeyboardArrowDown,
                             contentDescription = stringResource(R.string.navigate_back)

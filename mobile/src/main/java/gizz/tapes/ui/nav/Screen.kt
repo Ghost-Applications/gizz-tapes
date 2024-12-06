@@ -1,4 +1,4 @@
-package gizz.tapes.ui
+package gizz.tapes.ui.nav
 
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType

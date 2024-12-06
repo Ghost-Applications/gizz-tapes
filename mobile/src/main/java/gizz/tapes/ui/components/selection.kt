@@ -31,6 +31,7 @@ import gizz.tapes.R
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.theme.GizzTheme
@@ -50,14 +51,14 @@ fun SelectionScreen(
     playerState: PlayerState,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
-    upClick: (() -> Unit)?,
+    navigateUp: NavigateUp?,
     onMiniPlayerClick: (Title) -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
     GizzScaffold(
         title = title,
         state = state,
-        upClick = upClick,
+        navigateUp = navigateUp,
         actions = actions
     ) { value, playerError ->
         Column {

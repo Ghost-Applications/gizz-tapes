@@ -11,9 +11,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.R
+import gizz.tapes.ui.nav.NavigateUp
 
-fun navigationUpIcon(upClick: () -> Unit): @Composable () -> Unit = {
-    IconButton(onClick = upClick) {
+fun navigationUpIcon(navigateUp: NavigateUp): @Composable () -> Unit = {
+    IconButton(onClick = { navigateUp() }) {
         Icon(
             Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = stringResource(R.string.navigate_back)

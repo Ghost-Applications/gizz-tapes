@@ -67,7 +67,7 @@ private fun Paparazzi.snapshot(
             onPlayAction = {},
             actions = {},
             onRowClick = { _, _ -> },
-            upClick = {}
+            navigateUp = {}
         )
     }
 }
