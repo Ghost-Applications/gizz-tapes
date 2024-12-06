@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import gizz.tapes.R
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.navigationUpIcon
 import gizz.tapes.util.LCE
@@ -36,14 +37,14 @@ import gizz.tapes.util.LCE
 @Composable
 fun SettingsScreen(
     viewModel: SettingScreenViewModel = hiltViewModel(),
-    navigateUpClick: () -> Unit
+    navigateUp: NavigateUp
 ) {
 
     val state by viewModel.settingsScreenState.collectAsState()
     SettingsScreen(
         state = state,
         onRecordingTypeSelected = viewModel::updatePreferredRecordingType,
-        navigateUpClick = navigateUpClick
+        navigateUp = navigateUp
     )
 }
 
@@ -52,14 +53,14 @@ fun SettingsScreen(
 fun SettingsScreen(
     state: LCE<SettingsScreenState, Nothing>,
     onRecordingTypeSelected: RecordingTypeSelected,
-    navigateUpClick: () -> Unit
+    navigateUp: NavigateUp,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.settings)) },
-                navigationIcon = navigationUpIcon(navigateUpClick)
+                navigationIcon = navigationUpIcon(navigateUp)
             )
         }
     ) { innerPadding ->

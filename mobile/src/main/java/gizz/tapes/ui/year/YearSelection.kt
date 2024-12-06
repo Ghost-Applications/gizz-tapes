@@ -107,7 +107,7 @@ fun YearSelectionScreen(
 
     SelectionScreen(
         state = selectionData,
-        upClick = null,
+        navigateUp = null,
         onMiniPlayerClick = onMiniPlayerClick,
         playerState = playerState,
         onPauseAction = onPauseAction,

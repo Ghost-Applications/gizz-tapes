@@ -1,6 +1,7 @@
 package gizz.tapes.ui.player
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,13 +77,19 @@ fun MiniPlayer(
                             .padding(8.dp)
                             .weight(1f)
                     ) {
+
                         Text(
                             text = playerState.title,
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.basicMarquee(
+                                iterations = Int.MAX_VALUE
+                            ),
+                            maxLines = 1
                         )
                         Text(
                             text = playerState.albumTitle,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1
                         )
                     }
 

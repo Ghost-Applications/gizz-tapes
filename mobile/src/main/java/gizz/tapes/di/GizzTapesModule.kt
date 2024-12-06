@@ -1,6 +1,7 @@
 package gizz.tapes.di
 
 import android.content.Context
+import android.content.res.Resources
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
@@ -23,6 +24,8 @@ import gizz.tapes.data.Settings
 import gizz.tapes.data.SettingsSerializer
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.playback.RealMediaPlayerContainer
+import gizz.tapes.util.RealResourceManager
+import gizz.tapes.util.ResourceManager
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -115,8 +118,15 @@ interface GizzTapesModule {
                 context.preferencesDataStoreFile("kglw")
             }
         }
+
+        @Provides
+        @Singleton
+        fun provideResources(@ApplicationContext context: Context): Resources = context.resources
     }
 
     @Binds
     fun bindsMediaControllerContainer(container: RealMediaPlayerContainer): MediaPlayerContainer
+
+    @Binds
+    fun bindsResourceManager(resourceManager: RealResourceManager): ResourceManager
 }

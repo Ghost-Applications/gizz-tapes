@@ -15,7 +15,7 @@ interface SettingsScreenTest {
             SettingsScreen(
                 state = state,
                 onRecordingTypeSelected = { },
-                navigateUpClick = { }
+                navigateUp = { }
             )
         }
     }

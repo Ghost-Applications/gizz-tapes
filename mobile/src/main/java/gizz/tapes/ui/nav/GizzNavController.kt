@@ -1,4 +1,4 @@
-package gizz.tapes.ui
+package gizz.tapes.ui.nav
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -13,7 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import gizz.tapes.data.Title
-import gizz.tapes.ui.menu.AboutScreen
+import gizz.tapes.ui.menu.about.AboutScreen
 import gizz.tapes.ui.menu.settings.SettingsScreen
 import gizz.tapes.ui.player.FullPlayer
 import gizz.tapes.ui.selection.ShowSelectionScreen
@@ -38,6 +38,8 @@ fun GizzNavController(
             )
         }
 
+        val navigateUp = NavigateUp { navController.navigateUp() }
+
         composable(route = Screen.YearSelection.route) {
             YearSelectionScreen(
                 onMiniPlayerClick = miniPlayerClicked,
@@ -51,7 +53,7 @@ fun GizzNavController(
             arguments = Screen.ShowSelection.navArguments
         ) {
             ShowSelectionScreen(
-                navigateUpClick = { navController.navigateUp() },
+                navigateUpClick = navigateUp,
                 onShowClicked = { id, title ->
                     navController.navigate(
                         Screen.Show.createRoute(
@@ -68,7 +70,7 @@ fun GizzNavController(
             arguments = Screen.Show.navArguments,
         ) {
             ShowScreen(
-                upClick = { navController.navigateUp() },
+                navigateUp = navigateUp,
                 onMiniPlayerClick = miniPlayerClicked
             )
         }
@@ -76,11 +78,11 @@ fun GizzNavController(
         fullPlayerNavigation(navController)
 
         composable(route = Screen.About.route) {
-            AboutScreen { navController.navigateUp() }
+            AboutScreen(navigateUp = navigateUp)
         }
 
         composable(route = Screen.Settings.route) {
-            SettingsScreen { navController.navigateUp() }
+            SettingsScreen(navigateUp = navigateUp)
         }
     }
 }
@@ -110,7 +112,7 @@ fun NavGraphBuilder.fullPlayerNavigation(navController: NavHostController) {
                     popUpTo(Screen.YearSelection.route)
                 }
             },
-            upClick = { navController.navigateUp() },
+            navigateUp = { navController.navigateUp() },
         )
     }
 }

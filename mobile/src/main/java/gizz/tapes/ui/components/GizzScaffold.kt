@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.util.LCE
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 fun <T> GizzScaffold(
     title: Title,
     state: LCE<T, Any>,
-    upClick: (() -> Unit)?,
+    navigateUp: (NavigateUp)?,
     actions: @Composable RowScope.() -> Unit,
     content: @Composable (value: T, playerError: (PlayerError) -> Unit) -> Unit
 ) {
@@ -34,7 +35,7 @@ fun <T> GizzScaffold(
     val titleComposable: @Composable () -> Unit = { TopAppBarText(title) }
 
     val appBar: @Composable () -> Unit = {
-        if (upClick == null) {
+        if (navigateUp == null) {
             CenterAlignedTopAppBar(
                 title = titleComposable,
                 navigationIcon = gizzIcon(),
@@ -43,7 +44,7 @@ fun <T> GizzScaffold(
         } else {
             TopAppBar(
                 title = titleComposable,
-                navigationIcon = navigationUpIcon(upClick),
+                navigationIcon = navigationUpIcon(navigateUp),
                 actions = actions
             )
         }

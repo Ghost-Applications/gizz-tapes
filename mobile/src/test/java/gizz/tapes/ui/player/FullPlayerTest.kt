@@ -50,7 +50,7 @@ private fun Paparazzi.snapshot(state: PlayerState) {
             playerState = state,
             title = Title("2021/08/08 Deer Creek Music Center"),
             navigateToShow = { _, _ -> },
-            upClick = { },
+            navigateUp = { },
             seekTo = {},
             seekToPreviousMediaItem = { },
             seekToNextMediaItem = { },

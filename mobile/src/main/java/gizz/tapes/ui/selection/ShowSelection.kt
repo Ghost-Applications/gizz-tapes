@@ -8,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.SelectionData
 import gizz.tapes.ui.components.SelectionScreen
@@ -21,7 +22,7 @@ import gizz.tapes.util.mapCollection
 fun ShowSelectionScreen(
     viewModel: ShowSelectionViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
-    navigateUpClick: () -> Unit,
+    navigateUpClick: NavigateUp,
     onShowClicked: (ShowId, Title) -> Unit,
     onMiniPlayerClick: (Title) -> Unit,
 ) {
@@ -46,7 +47,7 @@ fun ShowSelectionScreen(
     screenTitle: Title,
     state: LCE<List<ShowSelectionData>, Throwable>,
     playerState: PlayerState,
-    navigateUpClick: () -> Unit,
+    navigateUpClick: NavigateUp,
     onShowClicked: (ShowId, Title) -> Unit,
     onMiniPlayerClick: (Title) -> Unit,
     onPauseAction: () -> Unit,
@@ -66,7 +67,7 @@ fun ShowSelectionScreen(
     SelectionScreen(
         title = screenTitle,
         state = selectionData,
-        upClick = navigateUpClick,
+        navigateUp = navigateUpClick,
         onMiniPlayerClick = onMiniPlayerClick,
         playerState = playerState,
         onPauseAction = onPauseAction,

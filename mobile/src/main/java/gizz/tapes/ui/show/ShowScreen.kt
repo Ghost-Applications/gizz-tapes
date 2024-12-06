@@ -44,6 +44,7 @@ import coil.compose.AsyncImage
 import gizz.tapes.R
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.ErrorScreen
 import gizz.tapes.ui.components.GizzScaffold
@@ -64,7 +65,7 @@ import kotlin.time.Duration.Companion.seconds
 fun ShowScreen(
     viewModel: ShowViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
-    upClick: () -> Unit,
+    navigateUp: NavigateUp,
     onMiniPlayerClick: (Title) -> Unit
 ) {
     val showState by viewModel.show.collectAsState()
@@ -76,7 +77,7 @@ fun ShowScreen(
         state = showState,
         playerState = playerState,
         appBarTitle = viewModel.title,
-        upClick = upClick,
+        navigateUp = navigateUp,
         onMiniPlayerClick = onMiniPlayerClick,
         onPauseAction = playerViewModel::pause,
         onPlayAction = playerViewModel::play,
@@ -112,7 +113,7 @@ fun ShowScreen(
     state: LCE<ShowScreenState, Throwable>,
     playerState: PlayerState,
     appBarTitle: Title,
-    upClick: () -> Unit,
+    navigateUp: NavigateUp,
     onRowClick: (index: Int, isPlaying: Boolean) -> Unit,
     onMiniPlayerClick: (Title) -> Unit,
     onPauseAction: () -> Unit,
@@ -122,7 +123,7 @@ fun ShowScreen(
     GizzScaffold(
         title = appBarTitle,
         state = state,
-        upClick = upClick,
+        navigateUp = navigateUp,
         actions = actions
     ) { value, playerError ->
         when(state) {
