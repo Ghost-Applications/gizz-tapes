@@ -18,6 +18,8 @@ import gizz.tapes.data.Settings
 import gizz.tapes.data.Year
 import gizz.tapes.util.showTitle
 import gizz.tapes.util.title
+import gizz.tapes.util.toAlbumFormat
+import gizz.tapes.util.toSimpleFormat
 import gizz.tapes.util.tryAndGetPreferredRecordingType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -47,7 +49,7 @@ class MediaItemTree @Inject constructor(
     private val shows: MutableMap<String, MediaItemNode> = mutableMapOf()
     private val tracks: MutableMap<String, MediaItemNode> = mutableMapOf()
 
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val root = MediaItemNode(
         MediaItem.Builder()
@@ -73,6 +75,7 @@ class MediaItemTree @Inject constructor(
                     .map { (key, value) ->
                         Year(key.year) to PosterUrl(value.random().posterUrl)
                     }
+                    .reversed()
                 val children = years.map { (year, posterUrl) ->
                     MediaItemNode(
                         MediaItem.Builder()
@@ -117,11 +120,16 @@ class MediaItemTree @Inject constructor(
                 // get shows for year add to the
                 val shows = retryForever { apiClient.shows() }
                     .filter { it.date.year.toString() == year.id }
+                    .reversed()
                     .map {
                         MediaItem.Builder()
                             .setMediaMetadata(
                                 MediaMetadata.Builder()
                                     .setTitle(it.showTitle)
+                                    .setDisplayTitle("${it.date.toAlbumFormat()} ${it.showTitle}")
+                                    .setReleaseYear(it.date.year)
+                                    .setReleaseDay(it.date.dayOfMonth)
+                                    .setReleaseMonth(it.date.monthNumber)
                                     .setIsPlayable(true)
                                     .setIsBrowsable(true)
                                     .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
@@ -147,6 +155,9 @@ class MediaItemTree @Inject constructor(
             if (show.children.isEmpty()) {
                 val showData = retryForever { apiClient.show(show.id) }
 
+                val showMetadata = show.item.mediaMetadata
+                val date = "${showMetadata.releaseYear}/${showMetadata.releaseMonth}/${showMetadata.releaseDay}"
+
                 val preferredRecordingType = dataStore.data.map { it.preferredRecordingType }.first()
                 val recording = showData.recordings.tryAndGetPreferredRecordingType(preferredRecordingType)
 
@@ -163,7 +174,7 @@ class MediaItemTree @Inject constructor(
                                         putString("showTitle", show.item.title)
                                     }
                                 )
-                                .setArtist(show.item.title)
+                                .setArtist("$date ${show.item.title}")
                                 .setAlbumArtist(BandName)
                                 .setAlbumTitle(show.item.title)
                                 .setTitle(track.title)
@@ -191,7 +202,7 @@ class MediaItemTree @Inject constructor(
         return ImmutableList.of()
     }
 
-    suspend fun getItem(mediaId: String): MediaItem? {
+    fun getItem(mediaId: String): MediaItem {
         if (root.id == mediaId) {
             return root.item
         }

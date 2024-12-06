@@ -172,6 +172,12 @@ class PlaybackService : MediaLibraryService(),
         browser: MediaSession.ControllerInfo,
         params: LibraryParams?
     ): ListenableFuture<LibraryResult<MediaItem>> {
+        Timber.d(
+            "onGetLibraryRoot() session=%s, browser=%s, params=%s",
+            session,
+            browser,
+            params
+        )
         return serviceScope.future {
             val item = mediaItemTree.getRoot()
             LibraryResult.ofItem(item, params)
