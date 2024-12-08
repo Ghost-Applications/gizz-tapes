@@ -6,3 +6,6 @@ record-screenshots:
 
 build:
     ./gradlew build
+
+release:
+    bundle exe fastlane release
