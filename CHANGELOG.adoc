@@ -1,6 +1,8 @@
 = Changelog
 
-== Dawn of Eternal Night
+== EvilDeathRow
+
+== Dawn of Eternal Night 2024-12-08
 
 - Fix system ui icon being same color as app background
 - Fix issue when playing a new show would always play the first song
