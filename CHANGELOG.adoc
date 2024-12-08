@@ -6,6 +6,7 @@
 - Fix issue when playing a new show would always play the first song
 even when taping other songs in the show.
 - Show show title in place of band name in Android Auto
+- Add settings screen, with ability to choose default stream type
 
 == Converge-Patch1 2024-11-18
 
