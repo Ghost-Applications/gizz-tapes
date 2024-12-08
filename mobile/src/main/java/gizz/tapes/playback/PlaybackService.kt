@@ -35,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.guava.future
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -45,13 +46,14 @@ class PlaybackService : MediaLibraryService(),
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    private var player: ReplaceableForwardingPlayer? = null
     private var mediaSession: MediaLibrarySession? = null
     private var exoPlayer: Player? = null
     private var castPlayer: Player? = null
 
-    @Inject
-    lateinit var mediaItemTree: MediaItemTree
+    @Inject lateinit var replaceableForwardingPlayer: ReplaceableForwardingPlayerFactory
+    @Inject lateinit var mediaItemTree: MediaItemTree
+
+    lateinit var player: ReplaceableForwardingPlayer
 
     @OptIn(UnstableApi::class)
     override fun onCreate() {
@@ -71,7 +73,8 @@ class PlaybackService : MediaLibraryService(),
 
         if (CastAvailabilityChecker.isAvailable) { setupCastPlayer() }
 
-        val player = ReplaceableForwardingPlayer(exoPlayer)
+        this.player = replaceableForwardingPlayer.create(exoPlayer)
+
         val pendingIntent = PendingIntent.getActivity(
             this,
             1337,
@@ -83,7 +86,6 @@ class PlaybackService : MediaLibraryService(),
             .setSessionActivity(pendingIntent)
             .build()
         this.exoPlayer = exoPlayer
-        this.player = player
     }
 
     override fun onDestroy() {
@@ -117,9 +119,9 @@ class PlaybackService : MediaLibraryService(),
     ): ListenableFuture<MediaItemsWithStartPosition> {
         return serviceScope.future(Dispatchers.Main) {
             MediaItemsWithStartPosition(
-                player?.playlist ?: emptyList(),
-                player?.currentPlaylistIndex ?: 0,
-                player?.currentPosition ?: C.TIME_UNSET
+                player.playlist,
+                player.currentPlaylistIndex,
+                player.currentPosition
             )
         }
     }
@@ -224,13 +226,13 @@ class PlaybackService : MediaLibraryService(),
                     object : androidx.media3.cast.SessionAvailabilityListener {
                         override fun onCastSessionAvailable() {
                             castPlayer?.let {
-                                player?.setPlayer(it)
+                                player.setPlayer(it)
                             }
                         }
 
                         override fun onCastSessionUnavailable() {
                             exoPlayer?.let {
-                                player?.setPlayer(it)
+                                player.setPlayer(it)
                             }
                         }
                     }
