@@ -69,31 +69,7 @@ class PlaybackService : MediaLibraryService(),
             .setSkipSilenceEnabled(true)
             .build()
 
-        if (CastAvailabilityChecker.isAvailable) {
-            val castContext = CastContext.getSharedInstance(this, MoreExecutors.directExecutor())
-                .addOnFailureListener {
-                    Timber.e(it, "Error getting the cast session")
-                }
-                .result
-
-            castPlayer = CastPlayer(castContext).apply {
-                setSessionAvailabilityListener(
-                    object : androidx.media3.cast.SessionAvailabilityListener {
-                        override fun onCastSessionAvailable() {
-                            castPlayer?.let {
-                                player?.setPlayer(it)
-                            }
-                        }
-
-                        override fun onCastSessionUnavailable() {
-                            exoPlayer.let {
-                                player?.setPlayer(it)
-                            }
-                        }
-                    }
-                )
-            }
-        }
+        if (CastAvailabilityChecker.isAvailable) { setupCastPlayer() }
 
         val player = ReplaceableForwardingPlayer(exoPlayer)
         val pendingIntent = PendingIntent.getActivity(
@@ -232,6 +208,36 @@ class PlaybackService : MediaLibraryService(),
                     it
                 }
             }
+        }
+    }
+
+    private fun setupCastPlayer() {
+        runCatching {
+            val castContext = CastContext.getSharedInstance(this, MoreExecutors.directExecutor())
+                .addOnFailureListener {
+                    Timber.e(it, "Error getting the cast session")
+                }
+                .result
+
+            castPlayer = CastPlayer(castContext).apply {
+                setSessionAvailabilityListener(
+                    object : androidx.media3.cast.SessionAvailabilityListener {
+                        override fun onCastSessionAvailable() {
+                            castPlayer?.let {
+                                player?.setPlayer(it)
+                            }
+                        }
+
+                        override fun onCastSessionUnavailable() {
+                            exoPlayer?.let {
+                                player?.setPlayer(it)
+                            }
+                        }
+                    }
+                )
+            }
+        }.onFailure {
+            Timber.e(it, "Error loading cast services")
         }
     }
 }
