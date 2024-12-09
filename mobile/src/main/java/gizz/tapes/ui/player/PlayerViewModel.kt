@@ -12,12 +12,14 @@ import gizz.tapes.data.PlayerErrorMessage
 import gizz.tapes.data.Title
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.ui.player.PlayerState.NoMedia
+import gizz.tapes.util.MediaItemWrapper
 import gizz.tapes.util.mediaExtras
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @UnstableApi
@@ -115,7 +117,13 @@ class PlayerViewModel @Inject constructor(
             cmi.mediaId.isEmpty() -> NoMedia
             else -> {
                 val metadata = cmi.mediaMetadata
-                val (showId, venueName) = cmi.mediaExtras
+                val (showId, venueName) = cmi.mediaExtras ?: run {
+                    Timber.w(
+                        "Current media item does not have required extras: %s",
+                        MediaItemWrapper(cmi)
+                    )
+                    return NoMedia
+                }
 
                 if (playerError == null) {
                     PlayerState.MediaLoaded(
