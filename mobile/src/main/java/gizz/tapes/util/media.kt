@@ -10,7 +10,7 @@ val Long.formatedElapsedTime: String get() = DateUtils.formatElapsedTime(max(thi
 val MediaItem?.title: String get() = this?.mediaMetadata?.title?.toString() ?: "--"
 
 /** Must be called on metadata with extras **/
-val MediaItem.mediaExtras: Pair<ShowId, Title> get() = mediaMetadata.extras!!.toShowInfo()
+val MediaItem.mediaExtras: Pair<ShowId, Title>? get() = mediaMetadata.extras?.toShowInfo()
 
 fun MediaItem.toReadableString() = """
     mediaId=${this.mediaId}
