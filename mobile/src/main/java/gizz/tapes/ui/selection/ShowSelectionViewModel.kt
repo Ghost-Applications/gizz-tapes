@@ -15,9 +15,10 @@ import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
 import gizz.tapes.util.showTitle
 import gizz.tapes.util.toSimpleFormat
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,16 +38,15 @@ class ShowSelectionViewModel @Inject constructor(
 ): ViewModel() {
 
     val showYear: String = checkNotNull(savedStateHandle["year"])
+    val shows = loadShows().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = LCE.Loading
+    )
 
-    private val _shows: MutableStateFlow<LCE<List<ShowSelectionData>, Throwable>> = MutableStateFlow(LCE.Loading)
-    val shows: StateFlow<LCE<List<ShowSelectionData>, Throwable>> = _shows
 
-    init {
-        loadShows()
-    }
-
-    private fun loadShows() {
-        viewModelScope.launch {
+    private fun loadShows(): Flow<LCE<List<ShowSelectionData>, Throwable>> {
+        return flow {
             val state = retryUntilSuccessful(
                 action = {
                     apiClient.shows().map { shows ->
@@ -67,7 +67,7 @@ class ShowSelectionViewModel @Inject constructor(
                 },
                 onErrorAfter3SecondsAction = { error ->
                     Timber.d(error, "Error retrieving shows")
-                    _shows.emit(
+                    emit(
                         LCE.Error(
                             userDisplayedMessage = apiErrorMessage.value,
                             error = error
@@ -75,7 +75,8 @@ class ShowSelectionViewModel @Inject constructor(
                     )
                 }
             )
-            _shows.emit(state)
+
+            emit(state)
         }
     }
 }

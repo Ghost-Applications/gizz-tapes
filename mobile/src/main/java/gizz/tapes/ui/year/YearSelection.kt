@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -22,36 +23,49 @@ import androidx.media3.common.util.UnstableApi
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.data.Year
+import gizz.tapes.data.SortOrder
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.SelectionData
 import gizz.tapes.ui.components.SelectionScreen
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerViewModel
 import gizz.tapes.util.LCE
+import gizz.tapes.util.map
 import gizz.tapes.util.mapCollection
 
 @OptIn(UnstableApi::class)
 @Composable
 fun YearSelectionScreen(
     viewModel: YearSelectionViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel = hiltViewModel(),
+//    playerViewModel: PlayerViewModel = hiltViewModel(),
     onYearClicked: (year: Year) -> Unit,
     onMiniPlayerClick: (Title) -> Unit,
     navigateToAboutPage: () -> Unit,
     navigateToSettingsPage: () -> Unit,
 ) {
     val state: LCE<List<YearSelectionData>, Throwable> by viewModel.years.collectAsState()
-    val playerState by playerViewModel.playerState.collectAsState()
+//    val playerState by playerViewModel.playerState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
+    var sortOrder: SortOrder by remember { mutableStateOf(SortOrder.Ascending) }
 
     YearSelectionScreen(
         yearData = state,
+        sortOrder = sortOrder,
         onYearClicked = onYearClicked,
         onMiniPlayerClick = onMiniPlayerClick,
-        playerState = playerState,
-        onPauseAction = playerViewModel::pause,
-        onPlayAction = playerViewModel::play,
+        playerState = PlayerState.NoMedia, //playerState,
+        onPauseAction = { }, //playerViewModel::pause,
+        onPlayAction = { }, //playerViewModel::play,
         actions = {
+            IconButton(
+                onClick = { sortOrder = !sortOrder }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SortByAlpha,
+                    contentDescription = "Sort By Year"
+                )
+            }
+
             CastButton()
 
             IconButton(onClick = { showMenu = !showMenu }) {
@@ -88,6 +102,7 @@ fun YearSelectionScreen(
 @Composable
 fun YearSelectionScreen(
     yearData: LCE<List<YearSelectionData>, Throwable>,
+    sortOrder: SortOrder,
     onYearClicked: (year: Year) -> Unit,
     onMiniPlayerClick: (title: Title) -> Unit,
     playerState: PlayerState,
@@ -102,6 +117,11 @@ fun YearSelectionScreen(
             posterUrl = it.randomShowPoster,
         ) {
             onYearClicked(it.year)
+        }
+    }.let {
+        when(sortOrder) {
+            SortOrder.Ascending -> it
+            SortOrder.Descending -> it.map { data -> data.reversed() }
         }
     }
 

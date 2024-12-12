@@ -1,6 +1,10 @@
 = Changelog
 
-== EvilDeathRow
+== Evil Death Roll
+
+- Bug fixes and Performance
+- Fixed Image Caching
+- Sorting for shows and years
 
 == Dawn of Eternal Night 2024-12-08
 

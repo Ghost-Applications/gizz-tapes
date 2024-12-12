@@ -1,6 +1,7 @@
 package gizz.tapes.ui.year
 
 import app.cash.paparazzi.Paparazzi
+import gizz.tapes.data.SortOrder
 import gizz.tapes.noShowPlayerState
 import gizz.tapes.showingPlayerState
 import gizz.tapes.ui.PaparazziNightTest
@@ -89,7 +90,8 @@ private fun Paparazzi.snapshot(
             onMiniPlayerClick = {},
             onPlayAction = {},
             onPauseAction = {},
-            actions = {}
+            actions = {},
+            sortOrder = SortOrder.Ascending
         )
     }
 }

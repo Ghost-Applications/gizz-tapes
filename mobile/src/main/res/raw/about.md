@@ -1,7 +1,7 @@
 **Gizz Tapes** is your ultimate jukebox for live tapes of [King Gizzard and the Lizard Wizard](https://kinggizzardandthelizardwizard.com/) shows!
 This **unofficial** app has no affiliation with the band but is built with love for the community.
 It utilizes the [Gizz Tapes Api](https://tapes.kglw.net/api/docs/) to bring you a treasure trove of live recordings.
-All audio is hosted by and streamed from the Internet Archive. Artwork, show notes and other metadata are obtained from [KGLW.net](KGLW.net).
+All audio is hosted by and streamed from the Internet Archive. Artwork, show notes and other metadata are obtained from [KGLW.net](http://kglw.net).
 
 Want to receive notifications when we add a new show to the site? Follow Gizz Tapes 
 on [Bluesky](https://bsky.app/profile/tapes.kglw.net), or check out our handy 

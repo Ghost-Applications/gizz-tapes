@@ -1,8 +1,10 @@
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
 
-actual fun runBlocking(body: suspend CoroutineScope.() -> Unit): Unit {
+@OptIn(DelicateCoroutinesApi::class)
+actual fun runBlocking(body: suspend CoroutineScope.() -> Unit) {
     GlobalScope.promise { body() }
-    return Unit
+    return
 }

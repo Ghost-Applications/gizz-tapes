@@ -46,9 +46,7 @@ import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Title
 import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.CastButton
-import gizz.tapes.ui.components.ErrorScreen
 import gizz.tapes.ui.components.GizzScaffold
-import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.ui.player.PlayerState
@@ -126,8 +124,7 @@ fun ShowScreen(
         navigateUp = navigateUp,
         actions = actions
     ) { value, playerError ->
-        when(state) {
-            is LCE.Content -> ShowListWithPlayer(
+        ShowListWithPlayer(
                 showData = value,
                 onMiniPlayerClick = onMiniPlayerClick,
                 onRowClick = onRowClick,
@@ -135,10 +132,7 @@ fun ShowScreen(
                 onPlayAction = onPlayAction,
                 playerState = playerState,
                 playerError = playerError
-            )
-            is LCE.Error -> ErrorScreen(state.userDisplayedMessage)
-            LCE.Loading -> LoadingScreen()
-        }
+        )
     }
 }
 

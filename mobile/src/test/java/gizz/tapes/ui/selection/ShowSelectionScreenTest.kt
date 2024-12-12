@@ -1,6 +1,7 @@
 package gizz.tapes.ui.selection
 
 import app.cash.paparazzi.Paparazzi
+import gizz.tapes.data.SortOrder
 import gizz.tapes.data.Title
 import gizz.tapes.noShowPlayerState
 import gizz.tapes.showListContent
@@ -82,6 +83,7 @@ private fun Paparazzi.snapshot(
         ShowSelectionScreen(
             screenTitle = Title("2001"),
             state = state,
+            sortOrder = SortOrder.Ascending,
             playerState = playerState,
             navigateUpClick = {},
             onShowClicked = { _, _ -> },

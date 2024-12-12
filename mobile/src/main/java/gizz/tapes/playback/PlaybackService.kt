@@ -203,7 +203,7 @@ class PlaybackService : MediaLibraryService(),
 
             mediaItems.map {
                 if (it.localConfiguration == null) {
-                    mediaItemTree.getItem(it.mediaId) ?: it
+                    mediaItemTree.getItem(it.mediaId)
                 } else {
                     it
                 }

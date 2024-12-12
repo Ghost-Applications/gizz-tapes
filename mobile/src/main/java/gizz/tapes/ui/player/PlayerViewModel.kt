@@ -14,10 +14,16 @@ import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.ui.player.PlayerState.NoMedia
 import gizz.tapes.util.MediaItemWrapper
 import gizz.tapes.util.mediaExtras
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -32,56 +38,61 @@ class PlayerViewModel @Inject constructor(
 
     private lateinit var player: Player
 
-    private val playerListener = object : Player.Listener {
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            viewModelScope.launch {
-                _playerState.emit(newState())
-            }
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            viewModelScope.launch {
-                _playerState.emit(newState())
-            }
-        }
-
-        override fun onIsLoadingChanged(isLoading: Boolean) {
-            viewModelScope.launch {
-                _playerState.emit(newState())
-            }
-        }
-
-        override fun onPlayerError(error: PlaybackException) {
-            viewModelScope.launch {
-                _playerState.emit(newState(PlayerError(playerErrorMessage.value)))
-            }
-        }
-    }
-
-    private val _playerState: MutableStateFlow<PlayerState> = MutableStateFlow(NoMedia)
-    val playerState: StateFlow<PlayerState> = _playerState
-
     val title: Title? = savedStateHandle.get<String>("title")?.let { Title.fromEncodedString(it) }
 
-    init {
-        viewModelScope.launch {
-            flow {
-                while(mediaPlayerContainer.mediaPlayer == null) {
-                    delay(1)
+    private val playerCallbackFlow = callbackFlow {
+        val listener = object : Player.Listener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                viewModelScope.launch {
+                    send(newState())
                 }
-                emit(checkNotNull(mediaPlayerContainer.mediaPlayer))
-            }.collect {
-                player = it
-                it.addListener(playerListener)
-                _playerState.emit(newState())
+            }
 
-                while (true) {
-                    delay(1000)
-                    _playerState.emit(newState())
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                viewModelScope.launch {
+                    send(newState())
+                }
+            }
+
+            override fun onIsLoadingChanged(isLoading: Boolean) {
+                viewModelScope.launch {
+                    send(newState())
+                }
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                viewModelScope.launch {
+                    send(newState(PlayerError(playerErrorMessage.value)))
                 }
             }
         }
+
+        while (mediaPlayerContainer.mediaPlayer == null) {
+            delay(10)
+        }
+
+        player = checkNotNull(mediaPlayerContainer.mediaPlayer)
+        player.addListener(listener)
+
+        awaitClose {
+            player.removeListener(listener)
+        }
     }
+
+    private fun updatePlayerState(): Flow<PlayerState> {
+        return flow {
+            while (currentCoroutineContext().isActive && mediaPlayerContainer.mediaPlayer != null) {
+                delay(600)
+                emit(newState())
+            }
+        }
+    }
+
+    val playerState = merge(playerCallbackFlow, updatePlayerState()).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = NoMedia
+    )
 
     fun play() = player.play()
     fun pause() = player.pause()
@@ -105,9 +116,6 @@ class PlayerViewModel @Inject constructor(
 
     fun seekTo(positionMs: Long) = player.seekTo(positionMs)
 
-    override fun onCleared() {
-        player.removeListener(playerListener)
-    }
 
     private fun newState(playerError: PlayerError? = null): PlayerState {
         val cmi = player.currentMediaItem
