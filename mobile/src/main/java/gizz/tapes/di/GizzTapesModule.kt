@@ -70,6 +70,7 @@ interface GizzTapesModule {
             .okHttpClient(okHttpClient)
             .components { add(SvgDecoder.Factory()) }
             .crossfade(true)
+            .respectCacheHeaders(false)
             .build()
 
         @Provides

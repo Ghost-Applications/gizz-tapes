@@ -19,16 +19,12 @@ import gizz.tapes.data.Year
 import gizz.tapes.util.showTitle
 import gizz.tapes.util.title
 import gizz.tapes.util.toAlbumFormat
-import gizz.tapes.util.toSimpleFormat
 import gizz.tapes.util.tryAndGetPreferredRecordingType
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -51,8 +47,7 @@ class MediaItemTree @Inject constructor(
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    private val root = MediaItemNode(
-        MediaItem.Builder()
+    private val root = MediaItem.Builder()
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setTitle("Gizz Tape Shows!")
@@ -63,20 +58,22 @@ class MediaItemTree @Inject constructor(
             )
             .setMediaId("ROOT")
             .build()
-    )
 
-    private lateinit var mediaTree: Deferred<MediaItemNode>
+    fun getRoot(): MediaItem {
+        return root
+    }
 
-    init {
-        scope.launch {
-            mediaTree = async {
-                val years: List<Pair<Year, PosterUrl>> = retryForever { apiClient.shows() }
-                    .groupBy { it.date }
-                    .map { (key, value) ->
-                        Year(key.year) to PosterUrl(value.random().posterUrl)
-                    }
-                    .reversed()
-                val children = years.map { (year, posterUrl) ->
+    @UnstableApi
+    suspend fun getChildren(parentId: String): ImmutableList<MediaItem> {
+        Timber.d("getChildren() parentId=%s", parentId)
+        if (root.mediaId == parentId) {
+            val years: List<MediaItemNode> = retryForever { apiClient.shows() }
+                .groupBy { it.date }
+                .map { (key, value) ->
+                    Year(key.year) to PosterUrl(value.random().posterUrl)
+                }
+                .reversed()
+                .map { (year, posterUrl) ->
                     MediaItemNode(
                         MediaItem.Builder()
                             .setMediaMetadata(
@@ -92,24 +89,12 @@ class MediaItemTree @Inject constructor(
                             .build()
                     )
                 }
-                root.children.addAll(children)
-                children.forEach {
-                    this@MediaItemTree.years[it.id] = it
-                }
-                root
+
+            years.forEach {
+                this@MediaItemTree.years[it.id] = it
             }
-        }
-    }
 
-    suspend fun getRoot(): MediaItem {
-        return mediaTree.await().item
-    }
-
-    @UnstableApi
-    suspend fun getChildren(parentId: String): ImmutableList<MediaItem> {
-        Timber.d("getChildren() parentId=%s", parentId)
-        if (root.item.mediaId == parentId) {
-            return ImmutableList.copyOf(root.children.map { it.item })
+            return ImmutableList.copyOf(years.map { it.item })
         }
 
         // years
@@ -156,10 +141,13 @@ class MediaItemTree @Inject constructor(
                 val showData = retryForever { apiClient.show(show.id) }
 
                 val showMetadata = show.item.mediaMetadata
-                val date = "${showMetadata.releaseYear}/${showMetadata.releaseMonth}/${showMetadata.releaseDay}"
+                val date =
+                    "${showMetadata.releaseYear}/${showMetadata.releaseMonth}/${showMetadata.releaseDay}"
 
-                val preferredRecordingType = dataStore.data.map { it.preferredRecordingType }.first()
-                val recording = showData.recordings.tryAndGetPreferredRecordingType(preferredRecordingType)
+                val preferredRecordingType =
+                    dataStore.data.map { it.preferredRecordingType }.first()
+                val recording =
+                    showData.recordings.tryAndGetPreferredRecordingType(preferredRecordingType)
 
                 val showChildren = recording.files.map { track ->
                     MediaItem.Builder()
@@ -203,8 +191,8 @@ class MediaItemTree @Inject constructor(
     }
 
     fun getItem(mediaId: String): MediaItem {
-        if (root.id == mediaId) {
-            return root.item
+        if (root.mediaId == mediaId) {
+            return root
         }
 
         val year = years[mediaId]

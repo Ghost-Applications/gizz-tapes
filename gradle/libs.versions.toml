@@ -1,7 +1,7 @@
 [versions]
 android-sdk = "35"
 kotlin = "2.0.21"
-firebase-bom = "33.6.0"
+firebase-bom = "33.7.0"
 androidx-media2 = "1.3.0"
 flipper = "0.261.0"
 coroutines = "1.9.0"
@@ -16,7 +16,7 @@ ktor = "2.3.12"
 arrow = "1.2.4"
 
 [libraries]
-android-build-gradle = { module = "com.android.tools.build:gradle", version = "8.7.2"}
+android-build-gradle = { module = "com.android.tools.build:gradle", version = "8.7.3"}
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin"}
 kotlin-poet = { module = "com.squareup:kotlinpoet", version = "1.18.1" }
 java-poet = "com.squareup:javapoet:1.13.0"

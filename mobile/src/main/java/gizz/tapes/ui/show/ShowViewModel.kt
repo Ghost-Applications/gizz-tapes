@@ -10,7 +10,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
-import arrow.core.NonEmptyList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.data.ApiErrorMessage
@@ -24,43 +23,16 @@ import gizz.tapes.util.LCE
 import gizz.tapes.util.map
 import gizz.tapes.util.retryUntilSuccessful
 import gizz.tapes.util.tryAndGetPreferredRecordingType
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
-
-data class ShowScreenState(
-    val removeOldMediaItemsAndAddNew: () -> Unit,
-    val showPosterUrl: PosterUrl,
-    val tracks: NonEmptyList<Track>
-) {
-    data class Track(
-        val id: TrackId,
-        val title: TrackTitle,
-        val duration: TrackDuration
-    )
-}
-
-@JvmInline
-value class TrackId(val id: String)
-
-@JvmInline
-value class TrackTitle(val title: String)
-
-@JvmInline
-value class TrackDuration(val duration: Duration) {
-    val formatedDuration: String get() {
-        val seconds = duration.inWholeSeconds - duration.inWholeMinutes.minutes.inWholeSeconds
-        val secondsString = seconds.toString().takeIf { it.length > 1 } ?: "0$seconds"
-
-        return "${duration.inWholeMinutes}:$secondsString"
-    }
-}
 
 @HiltViewModel
 class ShowViewModel @Inject constructor(
@@ -77,16 +49,16 @@ class ShowViewModel @Inject constructor(
         checkNotNull(savedStateHandle.get<String>("title"))
     )
 
-    private val _show: MutableStateFlow<LCE<ShowScreenState, Throwable>> = MutableStateFlow(LCE.Loading)
-    val show: StateFlow<LCE<ShowScreenState, Throwable>> = _show
-
-    init {
-        loadShow()
-    }
+    val show: StateFlow<LCE<ShowScreenState, Throwable>> = loadShow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = LCE.Loading
+        )
 
     @OptIn(UnstableApi::class)
-    private fun loadShow() {
-        viewModelScope.launch {
+    private fun loadShow(): Flow<LCE<ShowScreenState, Throwable>> {
+        return flow {
             val preferredRecording = datastore.data
                 .map { it.preferredRecordingType }
                 .first()
@@ -97,7 +69,7 @@ class ShowViewModel @Inject constructor(
                 },
                 onErrorAfter3SecondsAction = { error ->
                     Timber.d(error, "Error retrieving show")
-                    _show.emit(
+                    emit(
                         LCE.Error(
                             userDisplayedMessage = apiErrorMessage.value,
                             error = error
@@ -137,9 +109,11 @@ class ShowViewModel @Inject constructor(
                 ShowScreenState(
                     showPosterUrl = PosterUrl(show.posterUrl),
                     removeOldMediaItemsAndAddNew = {
-                        checkNotNull(mediaPlayerContainer.mediaPlayer).apply {
-                            clearMediaItems()
-                            addMediaItems(items)
+                        viewModelScope.launch {
+                            checkNotNull(mediaPlayerContainer.mediaPlayer).apply {
+                                clearMediaItems()
+                                addMediaItems(items)
+                            }
                         }
                     },
                     tracks = recording.files.map {
@@ -152,7 +126,7 @@ class ShowViewModel @Inject constructor(
                 )
             }
 
-            _show.emit(state)
+            emit(state)
         }
     }
 }

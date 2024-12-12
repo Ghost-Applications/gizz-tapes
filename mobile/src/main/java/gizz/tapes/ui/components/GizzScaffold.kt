@@ -1,10 +1,9 @@
 package gizz.tapes.ui.components
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -35,19 +34,11 @@ fun <T> GizzScaffold(
     val titleComposable: @Composable () -> Unit = { TopAppBarText(title) }
 
     val appBar: @Composable () -> Unit = {
-        if (navigateUp == null) {
-            CenterAlignedTopAppBar(
-                title = titleComposable,
-                navigationIcon = gizzIcon(),
-                actions = actions
-            )
-        } else {
-            TopAppBar(
-                title = titleComposable,
-                navigationIcon = navigationUpIcon(navigateUp),
-                actions = actions
-            )
-        }
+        TopAppBar(
+            title = titleComposable,
+            navigationIcon = if (navigateUp == null) gizzIcon() else navigationUpIcon(navigateUp),
+            actions = actions
+        )
     }
 
     Scaffold(
@@ -55,16 +46,25 @@ fun <T> GizzScaffold(
         snackbarHost = {
             SnackbarHost(snackbarHostState)
         },
-        topBar = appBar
+        topBar = appBar,
     ) { innerPadding ->
-        Box(
+        AnimatedContent(
+            label = "Gizz Scaffold",
+            targetState = state,
+            contentKey = { current ->
+                when(current) {
+                    is LCE.Content -> "Content"
+                    is LCE.Error -> "Error"
+                    LCE.Loading -> "Loading"
+                }
+            },
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-        ) {
-            when(state) {
-                is LCE.Error -> ErrorScreen(state.userDisplayedMessage)
-                is LCE.Content -> content(state.value) {
+        ) { s ->
+            when(s) {
+                is LCE.Error -> ErrorScreen(s.userDisplayedMessage)
+                is LCE.Content -> content(s.value) {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             it.message,

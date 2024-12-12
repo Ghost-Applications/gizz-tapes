@@ -48,10 +48,7 @@ class PlayerViewModelTest {
 
 private val unimportantMediaPlayerContainer = object : MediaPlayerContainer {
     override val mediaPlayer: Player = object : Player by stub() {
-        override fun addListener(listener: Player.Listener) {
-
-        }
-
+        override fun addListener(listener: Player.Listener) = Unit
         override fun getCurrentMediaItem(): MediaItem = mediaItem
         override fun isPlaying(): Boolean = false
         override fun getCurrentPosition(): Long = 1000L

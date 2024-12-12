@@ -24,22 +24,23 @@ interface MediaPlayerContainer {
 @OptIn(UnstableApi::class)
 @Singleton
 class RealMediaPlayerContainer @Inject constructor(
-    @ApplicationContext val context: Context,
+    @ApplicationContext private val context: Context,
 ): MediaPlayerContainer {
 
-    private val controllerFuture: ListenableFuture<MediaController>
-    private var _mediaController: MediaController? = null
+    private var controllerFuture: ListenableFuture<MediaController>? = null
+    private var mediaController: MediaController? = null
 
-    override val mediaPlayer: Player? get() =_mediaController
+    override val mediaPlayer: Player? get() = mediaController
 
     init {
         val sessionToken = SessionToken(context, ComponentName(context, PlaybackService::class.java))
-        val mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
-        controllerFuture = mediaControllerFuture
+        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+        this.controllerFuture = controllerFuture
 
-        mediaControllerFuture.addListener(
+        controllerFuture.addListener(
             {
-                _mediaController = mediaControllerFuture.get()
+                val m = controllerFuture.get()
+                mediaController = m
             },
             MoreExecutors.directExecutor()
         )

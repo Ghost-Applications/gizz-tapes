@@ -16,7 +16,7 @@
 }
 
 # Keep kotlin metadata annotations
--keep class kotlin.Metadata
+-keepclassmembers class kotlin.Metadata { *; }
 
 # With R8 full mode generic signatures are stripped for classes that are not
 # kept. Suspend functions are wrapped in continuations where the type argument
@@ -27,3 +27,4 @@
 -keep public class * extends java.lang.Exception  # Optional: Keep custom exceptions.
 
 -dontwarn org.slf4j.impl.StaticLoggerBinder
+

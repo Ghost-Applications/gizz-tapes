@@ -1,7 +1,9 @@
 package gizz.tapes.data
 
 import android.net.Uri
+import androidx.compose.runtime.Immutable
 
+@Immutable
 @JvmInline
 value class PosterUrl(val value: String) {
 

@@ -7,32 +7,46 @@ import gizz.tapes.api.data.Recording.Type
 import gizz.tapes.data.Settings
 import gizz.tapes.stub
 import gizz.tapes.util.LCE
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingScreenViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun `when datastore is loading from disc screen state should be loading`() {
+    fun `when datastore is loading from disc screen state should be loading`() = runTest {
+        val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
         val classUnderTest = SettingScreenViewModel(
             dataStore = object : DataStore<Settings> by stub() {
                 override val data: Flow<Settings> = flow {  }
             }
         )
 
-        val value = classUnderTest.settingsScreenState.value
-
-        assertThat(value).isEqualTo(LCE.Loading)
+        val job = launch {
+            classUnderTest.settingsScreenState.collect { emittedValues.add(it) }
+        }
+        advanceUntilIdle()
+        job.cancelAndJoin()
+        assertThat(emittedValues).containsExactly(LCE.Loading)
     }
 
     @Test
-    fun `when datastore data is loaded, the value should be returned in the state`() {
+    fun `when datastore data is loaded, the value should be returned in the state`() = runTest {
+        val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
         val classUnderTest = SettingScreenViewModel(
             dataStore = object : DataStore<Settings> {
                 val dataStateFlow: MutableStateFlow<Settings> = MutableStateFlow(Settings(Type.SBD))
@@ -43,12 +57,17 @@ class SettingScreenViewModelTest {
             }
         )
 
-        val value = classUnderTest.settingsScreenState.value
-        assertThat(value).isEqualTo(LCE.Content(SettingsScreenState(Type.SBD)))
+        val job = launch {
+            classUnderTest.settingsScreenState.collect { emittedValues.add(it) }
+        }
+        advanceUntilIdle()
+        job.cancelAndJoin()
+        assertThat(emittedValues).containsExactly(LCE.Content(SettingsScreenState(Type.SBD)))
     }
 
     @Test
-    fun `updatePreferredRecordingType should update saved preferred recording type`() {
+    fun `updatePreferredRecordingType should update saved preferred recording type`() = runTest {
+        val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
         val classUnderTest = SettingScreenViewModel(
             dataStore = object : DataStore<Settings> {
                 val dataStateFlow: MutableStateFlow<Settings> = MutableStateFlow(Settings(Type.SBD))
@@ -61,9 +80,16 @@ class SettingScreenViewModelTest {
             }
         )
 
+        val job = launch {
+            classUnderTest.settingsScreenState.collect { emittedValues.add(it) }
+        }
+        advanceTimeBy(500.milliseconds)
         classUnderTest.updatePreferredRecordingType(Type.MTX)
-
-        val value = classUnderTest.settingsScreenState.value
-        assertThat(value).isEqualTo(LCE.Content(SettingsScreenState(Type.MTX)))
+        advanceUntilIdle()
+        job.cancelAndJoin()
+        assertThat(emittedValues).containsExactly(
+            LCE.Content(SettingsScreenState(Type.SBD)),
+            LCE.Content(SettingsScreenState(Type.MTX))
+        )
     }
 }

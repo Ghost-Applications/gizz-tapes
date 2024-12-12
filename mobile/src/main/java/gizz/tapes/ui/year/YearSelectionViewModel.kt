@@ -9,17 +9,12 @@ import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Year
 import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
-
-data class YearSelectionData(
-    val year: Year,
-    val showCount: Int,
-    val randomShowPoster: PosterUrl,
-)
 
 @HiltViewModel
 class YearSelectionViewModel @Inject constructor(
@@ -27,16 +22,14 @@ class YearSelectionViewModel @Inject constructor(
     private val apiErrorMessage: ApiErrorMessage
 ): ViewModel() {
 
-    private val _years: MutableStateFlow<LCE<List<YearSelectionData>, Throwable>> =
-        MutableStateFlow(LCE.Loading)
-    val years: StateFlow<LCE<List<YearSelectionData>, Throwable>> = _years
+    val years = loadYears().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = LCE.Loading
+    )
 
-    init {
-        loadYears()
-    }
-
-    private fun loadYears() {
-        viewModelScope.launch {
+    private fun loadYears(): Flow<LCE<List<YearSelectionData>, Throwable>> {
+        return flow {
             val state = retryUntilSuccessful(
                 action = { apiClient.shows().map {
                     it.groupBy { show -> show.date.year }
@@ -51,7 +44,7 @@ class YearSelectionViewModel @Inject constructor(
                 } },
                 onErrorAfter3SecondsAction = { error ->
                     Timber.d(error, "Error loading years.")
-                    _years.emit(
+                    emit(
                         LCE.Error(
                             userDisplayedMessage = apiErrorMessage.value,
                             error = error
@@ -60,7 +53,7 @@ class YearSelectionViewModel @Inject constructor(
                 }
             )
 
-            _years.emit(state)
+            emit(state)
         }
     }
 }
