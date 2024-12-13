@@ -27,6 +27,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @UnstableApi
 @HiltViewModel
@@ -40,7 +41,7 @@ class PlayerViewModel @Inject constructor(
 
     val title: Title? = savedStateHandle.get<String>("title")?.let { Title.fromEncodedString(it) }
 
-    private val playerCallbackFlow = callbackFlow {
+    private fun playerCallbackFlow() = callbackFlow {
         val listener = object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 viewModelScope.launch {
@@ -82,15 +83,15 @@ class PlayerViewModel @Inject constructor(
     private fun updatePlayerState(): Flow<PlayerState> {
         return flow {
             while (currentCoroutineContext().isActive && mediaPlayerContainer.mediaPlayer != null) {
-                delay(600)
+                delay(1000)
                 emit(newState())
             }
         }
     }
 
-    val playerState = merge(playerCallbackFlow, updatePlayerState()).stateIn(
+    val playerState = merge(playerCallbackFlow(), updatePlayerState()).stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.WhileSubscribed(3.seconds.inWholeMilliseconds),
         initialValue = NoMedia
     )
 

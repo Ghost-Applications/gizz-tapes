@@ -27,20 +27,18 @@ class RealMediaPlayerContainer @Inject constructor(
     @ApplicationContext private val context: Context,
 ): MediaPlayerContainer {
 
-    private var controllerFuture: ListenableFuture<MediaController>? = null
+    private val controllerFuture: ListenableFuture<MediaController>
     private var mediaController: MediaController? = null
 
     override val mediaPlayer: Player? get() = mediaController
 
     init {
         val sessionToken = SessionToken(context, ComponentName(context, PlaybackService::class.java))
-        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
-        this.controllerFuture = controllerFuture
+        this.controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
 
         controllerFuture.addListener(
             {
-                val m = controllerFuture.get()
-                mediaController = m
+                mediaController = controllerFuture.get()
             },
             MoreExecutors.directExecutor()
         )

@@ -37,14 +37,14 @@ import gizz.tapes.util.mapCollection
 @Composable
 fun YearSelectionScreen(
     viewModel: YearSelectionViewModel = hiltViewModel(),
-//    playerViewModel: PlayerViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel(),
     onYearClicked: (year: Year) -> Unit,
     onMiniPlayerClick: (Title) -> Unit,
     navigateToAboutPage: () -> Unit,
     navigateToSettingsPage: () -> Unit,
 ) {
     val state: LCE<List<YearSelectionData>, Throwable> by viewModel.years.collectAsState()
-//    val playerState by playerViewModel.playerState.collectAsState()
+    val playerState by playerViewModel.playerState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var sortOrder: SortOrder by remember { mutableStateOf(SortOrder.Ascending) }
 
@@ -53,9 +53,9 @@ fun YearSelectionScreen(
         sortOrder = sortOrder,
         onYearClicked = onYearClicked,
         onMiniPlayerClick = onMiniPlayerClick,
-        playerState = PlayerState.NoMedia, //playerState,
-        onPauseAction = { }, //playerViewModel::pause,
-        onPlayAction = { }, //playerViewModel::play,
+        playerState = playerState,
+        onPauseAction = playerViewModel::pause,
+        onPlayAction = playerViewModel::play,
         actions = {
             IconButton(
                 onClick = { sortOrder = !sortOrder }
