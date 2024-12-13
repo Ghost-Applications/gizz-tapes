@@ -5,6 +5,7 @@
 - Bug fixes and Performance
 - Fixed Image Caching
 - Sorting for shows and years
+- Show media loading in media player ui
 
 == Dawn of Eternal Night 2024-12-08
 
