@@ -1,5 +1,24 @@
 default_platform(:android)
 
+def update_gradle_properties(properties)
+  gradle_properties_lines = File.readlines(file_path)
+
+  gradle_properties_lines = gradle_properties_lines.map do |line|
+    if line.strip.start_with?("#") || line.strip.empty?
+      line
+    else
+      key, value = line.strip.split("=", 2)
+      if properties.key?(key)
+        "#{key}=#{properties[key]}\n"
+      else
+        line
+      end
+    end
+  end
+
+  File.write('../gradle.properties', gradle_properties_lines.join)
+end
+
 platform :android do
 
   desc 'Publish a new build to open testing on Play Store'
@@ -16,6 +35,9 @@ platform :android do
 
   desc 'Release app to production and create github release'
   lane :release do
+    # make sure we only publish on main
+    ensure_git_branch(branch: 'main')
+
     # Get the current version from Google Play
     current_version = google_play_track_version_codes(track: 'beta')[0]
 
@@ -60,6 +82,12 @@ platform :android do
     sections = content.split(/^== .*/)
     description = sections[1].strip
 
+    # write new version and commit and push it
+    properties['gizz.tapes.defaultBuildNumber'] = current_version
+    update_gradle_properties(properties)
+    git_commit(path: '../gradle.properties', message: 'Version Bump')
+    push_to_git_remote()
+
     set_github_release(
       repository_name: 'Ghost-Applications/gizz-tapes',
       api_token: keys_properties['github_token'],
@@ -91,24 +119,6 @@ platform :android do
 
     properties['gizz.tapes.versionName'] = next_release_name
     properties['gizz.tapes.defaultBuildNumber'] = current_version + 1
-
-    gradle_properties_lines = gradle_properties_lines.map do |line|
-      # Skip comments and empty lines
-      if line.strip.start_with?("#") || line.strip.empty?
-        line
-      else
-        # Split the line into key and value
-        key, value = line.strip.split("=", 2)
-
-        # Check if this key needs to be updated
-        if properties.key?(key)
-          "#{key}=#{properties[key]}\n" # Replace with the new value
-        else
-          line # Keep the line unchanged
-        end
-      end
-    end
-
-    File.write('../gradle.properties', gradle_properties_lines.join)
+    update_gradle_properties(properties)
   end
 end
