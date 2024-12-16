@@ -1,5 +1,6 @@
 package gizz.tapes.ui.selection
 
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +9,9 @@ import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.Settings
 import gizz.tapes.data.ShowId
+import gizz.tapes.data.SortOrder
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.util.LCE
@@ -18,7 +21,9 @@ import gizz.tapes.util.toSimpleFormat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,6 +39,7 @@ data class ShowSelectionData(
 class ShowSelectionViewModel @Inject constructor(
     private val apiClient: GizzTapesApiClient,
     private val apiErrorMessage: ApiErrorMessage,
+    private val settingsDataStore: DataStore<Settings>,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -43,7 +49,21 @@ class ShowSelectionViewModel @Inject constructor(
         started = SharingStarted.Eagerly,
         initialValue = LCE.Loading
     )
+    val sortOrder = settingsDataStore.data
+        .map { it.showSortOrder }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = SortOrder.Ascending
+        )
 
+    fun updateSortOrder(sortOrder: SortOrder) {
+        viewModelScope.launch {
+            settingsDataStore.updateData {
+                it.copy(showSortOrder = sortOrder)
+            }
+        }
+    }
 
     private fun loadShows(): Flow<LCE<List<ShowSelectionData>, Throwable>> {
         return flow {

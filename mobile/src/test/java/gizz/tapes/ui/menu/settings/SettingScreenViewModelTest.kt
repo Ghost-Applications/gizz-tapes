@@ -49,7 +49,7 @@ class SettingScreenViewModelTest {
         val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
         val classUnderTest = SettingScreenViewModel(
             dataStore = object : DataStore<Settings> {
-                val dataStateFlow: MutableStateFlow<Settings> = MutableStateFlow(Settings(Type.SBD))
+                val dataStateFlow: MutableStateFlow<Settings> = MutableStateFlow(Settings())
                 override val data: Flow<Settings> = dataStateFlow
                 override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings {
                     return transform(dataStateFlow.value)
@@ -70,7 +70,7 @@ class SettingScreenViewModelTest {
         val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
         val classUnderTest = SettingScreenViewModel(
             dataStore = object : DataStore<Settings> {
-                val dataStateFlow: MutableStateFlow<Settings> = MutableStateFlow(Settings(Type.SBD))
+                val dataStateFlow: MutableStateFlow<Settings> = MutableStateFlow(Settings())
                 override val data: Flow<Settings> = dataStateFlow
                 override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings {
                     val transformed =  transform(dataStateFlow.value)

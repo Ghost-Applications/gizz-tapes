@@ -22,6 +22,7 @@ import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.PlayerErrorMessage
 import gizz.tapes.data.Settings
 import gizz.tapes.data.SettingsSerializer
+import gizz.tapes.data.SortOrder
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.playback.RealMediaPlayerContainer
 import gizz.tapes.util.RealResourceManager
@@ -114,10 +115,8 @@ interface GizzTapesModule {
         fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Settings> {
             return DataStoreFactory.create(
                 serializer = SettingsSerializer(),
-                corruptionHandler = ReplaceFileCorruptionHandler { Settings(preferredRecordingType = SBD) }
-            ) {
-                context.preferencesDataStoreFile("kglw")
-            }
+                corruptionHandler = ReplaceFileCorruptionHandler { Settings() }
+            ) { context.preferencesDataStoreFile("settings") }
         }
 
         @Provides
