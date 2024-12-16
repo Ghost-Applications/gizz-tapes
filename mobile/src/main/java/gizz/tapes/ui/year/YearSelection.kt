@@ -46,7 +46,7 @@ fun YearSelectionScreen(
     val state: LCE<List<YearSelectionData>, Throwable> by viewModel.years.collectAsState()
     val playerState by playerViewModel.playerState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
-    var sortOrder: SortOrder by remember { mutableStateOf(SortOrder.Ascending) }
+    val sortOrder: SortOrder by viewModel.sortOrder.collectAsState()
 
     YearSelectionScreen(
         yearData = state,
@@ -58,7 +58,7 @@ fun YearSelectionScreen(
         onPlayAction = playerViewModel::play,
         actions = {
             IconButton(
-                onClick = { sortOrder = !sortOrder }
+                onClick = { viewModel.updateSortOrder(!sortOrder) }
             ) {
                 Icon(
                     imageVector = Icons.Default.SortByAlpha,

@@ -37,7 +37,7 @@ fun ShowSelectionScreen(
 ) {
     val playerState by playerViewModel.playerState.collectAsState()
     val state: LCE<List<ShowSelectionData>, Throwable> by viewModel.shows.collectAsState()
-    var sortOrder: SortOrder by remember { mutableStateOf(SortOrder.Ascending) }
+    val sortOrder: SortOrder by viewModel.sortOrder.collectAsState()
 
     ShowSelectionScreen(
         screenTitle = Title(viewModel.showYear),
@@ -51,7 +51,7 @@ fun ShowSelectionScreen(
         sortOrder = sortOrder,
         actions = {
             IconButton(
-                onClick = { sortOrder = !sortOrder }
+                onClick = { viewModel.updateSortOrder(!sortOrder) }
             ) {
                 Icon(
                     imageVector = Icons.Default.SortByAlpha,
