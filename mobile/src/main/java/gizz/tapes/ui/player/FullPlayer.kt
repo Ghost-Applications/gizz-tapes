@@ -31,6 +31,9 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -39,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +60,8 @@ import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.TopAppBarText
 import gizz.tapes.util.formatedElapsedTime
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.max
 
 @UnstableApi
@@ -95,8 +101,12 @@ fun FullPlayer(
     onPlay: () -> Unit,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { TopAppBarText(title) },
@@ -115,6 +125,9 @@ fun FullPlayer(
         when (playerState) {
             is PlayerState.NoMedia -> LoadingScreen()
             is PlayerState.MediaLoaded -> {
+
+                HandlePlayerErrors(playerState, scope, snackbarHostState)
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -221,6 +234,24 @@ fun FullPlayer(
                         .fillMaxWidth()
                         .height(8.dp))
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HandlePlayerErrors(
+    playerState: PlayerState,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState
+) {
+    if (playerState is PlayerState.MediaLoaded.Error) {
+        LaunchedEffect(playerState) {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = playerState.playerError.message,
+                    duration = SnackbarDuration.Long
+                )
             }
         }
     }
