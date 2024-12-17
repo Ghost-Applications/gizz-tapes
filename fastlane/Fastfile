@@ -1,7 +1,7 @@
 default_platform(:android)
 
 def update_gradle_properties(properties)
-  gradle_properties_lines = File.readlines(file_path)
+  gradle_properties_lines = File.readlines('../gradle.properties')
 
   gradle_properties_lines = gradle_properties_lines.map do |line|
     if line.strip.start_with?("#") || line.strip.empty?
@@ -85,7 +85,7 @@ platform :android do
     # write new version and commit and push it
     properties['gizz.tapes.defaultBuildNumber'] = current_version
     update_gradle_properties(properties)
-    git_commit(path: '../gradle.properties', message: 'Version Bump')
+    git_commit(path: './gradle.properties', message: 'Version Bump')
     push_to_git_remote()
 
     set_github_release(
@@ -117,7 +117,7 @@ platform :android do
     # Write the updated content back to the file
     File.write('../CHANGELOG.adoc', updated_content)
 
-    properties['gizz.tapes.versionName'] = next_release_name
+    properties['gizz.tapes.versionName'] = next_release_name.split.join("")
     properties['gizz.tapes.defaultBuildNumber'] = current_version + 1
     update_gradle_properties(properties)
   end

@@ -1,6 +1,8 @@
 = Changelog
 
-== Evil Death Roll
+== Fishing For Fishies
+
+== Evil Death Roll 2024-12-17
 
 - Bug fixes and Performance
 - Fixed Image Caching
