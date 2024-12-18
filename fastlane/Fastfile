@@ -47,13 +47,6 @@ platform :android do
       version_code: current_version
     )
 
-    gradle(
-      task: 'build',
-      properties: {
-        'gizz.tapes.buildNumber' => current_version
-      }
-    )
-
     # Read properties from gradle.properties
     properties = {}
     gradle_properties_lines = File.readlines('../gradle.properties')
@@ -87,6 +80,13 @@ platform :android do
     update_gradle_properties(properties)
     git_commit(path: './gradle.properties', message: 'Version Bump')
     push_to_git_remote()
+
+    gradle(
+      task: 'build',
+      properties: {
+        'gizz.tapes.buildNumber' => current_version
+      }
+    )
 
     set_github_release(
       repository_name: 'Ghost-Applications/gizz-tapes',
