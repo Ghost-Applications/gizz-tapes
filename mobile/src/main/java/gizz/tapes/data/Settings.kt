@@ -22,11 +22,11 @@ data class Settings(
     val showSortOrder: SortOrder = Ascending,
 )
 
+@OptIn(ExperimentalSerializationApi::class)
 @Singleton
 class SettingsSerializer @Inject constructor(): Serializer<Settings> {
     override val defaultValue: Settings = Settings()
 
-    @OptIn(ExperimentalSerializationApi::class)
     override suspend fun readFrom(input: InputStream): Settings {
         return try {
             Json.decodeFromStream<Settings>(input)
@@ -36,7 +36,6 @@ class SettingsSerializer @Inject constructor(): Serializer<Settings> {
         }
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
     override suspend fun writeTo(t: Settings, output: OutputStream) {
         try {
             Json.encodeToStream(t, output)

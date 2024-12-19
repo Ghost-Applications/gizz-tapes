@@ -96,6 +96,8 @@ class ShowViewModel @Inject constructor(
                                 .setAlbumTitle(title.value)
                                 .setTitle(track.title)
                                 .setRecordingYear(show.date.year)
+                                .setRecordingMonth(show.date.monthNumber)
+                                .setRecordingDay(show.date.dayOfMonth)
                                 .setArtworkUri(PosterUrl(show.posterUrl).toUri())
                                 .setDurationMs(track.length.inWholeMilliseconds)
                                 .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)

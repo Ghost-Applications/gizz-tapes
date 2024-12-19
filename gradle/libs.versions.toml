@@ -171,7 +171,8 @@ media3 = [
 
 arrow = [
     "arrow-core",
-    "arrow-resilience"
+    "arrow-resilience",
+    "arrow-fx"
 ]
 
 [plugins]

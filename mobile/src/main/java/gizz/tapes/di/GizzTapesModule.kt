@@ -24,7 +24,10 @@ import gizz.tapes.data.Settings
 import gizz.tapes.data.SettingsSerializer
 import gizz.tapes.data.SortOrder
 import gizz.tapes.playback.MediaPlayerContainer
+import gizz.tapes.playback.MediaStorageItem
+import gizz.tapes.playback.StoredMediaSessionSerializer
 import gizz.tapes.playback.RealMediaPlayerContainer
+import gizz.tapes.playback.StoredMediaSession
 import gizz.tapes.util.RealResourceManager
 import gizz.tapes.util.ResourceManager
 import io.ktor.client.HttpClient
@@ -117,6 +120,17 @@ interface GizzTapesModule {
                 serializer = SettingsSerializer(),
                 corruptionHandler = ReplaceFileCorruptionHandler { Settings() }
             ) { context.preferencesDataStoreFile("settings") }
+        }
+
+        @Provides
+        @Singleton
+        fun provideMediaDataStore(@ApplicationContext context: Context): DataStore<StoredMediaSession> {
+            return DataStoreFactory.create(
+                serializer = StoredMediaSessionSerializer(),
+                corruptionHandler = ReplaceFileCorruptionHandler { StoredMediaSession() }
+            ) {
+                context.preferencesDataStoreFile("playlist")
+            }
         }
 
         @Provides

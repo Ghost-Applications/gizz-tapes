@@ -20,9 +20,6 @@ import gizz.tapes.util.showTitle
 import gizz.tapes.util.title
 import gizz.tapes.util.toAlbumFormat
 import gizz.tapes.util.tryAndGetPreferredRecordingType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -44,8 +41,6 @@ class MediaItemTree @Inject constructor(
     private val years: MutableMap<String, MediaItemNode> = mutableMapOf()
     private val shows: MutableMap<String, MediaItemNode> = mutableMapOf()
     private val tracks: MutableMap<String, MediaItemNode> = mutableMapOf()
-
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val root = MediaItem.Builder()
             .setMediaMetadata(

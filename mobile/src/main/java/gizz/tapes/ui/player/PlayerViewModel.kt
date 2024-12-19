@@ -27,7 +27,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 @UnstableApi
 @HiltViewModel
@@ -82,6 +81,10 @@ class PlayerViewModel @Inject constructor(
 
     private fun updatePlayerState(): Flow<PlayerState> {
         return flow {
+            while(mediaPlayerContainer.mediaPlayer == null) {
+                delay(100)
+            }
+
             while (currentCoroutineContext().isActive && mediaPlayerContainer.mediaPlayer != null) {
                 delay(1000)
                 emit(newState())
@@ -91,7 +94,7 @@ class PlayerViewModel @Inject constructor(
 
     val playerState = merge(playerCallbackFlow(), updatePlayerState()).stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(3.seconds.inWholeMilliseconds),
+        started = SharingStarted.Eagerly,
         initialValue = NoMedia
     )
 

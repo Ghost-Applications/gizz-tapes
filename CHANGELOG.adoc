@@ -2,6 +2,10 @@
 
 == Fishing For Fishies
 
+- Save player state, app restarts will no longer effect where you were left off in a show.
+- Fix issue where player loses where it is in the playlist when switching between casting and
+local playback.
+
 == Evil Death Roll 2024-12-17
 
 - Bug fixes and Performance
