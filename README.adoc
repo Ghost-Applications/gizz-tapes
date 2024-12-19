@@ -13,6 +13,7 @@ We highly recommend using https://github.com/ImranR98/Obtainium?tab=readme-ov-fi
 to install this app and to keep it up today!
 
 Steps:
+
 1. Install Obtainium,
 1. Tap "Add App"
 1. Paste `https://github.com/Ghost-Applications/gizz-tapes/releases` into App Srouce URL
