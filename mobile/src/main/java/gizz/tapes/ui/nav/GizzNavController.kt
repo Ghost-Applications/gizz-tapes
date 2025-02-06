@@ -12,6 +12,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.Title
 import gizz.tapes.ui.menu.about.AboutScreen
 import gizz.tapes.ui.menu.settings.SettingsScreen
@@ -28,36 +29,32 @@ fun GizzNavController(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.YearSelection.route
+        startDestination = YearSelection
     ) {
-        val miniPlayerClicked = { title: Title ->
-            navController.navigate(
-                Screen.Player.createRoute(
-                    title
-                )
-            )
+        val miniPlayerClicked = { title: FullShowTitle ->
+            navController.navigate(Player(title))
         }
 
         val navigateUp = NavigateUp { navController.navigateUp() }
 
-        composable(route = Screen.YearSelection.route) {
+        composable<YearSelection> {
             YearSelectionScreen(
                 onMiniPlayerClick = miniPlayerClicked,
-                onYearClicked = { navController.navigate(Screen.ShowSelection.createRoute(it)) },
-                navigateToAboutPage = { navController.navigate(Screen.About.route) },
-                navigateToSettingsPage = { navController.navigate(Screen.Settings.route) }
+                onYearClicked = { navController.navigate(ShowSelection(it)) },
+                navigateToAboutPage = { navController.navigate(About) },
+                navigateToSettingsPage = { navController.navigate(Settings) }
             )
         }
-        composable(
-            route = Screen.ShowSelection.route,
-            arguments = Screen.ShowSelection.navArguments
+
+        composable<ShowSelection>(
+            typeMap = ShowSelection.typeMap
         ) {
             ShowSelectionScreen(
                 navigateUpClick = navigateUp,
                 onShowClicked = { id, title ->
                     navController.navigate(
-                        Screen.Show.createRoute(
-                            showId = id,
+                        Show(
+                            id = id,
                             title = title
                         )
                     )
@@ -65,9 +62,9 @@ fun GizzNavController(
                 onMiniPlayerClick = miniPlayerClicked
             )
         }
-        composable(
-            route = Screen.Show.route,
-            arguments = Screen.Show.navArguments,
+
+        composable<Show>(
+            typeMap = Show.typeMap
         ) {
             ShowScreen(
                 navigateUp = navigateUp,
@@ -77,11 +74,11 @@ fun GizzNavController(
 
         fullPlayerNavigation(navController)
 
-        composable(route = Screen.About.route) {
+        composable<About> {
             AboutScreen(navigateUp = navigateUp)
         }
 
-        composable(route = Screen.Settings.route) {
+        composable<Settings> {
             SettingsScreen(navigateUp = navigateUp)
         }
     }
@@ -89,9 +86,8 @@ fun GizzNavController(
 
 @OptIn(UnstableApi::class)
 fun NavGraphBuilder.fullPlayerNavigation(navController: NavHostController) {
-    composable(
-        route = Screen.Player.route,
-        arguments = Screen.Player.navArguments,
+    composable<Player>(
+        typeMap = Player.typeMap,
         enterTransition = {
             slideIntoContainer(
                 animationSpec = tween(300, easing = EaseIn),
@@ -107,9 +103,9 @@ fun NavGraphBuilder.fullPlayerNavigation(navController: NavHostController) {
     ) {
         FullPlayer(
             navigateToShow = { id, name ->
-                navController.clearBackStack(Screen.Player.route)
-                navController.navigate(Screen.Show.createRoute(id, name)) {
-                    popUpTo(Screen.YearSelection.route)
+                navController.clearBackStack<Player>()
+                navController.navigate(Show(id, name)) {
+                    popUpTo(YearSelection)
                 }
             },
             navigateUp = { navController.navigateUp() },

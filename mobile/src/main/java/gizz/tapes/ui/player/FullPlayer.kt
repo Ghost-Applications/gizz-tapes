@@ -53,8 +53,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import gizz.tapes.R
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
-import gizz.tapes.data.Title
 import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.LoadingScreen
@@ -68,7 +68,7 @@ import kotlin.math.max
 @Composable
 fun FullPlayer(
     viewModel: PlayerViewModel = hiltViewModel(),
-    navigateToShow: (ShowId, Title) -> Unit,
+    navigateToShow: (ShowId, FullShowTitle) -> Unit,
     navigateUp: NavigateUp
 ) {
     val playerState by viewModel.playerState.collectAsState()
@@ -91,8 +91,8 @@ fun FullPlayer(
 @Composable
 fun FullPlayer(
     playerState: PlayerState,
-    title: Title,
-    navigateToShow: (ShowId, Title) -> Unit,
+    title: FullShowTitle,
+    navigateToShow: (ShowId, FullShowTitle) -> Unit,
     navigateUp: NavigateUp,
     seekTo: (Long) -> Unit,
     seekToPreviousMediaItem: () -> Unit,
@@ -109,7 +109,7 @@ fun FullPlayer(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { TopAppBarText(title) },
+                title = { TopAppBarText(title.fullShowTitle) },
                 navigationIcon = {
                     IconButton(onClick = { navigateUp() }) {
                         Icon(

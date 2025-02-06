@@ -1,6 +1,5 @@
 package gizz.tapes.playback
 
-import android.os.Bundle
 import androidx.datastore.core.DataStore
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -13,12 +12,17 @@ import arrow.resilience.retryEither
 import com.google.common.collect.ImmutableList
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.data.BandName
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Settings
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 import gizz.tapes.data.Year
+import gizz.tapes.ui.nav.Show
 import gizz.tapes.util.showTitle
 import gizz.tapes.util.title
 import gizz.tapes.util.toAlbumFormat
+import gizz.tapes.util.toExtrasBundle
 import gizz.tapes.util.tryAndGetPreferredRecordingType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -136,8 +140,7 @@ class MediaItemTree @Inject constructor(
                 val showData = retryForever { apiClient.show(show.id) }
 
                 val showMetadata = show.item.mediaMetadata
-                val date =
-                    "${showMetadata.releaseYear}/${showMetadata.releaseMonth}/${showMetadata.releaseDay}"
+                val dateString = "${showMetadata.releaseYear}/${showMetadata.releaseMonth}/${showMetadata.releaseDay}"
 
                 val preferredRecordingType =
                     dataStore.data.map { it.preferredRecordingType }.first()
@@ -152,12 +155,15 @@ class MediaItemTree @Inject constructor(
                         .setMediaMetadata(
                             MediaMetadata.Builder()
                                 .setExtras(
-                                    Bundle().apply {
-                                        putString("showId", show.id)
-                                        putString("showTitle", show.item.title)
-                                    }
+                                    Show(
+                                       id = ShowId(show.id),
+                                        title = FullShowTitle(
+                                            title = Title(show.item.title),
+                                            date = showData.date
+                                        )
+                                    ).toExtrasBundle()
                                 )
-                                .setArtist("$date ${show.item.title}")
+                                .setArtist("$dateString ${show.item.title}")
                                 .setAlbumArtist(BandName)
                                 .setAlbumTitle(show.item.title)
                                 .setTitle(track.title)

@@ -1,6 +1,7 @@
 package gizz.tapes.ui.player
 
 import android.net.Uri
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
 
@@ -14,7 +15,7 @@ sealed interface PlayerState {
     sealed interface MediaLoaded: PlayerState {
         val isPlaying: Boolean
         val showId: ShowId
-        val showTitle: Title
+        val showTitle: FullShowTitle
         val durationInfo: MediaDurationInfo
         val artworkUri: Uri?
         val title: String
@@ -26,7 +27,7 @@ sealed interface PlayerState {
                 isPlaying: Boolean,
                 isLoading: Boolean,
                 showId: ShowId,
-                showTitle: Title,
+                showTitle: FullShowTitle,
                 durationInfo: MediaDurationInfo,
                 artworkUri: Uri?,
                 title: String,
@@ -89,7 +90,7 @@ sealed interface PlayerState {
 
         data class Playing(
             override val showId: ShowId,
-            override val showTitle: Title,
+            override val showTitle: FullShowTitle,
             override val durationInfo: MediaDurationInfo,
             override val artworkUri: Uri?,
             override val title: String,
@@ -101,7 +102,7 @@ sealed interface PlayerState {
 
         data class Paused(
             override val showId: ShowId,
-            override val showTitle: Title,
+            override val showTitle: FullShowTitle,
             override val durationInfo: MediaDurationInfo,
             override val artworkUri: Uri?,
             override val title: String,
@@ -113,7 +114,7 @@ sealed interface PlayerState {
 
         data class Loading(
             override val showId: ShowId,
-            override val showTitle: Title,
+            override val showTitle: FullShowTitle,
             override val durationInfo: MediaDurationInfo,
             override val artworkUri: Uri?,
             override val title: String,
@@ -126,7 +127,7 @@ sealed interface PlayerState {
         data class Error(
             val playerError: PlayerError,
             override val showId: ShowId,
-            override val showTitle: Title,
+            override val showTitle: FullShowTitle,
             override val durationInfo: MediaDurationInfo,
             override val artworkUri: Uri?,
             override val title: String,

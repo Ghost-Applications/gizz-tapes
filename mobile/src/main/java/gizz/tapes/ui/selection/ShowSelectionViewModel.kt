@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.data.ApiErrorMessage
@@ -14,10 +15,11 @@ import gizz.tapes.data.ShowId
 import gizz.tapes.data.SortOrder
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
+import gizz.tapes.data.Year
+import gizz.tapes.ui.nav.ShowSelection
 import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
 import gizz.tapes.util.showTitle
-import gizz.tapes.util.toSimpleFormat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
@@ -43,7 +45,7 @@ class ShowSelectionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-    val showYear: String = checkNotNull(savedStateHandle["year"])
+    val showYear: Year = savedStateHandle.toRoute<ShowSelection>(ShowSelection.typeMap).year
     val shows = loadShows().stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -70,16 +72,16 @@ class ShowSelectionViewModel @Inject constructor(
             val state = retryUntilSuccessful(
                 action = {
                     apiClient.shows().map { shows ->
-                        shows.filter { it.date.year.toString() == showYear }
+                        shows.filter { it.date.year.toString() == showYear.value }
                             .map { show ->
 
                                 val showTitle = Title(show.showTitle)
 
                                 ShowSelectionData(
                                     showId = ShowId(show.id),
-                                    fullShowTitle = FullShowTitle(show.date, showTitle),
+                                    fullShowTitle = FullShowTitle(date = show.date, title = showTitle),
                                     showTitle = showTitle,
-                                    showSubTitle = Subtitle(show.date.toSimpleFormat()),
+                                    showSubTitle = Subtitle(show.date),
                                     posterUrl = PosterUrl(show.posterUrl)
                                 )
                             }

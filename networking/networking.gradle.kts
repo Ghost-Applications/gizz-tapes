@@ -51,6 +51,8 @@ kotlin {
 
         jsMain.dependencies {
             implementation(libs.ktor.client.js)
+            // temp work around for coroutines, remove later
+            implementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.10")
         }
     }
 }

@@ -12,7 +12,7 @@ fun TopAppBarText(title: Title) {
     Text(
         text = title.value,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+        overflow = TextOverflow.Visible,
         modifier = Modifier.basicMarquee(
             iterations = Int.MAX_VALUE
         ),

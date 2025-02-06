@@ -1,9 +1,18 @@
 package gizz.tapes.util
 
 import android.os.Bundle
-import gizz.tapes.data.ShowId
-import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.Show
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-fun Bundle.toShowInfo(): Pair<ShowId, Title> =
-    ShowId(getString("showId", "missing show id")) to
-            Title(getString("showTitle", "missing show title"))
+fun Show.toExtrasBundle(): Bundle {
+    val showInfoString = Json.encodeToString(this)
+
+    return Bundle().apply {
+        putString("showInfo", showInfoString)
+    }
+}
+
+fun Bundle.toShowInfo(): Show {
+    return Json.decodeFromString<Show>(checkNotNull(getString("showInfo")))
+}

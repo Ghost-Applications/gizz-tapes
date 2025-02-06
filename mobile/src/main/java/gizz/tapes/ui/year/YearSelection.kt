@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.data.Year
@@ -39,7 +40,7 @@ fun YearSelectionScreen(
     viewModel: YearSelectionViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
     onYearClicked: (year: Year) -> Unit,
-    onMiniPlayerClick: (Title) -> Unit,
+    onMiniPlayerClick: (FullShowTitle) -> Unit,
     navigateToAboutPage: () -> Unit,
     navigateToSettingsPage: () -> Unit,
 ) {
@@ -104,7 +105,7 @@ fun YearSelectionScreen(
     yearData: LCE<List<YearSelectionData>, Throwable>,
     sortOrder: SortOrder,
     onYearClicked: (year: Year) -> Unit,
-    onMiniPlayerClick: (title: Title) -> Unit,
+    onMiniPlayerClick: (title: FullShowTitle) -> Unit,
     playerState: PlayerState,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
