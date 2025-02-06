@@ -13,7 +13,7 @@ fun <CONTENT, E> LCE<CONTENT, E>.contentOrNull(): CONTENT? = when (this) {
     else -> null
 }
 
-fun <CONTENT, E> LCE<CONTENT, E>.onContent(action: (CONTENT) -> Unit): LCE<CONTENT, E> = apply {
+inline fun <CONTENT, E> LCE<CONTENT, E>.onContent(action: (CONTENT) -> Unit): LCE<CONTENT, E> = apply {
     when (this) {
         is LCE.Content -> {
             action(value)

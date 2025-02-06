@@ -1,6 +1,5 @@
 package gizz.tapes.playback
 
-import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
@@ -11,15 +10,16 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import arrow.fx.coroutines.parMap
 import gizz.tapes.data.BandName
+import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.Show
 import gizz.tapes.util.MediaItemWrapper
-import gizz.tapes.util.mediaExtras
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
+import gizz.tapes.util.showExtras
+import gizz.tapes.util.toExtrasBundle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -126,7 +126,7 @@ class CurrentlyPlayingSaver @Inject constructor(
         val metaData = mediaMetadata
         val localConfig =
             checkNotNull(localConfiguration) { "localConfiguration should not be null" }
-        val (showId, _) = mediaExtras ?: run {
+        val (showId, _) = showExtras ?: run {
             Timber.e("no extras for %s", MediaItemWrapper(this))
             return null
         }
@@ -153,10 +153,13 @@ class CurrentlyPlayingSaver @Inject constructor(
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setExtras(
-                        Bundle().apply {
-                            putString("showId", showId)
-                            putString("showTitle", albumTitle)
-                        }
+                        Show(
+                           id = ShowId(showId),
+                           title = FullShowTitle(
+                               title = Title(albumTitle),
+                               date = LocalDate(showYear, showMonth, showDay)
+                           )
+                        ).toExtrasBundle()
                     )
                     .setArtist(BandName)
                     .setAlbumArtist(BandName)

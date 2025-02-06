@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.R
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
@@ -52,7 +53,7 @@ fun SelectionScreen(
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
     navigateUp: NavigateUp?,
-    onMiniPlayerClick: (Title) -> Unit,
+    onMiniPlayerClick: (FullShowTitle) -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
     GizzScaffold(

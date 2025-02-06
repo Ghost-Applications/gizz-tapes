@@ -7,13 +7,15 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PlayerErrorMessage
-import gizz.tapes.data.Title
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.ui.player.PlayerState.NoMedia
 import gizz.tapes.util.MediaItemWrapper
-import gizz.tapes.util.mediaExtras
+import gizz.tapes.util.getDecodedFromString
+import gizz.tapes.util.showExtras
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -38,7 +40,7 @@ class PlayerViewModel @Inject constructor(
 
     private lateinit var player: Player
 
-    val title: Title? = savedStateHandle.get<String>("title")?.let { Title.fromEncodedString(it) }
+    val title: FullShowTitle? = savedStateHandle.getDecodedFromString("showTitle")
 
     private fun playerCallbackFlow() = callbackFlow {
         val listener = object : Player.Listener {
@@ -129,7 +131,7 @@ class PlayerViewModel @Inject constructor(
             cmi.mediaId.isEmpty() -> NoMedia
             else -> {
                 val metadata = cmi.mediaMetadata
-                val (showId, venueName) = cmi.mediaExtras ?: run {
+                val (showId, venueName) = cmi.showExtras ?: run {
                     Timber.w(
                         "Current media item does not have required extras: %s",
                         MediaItemWrapper(cmi)

@@ -8,12 +8,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import gizz.tapes.data.ShowId
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.SortOrder
 import gizz.tapes.data.Title
 import gizz.tapes.ui.components.CastButton
@@ -32,15 +30,15 @@ fun ShowSelectionScreen(
     viewModel: ShowSelectionViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
     navigateUpClick: NavigateUp,
-    onShowClicked: (ShowId, Title) -> Unit,
-    onMiniPlayerClick: (Title) -> Unit,
+    onShowClicked: (ShowId, FullShowTitle) -> Unit,
+    onMiniPlayerClick: (FullShowTitle) -> Unit,
 ) {
     val playerState by playerViewModel.playerState.collectAsState()
     val state: LCE<List<ShowSelectionData>, Throwable> by viewModel.shows.collectAsState()
     val sortOrder: SortOrder by viewModel.sortOrder.collectAsState()
 
     ShowSelectionScreen(
-        screenTitle = Title(viewModel.showYear),
+        screenTitle = Title(viewModel.showYear.value),
         state = state,
         playerState = playerState,
         navigateUpClick = navigateUpClick,
@@ -71,8 +69,8 @@ fun ShowSelectionScreen(
     sortOrder: SortOrder,
     playerState: PlayerState,
     navigateUpClick: NavigateUp,
-    onShowClicked: (ShowId, Title) -> Unit,
-    onMiniPlayerClick: (Title) -> Unit,
+    onShowClicked: (ShowId, FullShowTitle) -> Unit,
+    onMiniPlayerClick: (FullShowTitle) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
     actions: @Composable RowScope.() -> Unit,
@@ -83,7 +81,7 @@ fun ShowSelectionScreen(
             subtitle = it.showSubTitle,
             posterUrl = it.posterUrl,
         ) {
-            onShowClicked(it.showId, Title(it.fullShowTitle.toString()))
+            onShowClicked(it.showId, it.fullShowTitle)
         }
     }.let { lce ->
         when(sortOrder) {

@@ -1,12 +1,14 @@
 package gizz.tapes.ui.show
 
 import app.cash.paparazzi.Paparazzi
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.Title
 import gizz.tapes.showContent
 import gizz.tapes.showingPlayerState
 import gizz.tapes.ui.PaparazziNightTest
 import gizz.tapes.ui.PaparazziTest
 import gizz.tapes.util.LCE
+import kotlinx.datetime.LocalDate
 import okio.IOException
 import org.junit.Test
 
@@ -61,7 +63,10 @@ private fun Paparazzi.snapshot(
         ShowScreen(
             state = state,
             playerState = showingPlayerState,
-            appBarTitle = Title("2021/08/08 Ruoff Music Center"),
+            fullShowTitle = FullShowTitle(
+                title = Title("2021/08/08 Ruoff Music Center"),
+                date = LocalDate(2024, 1, 1)
+            ),
             onMiniPlayerClick = {},
             onPauseAction = {},
             onPlayAction = {},

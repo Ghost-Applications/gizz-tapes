@@ -5,11 +5,15 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import com.google.common.truth.Truth.assertThat
 import gizz.tapes.MainDispatcherRule
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PlayerErrorMessage
 import gizz.tapes.data.Title
 import gizz.tapes.mediaItem
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.stub
+import kotlinx.datetime.LocalDate
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okio.ByteString.Companion.encodeUtf8
 import org.junit.Rule
 import org.junit.Test
@@ -32,17 +36,22 @@ class PlayerViewModelTest {
 
     @Test
     fun `title should be returned from SavedStateHandle`() {
+        val expectedShowTitle = FullShowTitle(
+            title = Title("Alpine Valley"),
+            date = LocalDate(2025, 1, 1)
+        )
+
         val classUnderTest = PlayerViewModel(
             mediaPlayerContainer = unimportantMediaPlayerContainer,
             savedStateHandle = SavedStateHandle(
-                initialState = mapOf("title" to "Alpine Valley".encodeUtf8().base64Url())
+                initialState = mapOf(
+                    "showTitle" to Json.encodeToString(expectedShowTitle)
+                )
             ),
             playerErrorMessage = PlayerErrorMessage("There was an error!")
         )
 
-        assertThat(classUnderTest.title).isEqualTo(
-            Title("Alpine Valley")
-        )
+        assertThat(classUnderTest.title).isEqualTo(expectedShowTitle)
     }
 }
 

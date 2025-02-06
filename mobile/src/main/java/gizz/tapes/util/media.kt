@@ -2,15 +2,14 @@ package gizz.tapes.util
 
 import android.text.format.DateUtils
 import androidx.media3.common.MediaItem
-import gizz.tapes.data.ShowId
-import gizz.tapes.data.Title
+import gizz.tapes.ui.nav.Show
 import kotlin.math.max
 
 val Long.formatedElapsedTime: String get() = DateUtils.formatElapsedTime(max(this, 0) / 1000L)
 val MediaItem?.title: String get() = this?.mediaMetadata?.title?.toString() ?: "--"
 
 /** Must be called on metadata with extras **/
-val MediaItem.mediaExtras: Pair<ShowId, Title>? get() = mediaMetadata.extras?.toShowInfo()
+val MediaItem.showExtras: Show? get() = mediaMetadata.extras?.toShowInfo()
 
 fun MediaItem.toReadableString() = """
     mediaId=${this.mediaId}

@@ -2,7 +2,9 @@ package gizz.tapes.data
 
 import gizz.tapes.util.toSimpleFormat
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 
+@Serializable
 @JvmInline
 value class Subtitle(val value: String) {
 

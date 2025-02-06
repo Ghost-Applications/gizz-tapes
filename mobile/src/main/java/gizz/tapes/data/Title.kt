@@ -1,18 +1,29 @@
 package gizz.tapes.data
 
-import okio.ByteString.Companion.decodeBase64
-import okio.ByteString.Companion.encodeUtf8
+import android.net.Uri
+import android.os.Bundle
+import androidx.navigation.NavType
+import kotlinx.serialization.Serializable
 
+@Serializable
 @JvmInline
 value class Title(val value: String) {
-    val encodedTitle: String get() = value.encodeUtf8().base64Url()
-
     companion object {
-        fun fromEncodedString(encodedTitle: String): Title = Title(
-            checkNotNull(encodedTitle.decodeBase64()) {
-                "$encodedTitle was not encoded"
-            }.utf8()
-        )
+        val navType = object : NavType<Title>(
+            isNullableAllowed = false
+        ) {
+            override fun get(bundle: Bundle, key: String): Title {
+                return Title(checkNotNull(bundle.getString(key)))
+            }
+
+            override fun put(bundle: Bundle, key: String, value: Title) {
+                bundle.putString(key, value.value)
+            }
+
+            override fun serializeAsValue(value: Title): String = Uri.encode(value.value)
+
+            override fun parseValue(value: String): Title = Title(value)
+        }
     }
 
     override fun toString(): String = value

@@ -36,15 +36,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import gizz.tapes.R
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
 import gizz.tapes.ui.player.PlayerState.MediaLoaded.Error
 import gizz.tapes.ui.player.PlayerState.MediaLoaded.Loading
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun MiniPlayer(
     playerState: PlayerState,
-    onClick: (Title) -> Unit,
+    onClick: (FullShowTitle) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
     playerError: (PlayerError) -> Unit,
@@ -70,7 +72,7 @@ fun MiniPlayer(
                             .shadow(2.dp)
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .clickable {
-                                onClick(Title(playerState.albumTitle))
+                                onClick(playerState.showTitle)
                             },
                     ) {
 
@@ -155,7 +157,7 @@ fun MiniPlayerPreview() {
 
     val state = Loading(
         showId = ShowId("showId"),
-        showTitle = Title("Show Title"),
+        showTitle = FullShowTitle(title = Title("Show Title"), LocalDate(2024, 10, 1)),
         durationInfo = MediaDurationInfo(currentPosition = 0, duration = 1000),
         artworkUri = null,
         title = "Title",

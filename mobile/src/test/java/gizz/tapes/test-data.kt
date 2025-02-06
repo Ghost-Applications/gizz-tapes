@@ -19,6 +19,7 @@ import gizz.tapes.data.Year
 import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.selection.ShowSelectionData
+import gizz.tapes.ui.show.RecordingData
 import gizz.tapes.ui.show.ShowScreenState
 import gizz.tapes.ui.show.ShowScreenState.Track
 import gizz.tapes.ui.show.TrackDuration
@@ -57,7 +58,10 @@ val showingPlayerState = PlayerState.MediaLoaded(
     albumTitle = "2024-09-11 : Edgefield Amphitheater - Troutdale, OR, USA",
     title = "Free",
     mediaId = "https://phish.in/audio/000/032/562/32562.mp3",
-    showTitle = Title("Early Show - "),
+    showTitle = FullShowTitle(
+        title = Title("Early Show - "),
+        date = LocalDate(2024, 1, 1)
+    ),
     isLoading = false,
 )
 
@@ -308,7 +312,17 @@ val showContent = LCE.Content(
                 title = TrackTitle(it.title),
                 duration = TrackDuration(it.length)
             )
-        }
+        },
+        recordingData = RecordingData(
+            notes = null,
+            selectedRecording = "SMB: gizz-sb",
+            recordings = nonEmptyListOf("test-recording"),
+            taper = null,
+            source = null,
+            lineage = null,
+            identifier = "gizz-sb",
+            uploadDate = "2025-01-01"
+        )
     )
 )
 
@@ -317,7 +331,7 @@ val showListContent = partialShowData.map { showData ->
         ShowSelectionData(
             showTitle = Title(data.showTitle),
             showId = ShowId(data.id),
-            fullShowTitle = FullShowTitle(data.date, Title(data.showTitle)),
+            fullShowTitle = FullShowTitle(date = data.date, title = Title(data.showTitle)),
             showSubTitle = Subtitle(data.date),
             posterUrl = PosterUrl(data.posterUrl)
         )

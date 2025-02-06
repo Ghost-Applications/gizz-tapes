@@ -1,6 +1,5 @@
 package gizz.tapes.ui.show
 
-import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.SavedStateHandle
@@ -10,29 +9,42 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
+import gizz.tapes.api.data.Recording
 import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.BandName
+import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Settings
 import gizz.tapes.data.Title
 import gizz.tapes.playback.MediaPlayerContainer
+import gizz.tapes.ui.nav.Show
 import gizz.tapes.ui.show.ShowScreenState.Track
 import gizz.tapes.util.LCE
 import gizz.tapes.util.map
 import gizz.tapes.util.retryUntilSuccessful
+import gizz.tapes.util.toExtrasBundle
 import gizz.tapes.util.tryAndGetPreferredRecordingType
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMap
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import gizz.tapes.api.data.Show as ApiShow
 
 @HiltViewModel
 class ShowViewModel @Inject constructor(
@@ -43,11 +55,14 @@ class ShowViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-    private val showId: String = checkNotNull(savedStateHandle["id"])
+    private val showRoute = savedStateHandle.toRoute<Show>(Show.typeMap)
+    private val showId = showRoute.id
 
-    val title: Title = Title.fromEncodedString(
-        checkNotNull(savedStateHandle.get<String>("title"))
-    )
+    private val cachedShowData = MutableStateFlow<LCE<ApiShow, Nothing>>(LCE.Loading)
+    private val errorFlow = MutableStateFlow<LCE.Error<Throwable>?>(null)
+    private val selectedRecording = MutableStateFlow<String?>(null)
+
+    val title: FullShowTitle = showRoute.title
 
     val show: StateFlow<LCE<ShowScreenState, Throwable>> = loadShow()
         .stateIn(
@@ -56,28 +71,42 @@ class ShowViewModel @Inject constructor(
             initialValue = LCE.Loading
         )
 
+    fun changeSelectedRecording(recording: String) {
+        selectedRecording.value = recording
+    }
+
+    private suspend fun fetchAndCacheShow() {
+        val data: LCE.Content<ApiShow> = retryUntilSuccessful(
+            action = {
+                apiClient.show(showId.value)
+            },
+            onErrorAfter3SecondsAction = { error ->
+                Timber.d(error, "Error retrieving show")
+                errorFlow.emit(
+                    LCE.Error(
+                        userDisplayedMessage = apiErrorMessage.value,
+                        error = error
+                    )
+                )
+            }
+        )
+
+        cachedShowData.emit(data)
+    }
+
     @OptIn(UnstableApi::class)
     private fun loadShow(): Flow<LCE<ShowScreenState, Throwable>> {
-        return flow {
-            val preferredRecording = datastore.data
-                .map { it.preferredRecordingType }
-                .first()
+        return combine(selectedRecording, datastore.data, cachedShowData) { selectedRecording, settings, showData ->
+            Triple(selectedRecording, settings.preferredRecordingType, showData)
+        }.map { (selectedRecording, preferredRecording, showData) ->
+            if (cachedShowData.value == LCE.Loading) {
+                fetchAndCacheShow()
+            }
 
-            val state: LCE<ShowScreenState, Nothing> = retryUntilSuccessful(
-                action = {
-                    apiClient.show(showId)
-                },
-                onErrorAfter3SecondsAction = { error ->
-                    Timber.d(error, "Error retrieving show")
-                    emit(
-                        LCE.Error(
-                            userDisplayedMessage = apiErrorMessage.value,
-                            error = error
-                        )
-                    )
-                }
-            ).map { show ->
-                val recording = show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
+            showData.map { show ->
+
+                val recording = show.recordings.firstOrNull { it.id == selectedRecording }
+                        ?: show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
                 val items = recording.files.map { track ->
                     MediaItem.Builder()
                         .setUri(recording.filesPathPrefix + track.filename)
@@ -85,15 +114,10 @@ class ShowViewModel @Inject constructor(
                         .setMimeType(MimeTypes.AUDIO_MPEG)
                         .setMediaMetadata(
                             MediaMetadata.Builder()
-                                .setExtras(
-                                    Bundle().apply {
-                                        putString("showId", show.id)
-                                        putString("showTitle", title.value)
-                                    }
-                                )
+                                .setExtras(showRoute.toExtrasBundle())
                                 .setArtist(BandName)
                                 .setAlbumArtist(BandName)
-                                .setAlbumTitle(title.value)
+                                .setAlbumTitle(title.title.value)
                                 .setTitle(track.title)
                                 .setRecordingYear(show.date.year)
                                 .setRecordingMonth(show.date.monthNumber)
@@ -124,11 +148,102 @@ class ShowViewModel @Inject constructor(
                             title = TrackTitle(it.title),
                             duration = TrackDuration(it.length)
                         )
-                    }
+                    },
+                    recordingData = RecordingData(
+                        notes = show.notes,
+                        selectedRecording = recording.id,
+                        recordings = show.recordings.map { it.id }.toNonEmptyList(),
+                        taper = recording.taper,
+                        source = recording.source,
+                        lineage = recording.lineage,
+                        identifier = recording.id,
+                        uploadDate = recording.uploadedAt.toString()
+                    )
                 )
             }
-
-            emit(state)
         }
     }
+//
+//    @OptIn(UnstableApi::class)
+//    private fun loadShow(): Flow<LCE<ShowScreenState, Throwable>> {
+//        return flow {
+//            val preferredRecording = datastore.data
+//                .map { it.preferredRecordingType }
+//                .first()
+//
+//            val state: LCE<ShowScreenState, Nothing> = retryUntilSuccessful(
+//                action = {
+//                    apiClient.show(showId.value)
+//                },
+//                onErrorAfter3SecondsAction = { error ->
+//                    Timber.d(error, "Error retrieving show")
+//                    emit(
+//                        LCE.Error(
+//                            userDisplayedMessage = apiErrorMessage.value,
+//                            error = error
+//                        )
+//                    )
+//                }
+//            ).map { show ->
+//                val recording =
+//                    show.recordings.firstOrNull { it.id == "" } ?:
+//                    show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
+//                val items = recording.files.map { track ->
+//                    MediaItem.Builder()
+//                        .setUri(recording.filesPathPrefix + track.filename)
+//                        .setMediaId(track.filename)
+//                        .setMimeType(MimeTypes.AUDIO_MPEG)
+//                        .setMediaMetadata(
+//                            MediaMetadata.Builder()
+//                                .setExtras(showRoute.toExtrasBundle())
+//                                .setArtist(BandName)
+//                                .setAlbumArtist(BandName)
+//                                .setAlbumTitle(title.title.value)
+//                                .setTitle(track.title)
+//                                .setRecordingYear(show.date.year)
+//                                .setRecordingMonth(show.date.monthNumber)
+//                                .setRecordingDay(show.date.dayOfMonth)
+//                                .setArtworkUri(PosterUrl(show.posterUrl).toUri())
+//                                .setDurationMs(track.length.inWholeMilliseconds)
+//                                .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
+//                                .setIsPlayable(true)
+//                                .setIsBrowsable(false)
+//                                .build()
+//                        )
+//                        .build()
+//                }
+//
+//                ShowScreenState(
+//                    showPosterUrl = PosterUrl(show.posterUrl),
+//                    removeOldMediaItemsAndAddNew = {
+//                        viewModelScope.launch {
+//                            checkNotNull(mediaPlayerContainer.mediaPlayer).apply {
+//                                clearMediaItems()
+//                                addMediaItems(items)
+//                            }
+//                        }
+//                    },
+//                    tracks = recording.files.map {
+//                        Track(
+//                            id = TrackId(it.filename),
+//                            title = TrackTitle(it.title),
+//                            duration = TrackDuration(it.length)
+//                        )
+//                    },
+//                    recordingData = RecordingData(
+//                        notes = show.notes,
+//                        selectedRecording = recording.id,
+//                        recordings = show.recordings.map { it.id }.toNonEmptyList(),
+//                        taper = recording.taper,
+//                        source = recording.source,
+//                        lineage = recording.lineage,
+//                        identifier = recording.id,
+//                        uploadDate = recording.uploadedAt.toString()
+//                    )
+//                )
+//            }
+//
+//            emit(state)
+//        }
+//    }
 }
