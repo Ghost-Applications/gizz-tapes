@@ -2,6 +2,9 @@
 
 package gizz.tapes.ui.show
 
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.view.textclassifier.TextClassifier
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -51,16 +54,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import arrow.core.nonEmptyListOf
 import coil.compose.AsyncImage
+import com.google.android.material.textview.MaterialTextView
 import gizz.tapes.R
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.ui.components.CastButton
@@ -126,7 +134,8 @@ fun ShowScreen(
                     }
                 }
             }
-        }
+        },
+        recordingChanged = { rId -> viewModel.changeSelectedRecording(rId) }
     )
 }
 
@@ -140,6 +149,7 @@ fun ShowScreen(
     onMiniPlayerClick: (FullShowTitle) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
+    recordingChanged: (RecordingId) -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
 
@@ -230,7 +240,8 @@ fun ShowScreen(
                             )
                         }
                     },
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(innerPadding),
+                    recordingChanged = recordingChanged
                 )
                 is LCE.Error -> ErrorScreen(s.userDisplayedMessage)
                 LCE.Loading -> LoadingScreen()
@@ -248,6 +259,7 @@ fun ShowListWithPlayer(
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
     playerError: (PlayerError) -> Unit,
+    recordingChanged: (RecordingId) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (currentlyPlayingMediaId, playing) = when(playerState) {
@@ -263,7 +275,12 @@ fun ShowListWithPlayer(
                 .fillMaxSize()
                 .weight(1f)
         ) {
-            item { ShowHeader(recordingData = showData.recordingData) }
+            item {
+                ShowHeader(
+                    recordingData = showData.recordingData,
+                    recordingChanged = recordingChanged
+                )
+            }
 
             itemsIndexed(showData.tracks) { i, track ->
                 val isPlaying = track.id.id == currentlyPlayingMediaId && playing
@@ -290,7 +307,7 @@ fun ShowListWithPlayer(
 }
 
 @Composable
-fun ShowHeader(recordingData: RecordingData) {
+fun ShowHeader(recordingData: RecordingData, recordingChanged: (RecordingId) -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -308,21 +325,29 @@ fun ShowHeader(recordingData: RecordingData) {
                 onDismissRequest = { showMenu = false }
             ) {
 
-                recordingData.recordings.forEach {
+                recordingData.recordings.forEach { r ->
                     DropdownMenuItem(
                         onClick = {
+                            recordingChanged(r)
                             showMenu = false
                         },
-                        text = { Text(it) }
+                        text = { Text(r.id) }
                     )
                 }
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
         recordingData.notes?.let { notes ->
-            Text(
-                text = notes,
-                style = MaterialTheme.typography.bodySmall
+            val spannedNotes = HtmlCompat.fromHtml(notes, HtmlCompat.FROM_HTML_MODE_COMPACT)
+            AndroidView(
+                factory = {
+                    MaterialTextView(it).apply {
+                        autoLinkMask = Linkify.WEB_URLS and Linkify.EMAIL_ADDRESSES
+                        linksClickable = true
+                        movementMethod = LinkMovementMethod.getInstance()
+                        text = spannedNotes
+                    }
+                }
             )
         }
     }
@@ -337,8 +362,8 @@ fun ShowHeaderPreview() {
                 notes = "Rattlesnake contained Nuclear Fusion, O.N.E. and Automation teases and Honey teases & quotes. Ice V contained Mirage City teases. Hog Calling Contest featured Joey on acoustic guitar. Following Set Amby quoted She'll Be Coming 'Round the Mountain (traditional). Magenta Mountain contained The Grim Reaper quotes.",
                 selectedRecording = "SBD: kglw2020-11-20.bandcampbootlegger",
                 recordings = nonEmptyListOf(
-                    "SBD: kglw2020-11-20.bandcampbootlegger",
-                    "AUD by Archie Cove: kglw2024-11-20archie"
+                    RecordingId("SBD: kglw2020-11-20.bandcampbootlegger"),
+                    RecordingId("AUD by Archie Cove: kglw2024-11-20archie")
                 ),
                 taper = "",
                 source = "",
@@ -346,7 +371,7 @@ fun ShowHeaderPreview() {
                 identifier = "",
                 uploadDate = "",
             )
-        )
+        ) {}
     }
 }
 
@@ -387,7 +412,7 @@ fun ShowFooterPreview() {
                 lineage = "SBD > Bandcamp",
                 identifier = "kglw2020-11-20.bandcampbootlegger",
                 uploadDate = "2024-11-27 12:52:26",
-                recordings = nonEmptyListOf("AUD by Archie Cove: kglw2024-11-20archie")
+                recordings = nonEmptyListOf(RecordingId("AUD by Archie Cove: kglw2024-11-20archie"))
             )
         )
     }

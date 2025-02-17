@@ -5,7 +5,7 @@ import arrow.core.NonEmptyList
 data class RecordingData(
     val notes: String?,
     val selectedRecording: String,
-    val recordings: NonEmptyList<String>,
+    val recordings: NonEmptyList<RecordingId>,
     val taper: String?,
     val source: String?,
     val lineage: String?,
