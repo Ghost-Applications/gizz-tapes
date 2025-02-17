@@ -20,6 +20,7 @@ import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.selection.ShowSelectionData
 import gizz.tapes.ui.show.RecordingData
+import gizz.tapes.ui.show.RecordingId
 import gizz.tapes.ui.show.ShowScreenState
 import gizz.tapes.ui.show.ShowScreenState.Track
 import gizz.tapes.ui.show.TrackDuration
@@ -316,7 +317,7 @@ val showContent = LCE.Content(
         recordingData = RecordingData(
             notes = null,
             selectedRecording = "SMB: gizz-sb",
-            recordings = nonEmptyListOf("test-recording"),
+            recordings = nonEmptyListOf(RecordingId("test-recording")),
             taper = null,
             source = null,
             lineage = null,
