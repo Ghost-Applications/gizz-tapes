@@ -1,14 +1,14 @@
 [versions]
 android-sdk = "35"
-kotlin = "2.1.0"
-firebase-bom = "33.8.0"
+kotlin = "2.1.10"
+firebase-bom = "33.9.0"
 androidx-media2 = "1.3.0"
 flipper = "0.261.0"
 coroutines = "1.10.1"
 okhttp = "4.12.0"
-compose-bom = "2025.01.01"
+compose-bom = "2025.02.00"
 compose-compiler = "1.5.15"
-navigation = "2.8.6"
+navigation = "2.8.7"
 hilt = "2.54"
 hiltNavigationCompose = "1.2.0"
 media3 = "1.5.1"
@@ -16,7 +16,7 @@ ktor = "2.3.12"
 arrow = "1.2.4"
 
 [libraries]
-android-build-gradle = { module = "com.android.tools.build:gradle", version = "8.7.3"}
+android-build-gradle = { module = "com.android.tools.build:gradle", version = "8.8.1"}
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin"}
 kotlin-poet = { module = "com.squareup:kotlinpoet", version = "1.18.1" }
 java-poet = "com.squareup:javapoet:1.13.0"
@@ -66,11 +66,11 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-material-icons = "androidx.compose.material:material-icons-extended:1.7.7"
+androidx-material-icons = "androidx.compose.material:material-icons-extended:1.7.8"
 androidx-datastore = "androidx.datastore:datastore-preferences:1.1.2"
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}
-firbase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -140,7 +140,7 @@ android-test-libs = [
 ]
 
 firebase = [
-    "firbase-analytics",
+    "firebase-analytics",
     "firebase-crashlytics"
 ]
 
@@ -179,8 +179,8 @@ arrow = [
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 version-check = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.3" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-ksp = "com.google.devtools.ksp:2.1.0-1.0.29"
+ksp = "com.google.devtools.ksp:2.1.10-1.0.30"
 paparazzi = "app.cash.paparazzi:1.3.5"

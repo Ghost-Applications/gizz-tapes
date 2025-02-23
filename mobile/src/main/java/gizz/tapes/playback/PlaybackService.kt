@@ -28,14 +28,15 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.AndroidEntryPoint
 import gizz.tapes.MainActivity
+import gizz.tapes.data.MediaId
 import gizz.tapes.util.CastAvailabilityChecker
 import gizz.tapes.util.MediaItemsWrapper
+import gizz.tapes.util.realMediaId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.guava.future
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,6 +58,7 @@ class PlaybackService : MediaLibraryService(),
 
     @OptIn(UnstableApi::class)
     override fun onCreate() {
+        Timber.d("onCreate()")
         super.onCreate()
 
         val exoPlayer = ExoPlayer.Builder(this)
@@ -89,6 +91,7 @@ class PlaybackService : MediaLibraryService(),
     }
 
     override fun onDestroy() {
+        Timber.d("onDestroy()")
         mediaSession?.run {
             player.release()
             release()
@@ -104,6 +107,7 @@ class PlaybackService : MediaLibraryService(),
 
     // User dismissed the app from recent tasks
     override fun onTaskRemoved(rootIntent: Intent?) {
+        Timber.d("onTaskRemoved() rootIntent=%s", rootIntent)
         mediaSession?.player?.run {
             if (playWhenReady || mediaItemCount == 0 || playbackState == Player.STATE_ENDED) {
                 // stop player if it's not playing otherwise allow it to continue playing
@@ -117,6 +121,7 @@ class PlaybackService : MediaLibraryService(),
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo
     ): ListenableFuture<MediaItemsWithStartPosition> {
+        Timber.d("onPlaybackResumption() mediaSession=%s, controller=%s", mediaSession, controller)
         return serviceScope.future(Dispatchers.Main) {
             MediaItemsWithStartPosition(
                 player.playlist,
@@ -130,6 +135,7 @@ class PlaybackService : MediaLibraryService(),
         session: MediaSession,
         controller: MediaSession.ControllerInfo
     ): MediaSession.ConnectionResult {
+        Timber.d("onConnect() session=%s, controller=%s", session, controller)
         val sessionCommands = MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS
         if (
             session.isMediaNotificationController(controller) ||
@@ -172,7 +178,7 @@ class PlaybackService : MediaLibraryService(),
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("onGetChildren() parentId=%s", parentId)
         return serviceScope.future {
-            val items = mediaItemTree.getChildren(parentId)
+            val items = mediaItemTree.getChildren(MediaId.fromString(parentId))
             LibraryResult.ofItemList(items, params)
         }
     }
@@ -184,7 +190,7 @@ class PlaybackService : MediaLibraryService(),
     ): ListenableFuture<LibraryResult<MediaItem>> {
         Timber.d("onGetItem() mediaId=%s", mediaId)
         return serviceScope.future {
-            mediaItemTree.getItem(mediaId).toOption()
+            mediaItemTree.getItem(MediaId.fromString(mediaId)).toOption()
                 .map { LibraryResult.ofItem(it, null) }
                 .getOrElse { LibraryResult.ofError(SessionError.ERROR_INVALID_STATE) }
         }
@@ -198,14 +204,14 @@ class PlaybackService : MediaLibraryService(),
         Timber.d("onAddMediaItems() mediaItems=%s", MediaItemsWrapper(mediaItems))
         return serviceScope.future {
             if (mediaItems.size == 1 && mediaItems.first().localConfiguration == null) {
-                mediaItemTree.getChildren(mediaItems.first().mediaId).let { playlist ->
+                mediaItemTree.getChildren(MediaId.fromString(mediaItems.first().mediaId)).let { playlist ->
                     return@future playlist
                 }
             }
 
             mediaItems.map {
                 if (it.localConfiguration == null) {
-                    mediaItemTree.getItem(it.mediaId)
+                    mediaItemTree.getItem(it.realMediaId)
                 } else {
                     it
                 }

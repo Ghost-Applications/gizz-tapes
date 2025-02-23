@@ -55,10 +55,10 @@ import coil.compose.AsyncImage
 import gizz.tapes.R
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
-import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.CastButton
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.TopAppBarText
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.util.formatedElapsedTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

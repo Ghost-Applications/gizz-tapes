@@ -24,6 +24,7 @@ import androidx.media3.common.util.UnstableApi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import gizz.tapes.util.MediaItemWrapper
 import gizz.tapes.util.MediaItemsWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 
 @AssistedFactory
 interface ReplaceableForwardingPlayerFactory {
@@ -81,11 +83,12 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
         ) = updateCurrentPlaylistIndex()
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
+            Timber.d("onIsPlayingChanged() isPlaying=%s", isPlaying)
             when (isPlaying) {
                 true -> {
                     job = scope.launch {
                         while(coroutineContext.isActive) {
-                            delay(1000)
+                            delay(5.seconds)
                             saveState()
                         }
                     }
@@ -95,6 +98,7 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
         }
 
         fun updateCurrentPlaylistIndex() {
+            Timber.d("updateCurrentPlaylistIndex()")
             if (!player.currentTimeline.isEmpty) {
                 currentPlaylistIndex = player.currentMediaItemIndex
             }
@@ -130,6 +134,7 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     }
 
     fun setPlayer(newPlayer: Player) {
+        Timber.d("setPlayer() newPlayer=%s", newPlayer)
         player.removeListener(internalListener)
         newPlayer.addListener(internalListener)
 
@@ -182,55 +187,77 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
         startIndex: Int,
         startPositionMs: Long
     ) {
+        Timber.d("setMediaItems() mediaItems=%s startIndex=%s startPositionMs=%s",
+            MediaItemsWrapper(mediaItems),
+            startIndex,
+            startPositionMs
+        )
         currentPlaylistIndex = startIndex
         player.setMediaItems(mediaItems, startIndex, startPositionMs)
         _playlist.clear()
         _playlist.addAll(mediaItems)    }
 
     override fun setMediaItem(mediaItem: MediaItem) {
+        Timber.d("setMediaItem() mediaItem=%s", MediaItemWrapper(mediaItem))
         player.setMediaItem(mediaItem)
         _playlist.clear()
         _playlist.add(mediaItem)
     }
 
     override fun setMediaItem(mediaItem: MediaItem, startPositionMs: Long) {
+        Timber.d(
+            "setMediaItem() mediaItem=%s startPositionMs=%s",
+            MediaItemWrapper(mediaItem),
+            startPositionMs
+        )
         player.setMediaItem(mediaItem, startPositionMs)
         _playlist.clear()
         _playlist.add(mediaItem)
     }
 
     override fun setMediaItem(mediaItem: MediaItem, resetPosition: Boolean) {
+        Timber.d(
+            "setMediaItem() mediaItem=%s resetPosition=%s",
+            MediaItemWrapper(mediaItem),
+            resetPosition
+        )
         player.setMediaItem(mediaItem, resetPosition)
         _playlist.clear()
         _playlist.add(mediaItem)
     }
 
     override fun addMediaItem(mediaItem: MediaItem) {
+        Timber.d("addMediaItem() mediaItem=%s", MediaItemWrapper(mediaItem))
         player.addMediaItem(mediaItem)
         _playlist.add(mediaItem)
     }
 
     override fun addMediaItem(index: Int, mediaItem: MediaItem) {
+        Timber.d("addMediaItem() index=%s mediaItem=%s", index, MediaItemWrapper(mediaItem))
         player.addMediaItem(index, mediaItem)
         _playlist.add(index, mediaItem)
     }
 
     override fun addMediaItems(mediaItems: List<MediaItem>) {
+        Timber.d("addMediaItems() mediaItems=%s", MediaItemsWrapper(mediaItems))
         player.addMediaItems(mediaItems)
         _playlist.addAll(mediaItems)
     }
 
     override fun addMediaItems(index: Int, mediaItems: MutableList<MediaItem>) {
+        Timber.d("addMediaItems() index=%s mediaItems=%s", index, MediaItemsWrapper(mediaItems))
         player.addMediaItems(index, mediaItems)
         _playlist.addAll(index, mediaItems)
     }
 
     override fun moveMediaItem(currentIndex: Int, newIndex: Int) {
+        Timber.d("moveMediaItem() currentIndex=%s newIndex=%s", currentIndex, newIndex)
         player.moveMediaItem(currentIndex, newIndex)
         _playlist.add(min(newIndex, _playlist.size), _playlist.removeAt(currentIndex))
     }
 
     override fun moveMediaItems(fromIndex: Int, toIndex: Int, newIndex: Int) {
+        Timber.d("moveMediaItems() fromIndex=%s toIndex=%s newIndex=%s", fromIndex, toIndex, newIndex)
         val removedItems: ArrayDeque<MediaItem> = ArrayDeque()
         val removedItemsLength = toIndex - fromIndex
         for (i in removedItemsLength - 1 downTo 0) {
@@ -240,6 +267,7 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     }
 
     override fun replaceMediaItem(index: Int, mediaItem: MediaItem) {
+        Timber.d("replaceMediaItem() index=%s mediaItem=%s", index, MediaItemWrapper(mediaItem))
         player.replaceMediaItem(index, mediaItem)
         _playlist[index] = mediaItem
     }
@@ -249,6 +277,12 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
         toIndex: Int,
         mediaItems: MutableList<MediaItem>
     ) {
+        Timber.d(
+            "replaceMediaItems() fromIndex=%s toIndex=%s mediaItems=%s",
+            fromIndex,
+            toIndex,
+            MediaItemsWrapper(mediaItems)
+        )
         player.replaceMediaItems(fromIndex, toIndex, mediaItems)
         mediaItems.forEachIndexed { index, mediaItem ->
             _playlist[fromIndex + index] = mediaItem
@@ -256,6 +290,7 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     }
 
     override fun removeMediaItem(index: Int) {
+        Timber.d("removeMediaItem() index=%s", index)
         player.removeMediaItem(index)
         _playlist.removeAt(index)
     }
