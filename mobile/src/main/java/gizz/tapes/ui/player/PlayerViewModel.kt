@@ -7,7 +7,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PlayerErrorMessage
@@ -29,6 +28,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @UnstableApi
 @HiltViewModel
@@ -70,7 +71,7 @@ class PlayerViewModel @Inject constructor(
         }
 
         while (mediaPlayerContainer.mediaPlayer == null) {
-            delay(10)
+            delay(10.milliseconds)
         }
 
         player = checkNotNull(mediaPlayerContainer.mediaPlayer)
@@ -84,11 +85,11 @@ class PlayerViewModel @Inject constructor(
     private fun updatePlayerState(): Flow<PlayerState> {
         return flow {
             while(mediaPlayerContainer.mediaPlayer == null) {
-                delay(100)
+                delay(100.milliseconds)
             }
 
             while (currentCoroutineContext().isActive && mediaPlayerContainer.mediaPlayer != null) {
-                delay(1000)
+                delay(1.seconds)
                 emit(newState())
             }
         }
@@ -114,7 +115,7 @@ class PlayerViewModel @Inject constructor(
         // this is an issue when switching between local player and cast player
         viewModelScope.launch {
             while (!player.isCommandAvailable(Player.COMMAND_SEEK_TO_MEDIA_ITEM)) {
-                delay(100)
+                delay(100.milliseconds)
             }
             player.seekTo(mediaItemIndex, positionMs)
         }

@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import gizz.tapes.R
-import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.navigationUpIcon
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.theme.GizzTheme
 import io.noties.markwon.Markwon
 

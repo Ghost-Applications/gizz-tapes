@@ -15,6 +15,7 @@ import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
 import gizz.tapes.ui.nav.Show
 import gizz.tapes.util.MediaItemWrapper
+import gizz.tapes.util.MediaMetaDataWrapper
 import gizz.tapes.util.showExtras
 import gizz.tapes.util.toExtrasBundle
 import kotlinx.coroutines.flow.first
@@ -124,8 +125,13 @@ class CurrentlyPlayingSaver @Inject constructor(
     @UnstableApi
     private fun MediaItem.toMediaStorageItem(): MediaStorageItem? {
         val metaData = mediaMetadata
-        val localConfig =
-            checkNotNull(localConfiguration) { "localConfiguration should not be null" }
+
+        if (metaData.isPlayable != true) {
+            Timber.d("Metadata is not playable: %s", MediaMetaDataWrapper(metaData))
+            return null
+        }
+
+        val localConfig = checkNotNull(localConfiguration) { "localConfiguration should not be null" }
         val (showId, _) = showExtras ?: run {
             Timber.e("no extras for %s", MediaItemWrapper(this))
             return null

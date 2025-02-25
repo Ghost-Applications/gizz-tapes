@@ -2,7 +2,6 @@ package gizz.tapes.util
 
 import android.os.Bundle
 import gizz.tapes.ui.nav.Show
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 fun Show.toExtrasBundle(): Bundle {

@@ -1,7 +1,7 @@
 package gizz.tapes.ui.nav
 
-import gizz.tapes.data.ShowId
 import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.ShowId
 import gizz.tapes.data.Year
 import gizz.tapes.data.Year.Companion.NavType
 import kotlinx.serialization.Serializable

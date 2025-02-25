@@ -12,33 +12,26 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import gizz.tapes.api.GizzTapesApiClient
-import gizz.tapes.api.data.Recording
 import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.BandName
 import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.MediaId
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Settings
-import gizz.tapes.data.Title
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.ui.nav.Show
 import gizz.tapes.ui.show.ShowScreenState.Track
 import gizz.tapes.util.LCE
 import gizz.tapes.util.map
 import gizz.tapes.util.retryUntilSuccessful
+import gizz.tapes.util.setMediaId
 import gizz.tapes.util.toExtrasBundle
 import gizz.tapes.util.tryAndGetPreferredRecordingType
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineTransform
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMap
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -104,13 +97,19 @@ class ShowViewModel @Inject constructor(
             }
 
             showData.map { show ->
-
                 val recording = show.recordings.firstOrNull { it.id == selectedRecording?.id }
                         ?: show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
+
                 val items = recording.files.map { track ->
                     MediaItem.Builder()
                         .setUri(recording.filesPathPrefix + track.filename)
-                        .setMediaId(track.filename)
+                        .setMediaId(
+                            MediaId.TrackId(
+                                show = show,
+                                file = track,
+                                recording = recording
+                            )
+                        )
                         .setMimeType(MimeTypes.AUDIO_MPEG)
                         .setMediaMetadata(
                             MediaMetadata.Builder()

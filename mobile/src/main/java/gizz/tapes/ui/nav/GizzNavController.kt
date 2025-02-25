@@ -13,7 +13,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import gizz.tapes.data.FullShowTitle
-import gizz.tapes.data.Title
 import gizz.tapes.ui.menu.about.AboutScreen
 import gizz.tapes.ui.menu.settings.SettingsScreen
 import gizz.tapes.ui.player.FullPlayer

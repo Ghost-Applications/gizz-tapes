@@ -12,9 +12,7 @@ import gizz.tapes.mediaItem
 import gizz.tapes.playback.MediaPlayerContainer
 import gizz.tapes.stub
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okio.ByteString.Companion.encodeUtf8
 import org.junit.Rule
 import org.junit.Test
 

@@ -29,9 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import gizz.tapes.R
-import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.navigationUpIcon
+import gizz.tapes.ui.nav.NavigateUp
 import gizz.tapes.util.LCE
 
 @Composable
