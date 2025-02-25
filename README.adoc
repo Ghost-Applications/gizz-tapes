@@ -10,7 +10,7 @@ image:https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f31
 image:https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png[alt="Get it on Google Play", height=80, link=https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png]
 
 We highly recommend using https://github.com/ImranR98/Obtainium?tab=readme-ov-file#-obtainium[Obtainium]
-to install this app and to keep it up today!
+to install this app and to keep it up to date!
 
 Steps:
 
