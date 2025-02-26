@@ -22,6 +22,7 @@ import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.SessionError
 import arrow.core.getOrElse
 import arrow.core.toOption
+import arrow.fx.coroutines.parMap
 import com.google.android.gms.cast.framework.CastContext
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
@@ -30,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import gizz.tapes.MainActivity
 import gizz.tapes.data.MediaId
 import gizz.tapes.util.CastAvailabilityChecker
+import gizz.tapes.util.MediaItemWrapper
 import gizz.tapes.util.MediaItemsWrapper
 import gizz.tapes.util.realMediaId
 import kotlinx.coroutines.CoroutineScope
@@ -123,6 +125,7 @@ class PlaybackService : MediaLibraryService(),
     ): ListenableFuture<MediaItemsWithStartPosition> {
         Timber.d("onPlaybackResumption() mediaSession=%s, controller=%s", mediaSession, controller)
         return serviceScope.future(Dispatchers.Main) {
+            Timber.d("onPlaybackResumption() future")
             MediaItemsWithStartPosition(
                 player.playlist,
                 player.currentPlaylistIndex,
@@ -164,6 +167,7 @@ class PlaybackService : MediaLibraryService(),
         )
         return serviceScope.future {
             val item = mediaItemTree.getRoot()
+            Timber.d("onGetLibraryRoot() future result item=%s", MediaItemWrapper(item))
             LibraryResult.ofItem(item, params)
         }
     }
@@ -179,6 +183,7 @@ class PlaybackService : MediaLibraryService(),
         Timber.d("onGetChildren() parentId=%s", parentId)
         return serviceScope.future {
             val items = mediaItemTree.getChildren(MediaId.fromString(parentId))
+            Timber.d("onGetChildren() future result items=%s", MediaItemsWrapper(items))
             LibraryResult.ofItemList(items, params)
         }
     }
@@ -190,6 +195,7 @@ class PlaybackService : MediaLibraryService(),
     ): ListenableFuture<LibraryResult<MediaItem>> {
         Timber.d("onGetItem() mediaId=%s", mediaId)
         return serviceScope.future {
+            Timber.d("onPlaybackResumption() future")
             mediaItemTree.getItem(MediaId.fromString(mediaId)).toOption()
                 .map { LibraryResult.ofItem(it, null) }
                 .getOrElse { LibraryResult.ofError(SessionError.ERROR_INVALID_STATE) }
@@ -205,11 +211,12 @@ class PlaybackService : MediaLibraryService(),
         return serviceScope.future {
             if (mediaItems.size == 1 && mediaItems.first().localConfiguration == null) {
                 mediaItemTree.getChildren(MediaId.fromString(mediaItems.first().mediaId)).let { playlist ->
+                    Timber.d("onAddMediaItems() future result playlist=%s", MediaItemsWrapper(playlist))
                     return@future playlist
                 }
             }
 
-            mediaItems.map {
+            mediaItems.parMap {
                 if (it.localConfiguration == null) {
                     mediaItemTree.getItem(it.realMediaId)
                 } else {

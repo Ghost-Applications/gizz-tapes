@@ -26,6 +26,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import gizz.tapes.util.MediaItemWrapper
 import gizz.tapes.util.MediaItemsWrapper
+import gizz.tapes.util.MediaMetaDataWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -106,6 +107,7 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     }
 
     init {
+        Timber.d("init() ->")
         externalListeners.add(replaceableForwardingPlayerListener)
         player.addListener(internalListener)
 
@@ -117,8 +119,10 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
             withContext(Dispatchers.Main) {
                 setMediaItems(mediaItems.await(), true)
                 seekTo(currentTrack.await(), currentPosition.await())
+                Timber.d("init() withContext complete")
             }
         }
+        Timber.d("init() <-")
     }
 
     private suspend fun saveState() {
@@ -158,14 +162,17 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     override fun getApplicationLooper(): Looper = player.applicationLooper
 
     override fun addListener(listener: Listener) {
+        Timber.d("addListener()")
         externalListeners.add(listener)
     }
 
     override fun removeListener(listener: Listener) {
+        Timber.d("removeListener()")
         externalListeners.remove(listener)
     }
 
     override fun setMediaItems(mediaItems: List<MediaItem>) {
+        Timber.d("setMediaItems mediaItems=%s", MediaItemsWrapper(mediaItems))
         player.setMediaItems(mediaItems)
         _playlist.clear()
         _playlist.addAll(mediaItems)
@@ -326,10 +333,12 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     override fun getPlayerError(): PlaybackException? = player.playerError
 
     override fun play() {
+        Timber.d("play()")
         player.play()
     }
 
     override fun pause() {
+        Timber.d("pause()")
         player.pause()
     }
 
@@ -423,6 +432,7 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     override fun getPlaylistMetadata(): MediaMetadata = player.playlistMetadata
 
     override fun setPlaylistMetadata(mediaMetadata: MediaMetadata) {
+        Timber.d("setPlaylistMetadata() mediaMetadata=%s", MediaMetaDataWrapper(mediaMetadata))
         player.playlistMetadata = mediaMetadata
     }
 
