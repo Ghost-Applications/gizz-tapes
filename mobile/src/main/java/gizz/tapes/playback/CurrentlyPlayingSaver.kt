@@ -82,6 +82,7 @@ class CurrentlyPlayingSaver @Inject constructor(
     private val dataStorage: DataStore<StoredMediaSession>,
 ) {
     suspend fun mediaItems(): List<MediaItem> {
+        Timber.d("mediaItems()")
         return dataStorage.data
             .map { it.mediaItems }
             .first()
@@ -89,12 +90,14 @@ class CurrentlyPlayingSaver @Inject constructor(
     }
 
     suspend fun currentTrack(): Int {
+        Timber.d("currentTrack()")
         return dataStorage.data
             .map { it.currentTrack }
             .first() ?: 0
     }
 
     suspend fun currentPosition(): Long {
+        Timber.d("currentPosition()")
         return dataStorage.data
             .map { it.currentTime }
             .first() ?: 0
