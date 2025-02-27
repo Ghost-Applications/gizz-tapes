@@ -46,24 +46,28 @@ class PlayerViewModel @Inject constructor(
     private fun playerCallbackFlow() = callbackFlow {
         val listener = object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                Timber.d("onMediaItemTransition() mediaItem=%s reason=%s", mediaItem, reason)
                 viewModelScope.launch {
                     send(newState())
                 }
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
+                Timber.d("onIsPlayingChanged() isPlaying=%s", isPlaying)
                 viewModelScope.launch {
                     send(newState())
                 }
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
+                Timber.d("onIsLoadingChanged() isLoading=%s", isLoading)
                 viewModelScope.launch {
                     send(newState())
                 }
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                Timber.i(error, "onPlayerError() error=%s", error)
                 viewModelScope.launch {
                     send(newState(PlayerError(playerErrorMessage.value)))
                 }

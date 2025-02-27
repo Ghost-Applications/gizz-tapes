@@ -24,28 +24,32 @@ class DelegatingPlayerListener(
     private val delegates: List<Player.Listener>
 ): Player.Listener {
     override fun onPlaybackStateChanged(playbackState: Int) {
+        Timber.d("onPlaybackStateChanged: playbackState=%s", playbackState)
         delegates.forEach { it.onPlaybackStateChanged(playbackState) }
     }
 
     override fun onTracksChanged(tracks: Tracks) {
+        Timber.d("onTracksChanged: tracks=%s", tracks)
         delegates.forEach { it.onTracksChanged(tracks) }
     }
 
     override fun onIsPlayingChanged(isPlaying: Boolean) {
+        Timber.d("onIsPlayingChanged: isPlaying=%s", isPlaying)
         delegates.forEach { it.onIsPlayingChanged(isPlaying) }
     }
 
     override fun onPlayerError(error: PlaybackException) {
-        Timber.e(error, "onPlayerError: ${error.errorCodeName}")
+        Timber.e(error, "onPlayerError: %s", error.errorCodeName)
         delegates.forEach { it.onPlayerError(error) }
     }
 
     override fun onPlayerErrorChanged(error: PlaybackException?) {
-        Timber.e(error, "onPlayerErrorChanged")
+        Timber.e(error, "onPlayerErrorChanged()")
         delegates.forEach { it.onPlayerErrorChanged(error) }
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+        Timber.d("onTimelineChanged: timeline=%s, reason=%s", timeline, reason)
         delegates.forEach { it.onTimelineChanged(timeline, reason) }
     }
 
@@ -54,10 +58,12 @@ class DelegatingPlayerListener(
         newPosition: Player.PositionInfo,
         reason: Int
     ) {
+        Timber.d("onPositionDiscontinuity: oldPosition=%s, newPosition=%s, reason=%s", oldPosition, newPosition, reason)
         delegates.forEach { it.onPositionDiscontinuity(oldPosition, newPosition, reason) }
     }
 
     override fun onAudioAttributesChanged(audioAttributes: AudioAttributes) {
+        Timber.d("onAudioAttributesChanged: audioAttributes=%s")
         delegates.forEach { it.onAudioAttributesChanged(audioAttributes) }
     }
 
