@@ -15,6 +15,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
@@ -64,6 +66,11 @@ class PlaybackService : MediaLibraryService(),
         super.onCreate()
 
         val exoPlayer = ExoPlayer.Builder(this)
+            // only load renderers for audio files since we do not support video
+            // this should decrease the release app size.
+            .setRenderersFactory { eventHandler, _, audioRendererEventListener, _, _ ->
+                arrayOf(MediaCodecAudioRenderer(applicationContext, MediaCodecSelector.DEFAULT, eventHandler, audioRendererEventListener))
+            }
             .setAudioAttributes(
                 AudioAttributes.Builder()
                     .setUsage(C.USAGE_MEDIA)
