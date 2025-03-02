@@ -1,6 +1,8 @@
 = Changelog
 
-== Fishing For Fishies
+== Gaia
+
+== Fishing For Fishies 2025-03-02
 
 - Save player state, app restarts will no longer effect where you were left off in a show.
 - Fix issue where player loses where it is in the playlist when switching between casting and
