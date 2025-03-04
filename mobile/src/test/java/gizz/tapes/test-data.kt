@@ -11,6 +11,7 @@ import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Recording
 import gizz.tapes.api.data.Show
 import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.MediaId
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Subtitle
@@ -24,7 +25,6 @@ import gizz.tapes.ui.show.RecordingId
 import gizz.tapes.ui.show.ShowScreenState
 import gizz.tapes.ui.show.ShowScreenState.Track
 import gizz.tapes.ui.show.TrackDuration
-import gizz.tapes.ui.show.TrackId
 import gizz.tapes.ui.show.TrackTitle
 import gizz.tapes.ui.year.YearSelectionData
 import gizz.tapes.util.LCE
@@ -309,7 +309,11 @@ val showContent = LCE.Content(
         showPosterUrl = PosterUrl("https://kglw.net/i/poster-art-1699403482.jpeg"),
         tracks = show.recordings.first().files.map {
             Track(
-                id = TrackId(it.filename),
+                id = MediaId.TrackId(
+                    show = show,
+                    recording = show.recordings.first(),
+                    file = it
+                ),
                 title = TrackTitle(it.title),
                 duration = TrackDuration(it.length)
             )

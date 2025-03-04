@@ -426,7 +426,7 @@ fun TrackRow(
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(if (playing) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainer)
             .fillMaxWidth()
             .requiredHeight(96.dp)
             .height(IntrinsicSize.Max)

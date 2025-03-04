@@ -143,7 +143,7 @@ class ShowViewModel @Inject constructor(
                     },
                     tracks = recording.files.map {
                         Track(
-                            id = TrackId(it.filename),
+                            id = MediaId.TrackId(recording = recording, show = show, file = it),
                             title = TrackTitle(it.title),
                             duration = TrackDuration(it.length)
                         )

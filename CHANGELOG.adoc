@@ -2,6 +2,9 @@
 
 == Gaia
 
+- Fixed bug where the currently playing track wasn't shown as playing in the show screen
+- Highlight the background of the currently playing track on the show screen
+
 == Fishing For Fishies 2025-03-02
 
 - Save player state, app restarts will no longer effect where you were left off in a show.

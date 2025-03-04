@@ -1,6 +1,7 @@
 package gizz.tapes.ui.show
 
 import arrow.core.NonEmptyList
+import gizz.tapes.data.MediaId.TrackId
 import gizz.tapes.data.PosterUrl
 
 data class ShowScreenState(
