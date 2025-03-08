@@ -1,5 +1,32 @@
-Dive into the electrifying world of King Gizzard and the Lizard Wizard with Gizz Tapes, your one-stop shop for live concert bootlegs!  Curated from the vast archive of the Internet Archive, Gizz Tapes lets you relive the band's legendary performances at the click of a button.
+Dive into the electrifying world of King Gizzard and the Lizard Wizard with Gizz Tapes, your
+one-stop app for live concert bootlegs! Curated from the vast archives of the Internet Archive,
+Gizz Tapes lets you relive the band's legendary performances at the click of a button.
 
-Want to mosh along to the explosive energy of a KGLW live set? Gizz Tapes has it all!
+What is Gizz Tapes?
+Gizz Tapes is a jukebox for live recordings of King Gizzard and the Lizard Wizard shows. It’s a
+strictly unofficial app with no ties to the band, designed for fans by fans. All audio is hosted
+and streamed directly from the Internet Archive, while artwork, show notes, and metadata are
+sourced from KGLW.net. Inspired by platforms like phish.in and Relisten, Gizz Tapes brings
+together audio from both the Live Music Archive and Community Audio collections, offering a
+seamless listening experience.
 
-So crank up the volume, queue up your favorite show, and get ready to experience King Gizzard and the Lizard Wizard like never before.  Gizz Tapes: Because the jams don't stop!
+Why Gizz Tapes?
+
+Massive Library: Access a treasure trove of live performances, from explosive mosh-worthy sets to
+rare, intimate shows.
+
+Easy to Use: Queue up your favorite shows, explore curated collections, and enjoy high-quality
+streaming.
+
+Stay Updated: Follow Gizz Tapes on Bluesky or subscribe to our Atom feed to get notified when new
+shows are added.
+
+Community-Driven: Found a bug or have feedback? Raise an issue on our issue tracker or email us
+directly. Want to contribute? Check out our Git repo!
+
+Support the Cause
+Gizz Tapes wouldn’t be possible without the Internet Archive. Please consider making a donation to
+support their vital work in preserving digital culture and keeping the music alive for everyone.
+
+Crank up the volume, queue up your favorite show, and experience King Gizzard and the Lizard
+Wizard like never before. Gizz Tapes: Because the jams don’t stop!
