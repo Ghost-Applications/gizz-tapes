@@ -4,6 +4,7 @@
 
 - Fixed bug where the currently playing track wasn't shown as playing in the show screen
 - Highlight the background of the currently playing track on the show screen
+- Update api to handle nulls for title in Show and PartialShowData data classes
 
 == Fishing For Fishies 2025-03-02
 
