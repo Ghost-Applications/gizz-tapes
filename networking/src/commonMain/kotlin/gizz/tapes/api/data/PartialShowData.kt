@@ -11,7 +11,7 @@ data class PartialShowData(
     @SerialName("venuename")
     val venueName: String,
     val location: String,
-    val title: String,
+    val title: String?,
     val order: UShort,
     @SerialName("poster_url")
     val posterUrl: String?

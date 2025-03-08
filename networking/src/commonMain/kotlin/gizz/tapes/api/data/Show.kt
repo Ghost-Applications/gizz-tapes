@@ -14,7 +14,7 @@ data class Show(
     @SerialName("poster_url")
     val posterUrl: String?,
     val notes: String?,
-    val title: String,
+    val title: String?,
     @SerialName("kglw_net")
     val kglwNet: KglwNet,
     @SerialName("venue_id")
