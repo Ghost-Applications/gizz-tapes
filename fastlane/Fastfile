@@ -29,7 +29,7 @@ platform :android do
     upload_to_play_store(
       track: 'beta',
       skip_upload_apk: true,
-      aab: 'mobile/build/outputs/bundle/fullRelease/mobile-full-release.aab'
+      aab: 'android/build/outputs/bundle/fullRelease/*.aab'
     )
   end
 
@@ -92,8 +92,8 @@ platform :android do
       repository_name: 'Ghost-Applications/gizz-tapes',
       api_token: keys_properties['github_token'],
       upload_assets: [
-        'mobile/build/outputs/apk/foss/release/mobile-foss-release.apk',
-        'mobile/build/outputs/apk/full/release/mobile-full-release.apk'
+        'android/build/outputs/apk/foss/release/*.apk',
+        'android/build/outputs/apk/full/release/*.apk'
       ],
       name: version_name,
       tag_name: version_name,

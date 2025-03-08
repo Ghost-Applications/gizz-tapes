@@ -53,6 +53,7 @@ android {
         versionCode = buildNumber.toInt()
         versionName = properties["gizz.tapes.versionName"] as String
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        base.archivesName = "gizz-tapes-$versionName-$buildNumber"
     }
 
     compileOptions {
