@@ -5,7 +5,7 @@ record-screenshots:
     ./gradlew recordPaparazzi
 
 build:
-    ./gradlew build
+    ./gradlew build bundle
 
 release:
     bundle exe fastlane release

@@ -20,7 +20,7 @@ plugins {
 }
 
 include(
-    ":mobile",
+    ":android",
     ":networking",
     ":networking-integration"
 )
