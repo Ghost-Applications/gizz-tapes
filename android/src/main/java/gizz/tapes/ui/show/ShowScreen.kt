@@ -53,10 +53,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -178,12 +185,14 @@ fun ShowScreen(
                         }
 
                         Column(
-                            modifier = Modifier.clickable {
-                                scope.launch {
-                                    listState.animateScrollToItem(0)
-                                    scrollBehavior.state.heightOffset = 1f
+                            modifier = Modifier
+                                .clickable {
+                                    scope.launch {
+                                        listState.animateScrollToItem(0)
+                                        scrollBehavior.state.heightOffset = 1f
+                                    }
                                 }
-                            }.padding(start = 8.dp)
+                                .padding(start = 8.dp)
                         ) {
                             Text(
                                 text = fullShowTitle.date.toAlbumFormat(),
@@ -347,6 +356,21 @@ fun ShowHeader(recordingData: RecordingData, recordingChanged: (RecordingId) -> 
                 }
             )
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        val annotatedString = buildAnnotatedString {
+            withLink(
+                LinkAnnotation.Url(
+                    recordingData.kglwNetShowLink,
+                    TextLinkStyles(style = SpanStyle(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textDecoration = TextDecoration.Underline
+                    ))
+                )
+            ) {
+                append(stringResource(R.string.view_show_stats_on_kglw_net))
+            }
+        }
+        Text(annotatedString)
     }
 }
 
@@ -367,6 +391,7 @@ fun ShowHeaderPreview() {
                 lineage = "",
                 identifier = "",
                 uploadDate = "",
+                kglwNetShowLink = "https://kglw.net/setlists/king-gizzard-the-lizard-wizard-november-21-2024-factory-town-miami-fl-usa.html"
             )
         ) {}
     }
@@ -409,7 +434,8 @@ fun ShowFooterPreview() {
                 lineage = "SBD > Bandcamp",
                 identifier = "kglw2020-11-20.bandcampbootlegger",
                 uploadDate = "2024-11-27 12:52:26",
-                recordings = nonEmptyListOf(RecordingId("AUD by Archie Cove: kglw2024-11-20archie"))
+                recordings = nonEmptyListOf(RecordingId("AUD by Archie Cove: kglw2024-11-20archie")),
+                kglwNetShowLink = "https://kglw.net/setlists/king-gizzard-the-lizard-wizard-november-21-2024-factory-town-miami-fl-usa.html"
             )
         )
     }
@@ -462,7 +488,8 @@ fun TrackRow(
         }
 
         Column(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .padding(8.dp)
                 .align(Alignment.CenterVertically)
         ) {
             Text(

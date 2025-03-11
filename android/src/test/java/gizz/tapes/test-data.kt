@@ -326,7 +326,8 @@ val showContent = LCE.Content(
             source = null,
             lineage = null,
             identifier = "gizz-sb",
-            uploadDate = "2025-01-01"
+            uploadDate = "2025-01-01",
+            kglwNetShowLink = "https://kglw.net/setlists/king-gizzard-the-lizard-wizard-november-21-2024-factory-town-miami-fl-usa.html"
         )
     )
 )

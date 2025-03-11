@@ -11,4 +11,5 @@ data class RecordingData(
     val lineage: String?,
     val identifier: String,
     val uploadDate: String,
+    val kglwNetShowLink: String,
 )

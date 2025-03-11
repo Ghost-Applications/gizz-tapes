@@ -67,8 +67,8 @@ fun MiniPlayer(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp)
-                            .shadow(2.dp)
+                            .height(64.dp)
+                            .shadow(4.dp)
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .clickable {
                                 onClick(playerState.showTitle)
@@ -78,7 +78,7 @@ fun MiniPlayer(
                         AsyncImage(
                             model = playerState.artworkUri,
                             contentDescription = null,
-                            modifier = Modifier.size(56.dp),
+                            modifier = Modifier.size(64.dp),
                             contentScale = ContentScale.Crop
                         )
 
