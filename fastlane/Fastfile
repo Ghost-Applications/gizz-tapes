@@ -29,7 +29,7 @@ platform :android do
     upload_to_play_store(
       track: 'beta',
       skip_upload_apk: true,
-      aab: 'android/build/outputs/bundle/fullRelease/*.aab'
+      aab: lane_context[:GRADLE_AAB_OUTPUT_PATH]
     )
   end
 
