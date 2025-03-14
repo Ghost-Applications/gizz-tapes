@@ -20,7 +20,7 @@ There, you can:
 ## Feedback & Support
 For feature requests, bug reports, or general inquiries, feel free to email us at
 [ghost.apps.llc@gmail.com](mailto:ghost.apps.llc@gmail.com). You can also connect with us on
-[**Reddit**]((https://www.reddit.com/user/Rough_Host8179/)) or
+[**Reddit**](https://www.reddit.com/user/Rough_Host8179/) or
 [**Blue Sky**](https://bsky.app/profile/ghostapps.bsky.social) to share your thoughts or support the project.
 
 ## Show Your Love
