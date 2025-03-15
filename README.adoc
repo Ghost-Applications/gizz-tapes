@@ -6,7 +6,7 @@ https://tapes.kglw.net/[Gizz Tapes] API.
 == Installation
 
 image:https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png[alt="Get it on GitHub", height=80, link=https://github.com/Ghost-Applications/gizz-tapes/releases]
-image:https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png[alt="Get it on Google Play", height=80, link=https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png]
+image:https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png[alt="Get it on Google Play", height=80, link=https://play.google.com/store/apps/details?id=gizz.tapes.full]
 
 We highly recommend using https://github.com/ImranR98/Obtainium?tab=readme-ov-file#-obtainium[Obtainium]
 to install this app and to keep it up to date!
