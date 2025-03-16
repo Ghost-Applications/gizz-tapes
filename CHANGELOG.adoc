@@ -1,6 +1,8 @@
 = Changelog
 
-== Gaia
+== Hate Dancin'
+
+== Gaia 2025-03-16
 
 - Fixed bug where the currently playing track wasn't shown as playing in the show screen
 - Highlight the background of the currently playing track on the show screen
@@ -12,6 +14,7 @@
 - Fix issue where player loses where it is in the playlist when switching between casting and
 local playback.
 - added show notes and ability to change recording source
+- Fix reddit link in about page
 
 == Evil Death Roll 2024-12-17
 
