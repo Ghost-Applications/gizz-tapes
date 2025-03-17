@@ -89,18 +89,17 @@ platform :android do
     )
 
     # Find all .apk and .aab files in the specified directories
-    apk_files_foss = Dir.glob('android/build/outputs/apk/foss/release/*.apk')
-    apk_files_full = Dir.glob('android/build/outputs/apk/full/release/*.apk')
-    aab_files_foss = Dir.glob('android/build/outputs/bundle/fossRelease/*.aab')
-    aab_files_full = Dir.glob('android/build/outputs/bundle/fullRelease/*.aab')
+    apk_files = Dir.glob('android/build/outputs/apk/*/release/*.apk')
+    aab_files = Dir.glob('android/build/outputs/bundle/*Release/*.aab')
 
     # Combine all files into a single array
-    upload_assets = apk_files_foss + apk_files_full + aab_files_foss + aab_files_full
+    upload_assets = apk_files + aab_files
 
     if upload_assets.empty?
       UI.error("No APK or AAB files found to upload!")
     else
       UI.success("Found the following files to upload: #{upload_assets.join(', ')}")
+    end
 
     set_github_release(
       repository_name: 'Ghost-Applications/gizz-tapes',
