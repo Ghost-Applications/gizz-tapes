@@ -48,7 +48,7 @@ android {
 
     defaultConfig {
         val buildNumber: String by project
-        minSdk = 23
+        minSdk =  libs.versions.android.min.sdk.get().toInt()
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
         versionName = properties["gizz.tapes.versionName"] as String
