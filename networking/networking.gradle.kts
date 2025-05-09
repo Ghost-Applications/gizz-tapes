@@ -38,7 +38,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.okhttp)
         }
 
         iosMain.dependencies {

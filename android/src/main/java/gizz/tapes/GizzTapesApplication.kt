@@ -1,14 +1,15 @@
 package gizz.tapes
 
 import android.app.Application
-import coil.ImageLoader
-import coil.ImageLoaderFactory
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltAndroidApp
-class GizzTapesApplication : Application(), ImageLoaderFactory {
+class GizzTapesApplication : Application(), SingletonImageLoader.Factory {
 
     @Inject lateinit var appInitializer: AppInitializer
     @Inject lateinit var imageLoader: ImageLoader
@@ -23,5 +24,5 @@ class GizzTapesApplication : Application(), ImageLoaderFactory {
         Timber.i("onTrimMemory: level=%s", level)
     }
 
-    override fun newImageLoader(): ImageLoader = imageLoader
+    override fun newImageLoader(context: PlatformContext): ImageLoader = imageLoader
 }
