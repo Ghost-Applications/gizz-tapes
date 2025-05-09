@@ -10,6 +10,8 @@
 
 - Fix show notes link
 
+- Update Coil to 3.x
+
 == Gaia 2025-03-16
 
 - Fixed bug where the currently playing track wasn't shown as playing in the show screen

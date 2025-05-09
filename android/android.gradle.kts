@@ -2,9 +2,8 @@ import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import com.google.gms.googleservices.GoogleServicesTask
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
@@ -157,6 +156,7 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
 
     implementation(libs.coil)
+    implementation(libs.coil.okhttp)
     implementation(libs.coil.svg)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.timber)

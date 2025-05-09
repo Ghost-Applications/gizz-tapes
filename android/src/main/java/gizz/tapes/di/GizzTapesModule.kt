@@ -6,8 +6,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.preferencesDataStoreFile
-import coil.ImageLoader
-import coil.decode.SvgDecoder
+import coil3.ImageLoader
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.crossfade
+import coil3.svg.SvgDecoder
 import com.jakewharton.byteunits.DecimalByteUnit.MEGABYTES
 import dagger.Binds
 import dagger.Module
@@ -67,11 +69,24 @@ interface GizzTapesModule {
         fun provideImageLoader(
             @ApplicationContext context: Context,
             okHttpClient: OkHttpClient
-        ) = ImageLoader.Builder(context)
-            .okHttpClient(okHttpClient)
-            .components { add(SvgDecoder.Factory()) }
+        ): ImageLoader = ImageLoader.Builder(context)
+            .components {
+                add(
+                    OkHttpNetworkFetcherFactory(
+                        callFactory = {
+                            okHttpClient.newBuilder()
+                                .addInterceptor {
+                                    val newRequest = it.request().newBuilder()
+                                        .header("Cache-Control", "public, max-age=2592000")
+                                        .build()
+                                    it.proceed(newRequest)
+                                }
+                                .build()
+                        }
+                    )
+                )
+            }
             .crossfade(true)
-            .respectCacheHeaders(false)
             .build()
 
         @Provides

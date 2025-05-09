@@ -70,7 +70,7 @@ import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import arrow.core.nonEmptyListOf
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.google.android.material.textview.MaterialTextView
 import gizz.tapes.R
 import gizz.tapes.data.FullShowTitle
