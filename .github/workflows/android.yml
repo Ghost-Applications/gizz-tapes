@@ -9,10 +9,10 @@ jobs:
         lfs: true
     - name: Checkout LFS objects
       run: git lfs checkout
-    - name: set up JDK 17
+    - name: set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: 17
+        java-version: 21
         distribution: 'zulu'
         cache: 'gradle'
     - name: Setup Gradle

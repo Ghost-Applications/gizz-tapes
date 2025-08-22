@@ -2,6 +2,8 @@
 
 == Hate Dancin'
 
+- Fix show notes link
+
 == Gaia 2025-03-16
 
 - Fixed bug where the currently playing track wasn't shown as playing in the show screen

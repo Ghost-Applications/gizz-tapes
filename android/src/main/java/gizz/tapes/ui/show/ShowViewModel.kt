@@ -157,7 +157,7 @@ class ShowViewModel @Inject constructor(
                         lineage = recording.lineage,
                         identifier = recording.id,
                         uploadDate = recording.uploadedAt.toString(),
-                        kglwNetShowLink = "https://kglw.net/setlists/king-gizzard-the-lizard-wizard-november-21-2024-factory-town-miami-fl-usa.html"
+                        kglwNetShowLink = show.kglwNet.fullLink
                     )
                 )
             }
