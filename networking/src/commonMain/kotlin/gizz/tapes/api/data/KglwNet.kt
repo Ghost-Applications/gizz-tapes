@@ -1,13 +1,11 @@
 package gizz.tapes.api.data
 
-import io.ktor.http.URLBuilder
-import io.ktor.http.Url
-import io.ktor.http.path
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class KglwNet(
     val id: UInt,
+    /** Slug to the show, use fullLink to get the full url */
     val permalink: String
 ) {
     companion object {

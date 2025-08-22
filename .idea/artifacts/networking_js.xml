@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="networking-js">
+    <output-path>$PROJECT_DIR$/networking/build/libs</output-path>
+    <root id="archive" name="networking-js.jar" />
+  </artifact>
+</component>
