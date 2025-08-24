@@ -1,6 +1,8 @@
 = Changelog
 
-== Hate Dancin'
+== Ice V
+
+== Hate Dancin' 2025-08-24
 
 - Fix show notes link
 
