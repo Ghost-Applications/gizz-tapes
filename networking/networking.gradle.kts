@@ -2,7 +2,6 @@ plugins {
     kotlin("multiplatform")
     alias(libs.plugins.serialization)
 }
-
 kotlin {
     // jvm and iOS targets will be priority for apps
     // with plans / abilities to support the others in the future.
@@ -17,7 +16,7 @@ kotlin {
         nodejs()
     }
 
-    jvmToolchain(17)
+    jvmToolchain(21)
 
     sourceSets {
         commonMain.dependencies {
