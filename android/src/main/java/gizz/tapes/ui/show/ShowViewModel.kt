@@ -1,3 +1,5 @@
+@file:kotlin.OptIn(ExperimentalTime::class)
+
 package gizz.tapes.ui.show
 
 import androidx.annotation.OptIn
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.ExperimentalTime
 import gizz.tapes.api.data.Show as ApiShow
 
 @HiltViewModel

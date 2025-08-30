@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package gizz.tapes.api.data
 
 import arrow.core.NonEmptyList
@@ -14,6 +16,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.time.ExperimentalTime
 
 @Serializable
 data class Recording(

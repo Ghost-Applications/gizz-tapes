@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package gizz.tapes.util
 
 import arrow.core.nel
@@ -12,6 +14,7 @@ import gizz.tapes.api.data.Recording.Type.UnknownType
 import kotlinx.datetime.Instant
 import org.junit.Test
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 class RecordingKtTest {
     @Test

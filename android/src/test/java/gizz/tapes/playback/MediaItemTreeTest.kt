@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package gizz.tapes.playback
 
 import android.net.Uri
@@ -20,6 +22,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 class MediaItemTreeTest {
     @Test
