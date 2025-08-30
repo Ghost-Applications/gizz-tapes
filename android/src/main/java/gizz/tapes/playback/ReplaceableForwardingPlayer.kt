@@ -379,29 +379,13 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     override fun seekForward() = player.seekForward()
 
     override fun hasPreviousMediaItem(): Boolean = player.hasPreviousMediaItem()
-
-    @Deprecated("Deprecated in Java")
-    override fun seekToPreviousWindow() = player.seekToPreviousWindow()
-
     override fun seekToPreviousMediaItem() = player.seekToPreviousMediaItem()
 
     override fun getMaxSeekToPreviousPosition(): Long = player.maxSeekToPreviousPosition
 
     override fun seekToPrevious() = player.seekToPrevious()
 
-    @Deprecated("Deprecated in Java")
-    override fun hasNext(): Boolean = player.hasNext()
-
-    @Deprecated("Deprecated in Java")
-    override fun hasNextWindow(): Boolean = player.hasNextWindow()
-
     override fun hasNextMediaItem(): Boolean = player.hasNextMediaItem()
-
-    @Deprecated("Deprecated in Java")
-    override fun next() = player.next()
-
-    @Deprecated("Deprecated in Java")
-    override fun seekToNextWindow() = player.seekToNextWindow()
 
     override fun seekToNextMediaItem() = player.seekToNextMediaItem()
 

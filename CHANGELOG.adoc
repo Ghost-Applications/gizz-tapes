@@ -2,6 +2,9 @@
 
 == Ice V
 
+- Updating to Android SDK 36
+- Updating libraries to latest versions
+
 == Hate Dancin' 2025-08-24
 
 - Fix show notes link

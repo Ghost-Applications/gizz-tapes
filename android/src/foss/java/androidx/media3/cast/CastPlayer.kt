@@ -223,10 +223,6 @@ class CastPlayer : Player {
         error("Not implemented in FOSS variant")
     }
 
-    override fun seekToPreviousWindow() {
-        error("Not implemented in FOSS variant")
-    }
-
     override fun seekToPreviousMediaItem() {
         error("Not implemented in FOSS variant")
     }
@@ -239,23 +235,7 @@ class CastPlayer : Player {
         error("Not implemented in FOSS variant")
     }
 
-    override fun hasNext(): Boolean {
-        error("Not implemented in FOSS variant")
-    }
-
-    override fun hasNextWindow(): Boolean {
-        error("Not implemented in FOSS variant")
-    }
-
     override fun hasNextMediaItem(): Boolean {
-        error("Not implemented in FOSS variant")
-    }
-
-    override fun next() {
-        error("Not implemented in FOSS variant")
-    }
-
-    override fun seekToNextWindow() {
         error("Not implemented in FOSS variant")
     }
 

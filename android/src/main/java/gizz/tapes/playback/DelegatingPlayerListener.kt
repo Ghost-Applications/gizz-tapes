@@ -63,7 +63,7 @@ class DelegatingPlayerListener(
     }
 
     override fun onAudioAttributesChanged(audioAttributes: AudioAttributes) {
-        Timber.d("onAudioAttributesChanged: audioAttributes=%s")
+        Timber.d("onAudioAttributesChanged: audioAttributes=%s", audioAttributes)
         delegates.forEach { it.onAudioAttributesChanged(audioAttributes) }
     }
 

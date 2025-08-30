@@ -152,11 +152,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
     implementation(libs.coil)
     implementation(libs.coil.svg)
     implementation(libs.ktor.client.okhttp)
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
     implementation(libs.timber)
     implementation(libs.byteunits)
     implementation(libs.okio)

@@ -34,6 +34,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 val mediaItem = MediaItem.Builder()
     .setUri("https://archive.org/download/kglw2024-09-11.bandcampbootlegger/King Gizzard & The Lizard Wizard - Live at Edgefield Amphiteater- Troutdale- OR (9-11-24)/King Gizzard & The Lizard Wizard - Live at Edgefield Amphiteater, Troutdale, OR (9-11-24) - 01 The Dripping Tap (Live).mp3")
@@ -192,6 +193,7 @@ val partialShowData = LCE.Content(
 )
 
 
+@OptIn(ExperimentalTime::class)
 val show = Show(
     id = "2024-09-11",
     date = LocalDate.parse("2024-09-11"),
