@@ -4,6 +4,7 @@
 
 - Updating to Android SDK 36
 - Updating libraries to latest versions
+- Migrate from kotlinx.datetime.Instant to kotlin.time.Instant
 
 == Hate Dancin' 2025-08-24
 

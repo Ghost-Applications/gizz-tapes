@@ -18,7 +18,7 @@ import gizz.tapes.api.data.Show
 import gizz.tapes.data.MediaId
 import gizz.tapes.stub
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import org.junit.Test
 import kotlin.time.Duration.Companion.seconds

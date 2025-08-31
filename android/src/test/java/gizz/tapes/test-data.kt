@@ -30,7 +30,7 @@ import gizz.tapes.ui.year.YearSelectionData
 import gizz.tapes.util.LCE
 import gizz.tapes.util.map
 import gizz.tapes.util.showTitle
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds

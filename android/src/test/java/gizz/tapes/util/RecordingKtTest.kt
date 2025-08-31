@@ -11,7 +11,7 @@ import gizz.tapes.api.data.Recording
 import gizz.tapes.api.data.Recording.Type.MTX
 import gizz.tapes.api.data.Recording.Type.SBD
 import gizz.tapes.api.data.Recording.Type.UnknownType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.Test
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
