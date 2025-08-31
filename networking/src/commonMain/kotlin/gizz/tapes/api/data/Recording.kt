@@ -6,7 +6,7 @@ import arrow.core.NonEmptyList
 import arrow.core.getOrElse
 import arrow.core.serialization.NonEmptyListSerializer
 import arrow.core.toOption
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
