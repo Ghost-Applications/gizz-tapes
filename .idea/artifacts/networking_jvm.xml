@@ -1,8 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="networking-jvm">
     <output-path>$PROJECT_DIR$/networking/build/libs</output-path>
-    <root id="archive" name="networking-jvm.jar">
-      <element id="module-output" name="gizz-tapes.networking.jvmMain" />
-    </root>
+    <root id="archive" name="networking-jvm.jar" />
   </artifact>
 </component>
