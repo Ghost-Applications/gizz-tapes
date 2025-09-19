@@ -9,7 +9,6 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import coil3.ImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
-import coil3.svg.SvgDecoder
 import com.jakewharton.byteunits.DecimalByteUnit.MEGABYTES
 import dagger.Binds
 import dagger.Module

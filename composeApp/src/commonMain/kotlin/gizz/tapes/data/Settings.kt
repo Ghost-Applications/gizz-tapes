@@ -4,14 +4,12 @@ import androidx.datastore.core.okio.OkioSerializer
 import gizz.tapes.api.data.Recording
 import gizz.tapes.api.data.Recording.Type.SBD
 import gizz.tapes.data.SortOrder.Ascending
-import kotlinx.io.Buffer
-import kotlinx.io.buffered
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.io.decodeFromSource
 import okio.BufferedSink
 import okio.BufferedSource
+import okio.use
 
 @Serializable
 data class Settings(
@@ -23,11 +21,16 @@ data class Settings(
 class SettingsSerializer : OkioSerializer<Settings> {
     @OptIn(ExperimentalSerializationApi::class)
     override suspend fun readFrom(source: BufferedSource): Settings {
-        TODO("Not yet implemented")
+        return source.use {
+            Json.decodeFromString(source.readUtf8())
+        }
     }
 
     override suspend fun writeTo(t: Settings, sink: BufferedSink) {
-        TODO("Not yet implemented")
+        sink.use {
+            val s = Json.encodeToString(t)
+            sink.writeUtf8(s)
+        }
     }
 
     override val defaultValue: Settings = Settings()

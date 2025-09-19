@@ -8,6 +8,7 @@ import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import gizz.tapes.data.Settings
+import gizz.tapes.data.SettingsSerializer
 import okio.FileSystem
 import okio.SYSTEM
 
@@ -18,13 +19,14 @@ interface AppGraph : NetworkProviders {
     @Provides
     @SingleIn(AppScope::class)
     fun provideSettingsDataStore(): DataStore<Settings> {
-        OkioStorage<Settings>(
+        val okioStorage = OkioStorage(
             fileSystem = FileSystem.SYSTEM,
-            serializer = OkioSerializer(Settings.serializer()),
+            serializer = SettingsSerializer(),
+            producePath = { TODO() }
         )
 
-        DataStoreFactory.create(
-            storage =
+       return DataStoreFactory.create(
+            storage = okioStorage,
         )
     }
 }
