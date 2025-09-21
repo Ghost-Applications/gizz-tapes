@@ -1,10 +1,10 @@
 [versions]
 # values used in build scripts
 compose-compiler = "1.5.15"
-android-sdk = "35"
+android-sdk = "36"
 android-min-sdk = "23"
 
-agp = "8.9.3"
+agp = "8.13.0"
 kotlin = "2.2.20"
 firebase-bom = "34.3.0"
 androidx-media2 = "1.3.0"
@@ -72,7 +72,7 @@ timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version = "2.14" }
 okio = { module = "com.squareup.okio:okio", version = "3.16.0" }
 
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.10.1" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.11.0" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -196,6 +196,6 @@ google-services = "com.google.gms.google-services:4.4.3"
 firebase-crashlytics = "com.google.firebase.crashlytics:3.0.6"
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-ksp = "com.google.devtools.ksp:2.2.10-2.0.2"
+ksp = "com.google.devtools.ksp:2.2.20-2.0.3"
 paparazzi = "app.cash.paparazzi:2.0.0-alpha02"
 metro = "dev.zacsweers.metro:0.6.6"
