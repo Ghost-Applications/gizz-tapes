@@ -1,6 +1,5 @@
 package gizz.tapes
 
-import coil3.ImageLoader
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
@@ -11,6 +10,9 @@ import io.ktor.client.plugins.cache.HttpCache
 import kotlin.time.Duration.Companion.seconds
 
 interface NetworkProviders {
+
+    val gizzClientApi: GizzTapesApiClient
+
     @Provides
     @SingleIn(AppScope::class)
     fun provideGizzApi(): GizzTapesApiClient {

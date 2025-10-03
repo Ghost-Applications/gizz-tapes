@@ -49,12 +49,17 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+
+            implementation(libs.ktor.client)
+
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.multiplatform.compose.navigation)
             implementation(libs.kotlinx.serialization)
 
             implementation(projects.networking)
+            implementation(projects.utils)
+
             implementation(libs.coil)
             implementation(libs.coil.svg)
 

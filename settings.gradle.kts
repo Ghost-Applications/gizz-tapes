@@ -29,14 +29,15 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.gradle.develocity") version "3.17.6"
+    id("com.gradle.develocity") version "4.2.1"
 }
 
 include(
     ":android",
     ":composeApp",
     ":networking",
-    ":networking-integration"
+    ":networking-integration",
+    ":utils"
 )
 
 rootProject.name = "gizz-tapes"

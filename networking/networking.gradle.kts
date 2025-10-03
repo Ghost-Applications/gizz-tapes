@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     alias(libs.plugins.serialization)
 }
+
 kotlin {
     // jvm and iOS targets will be priority for apps
     // with plans / abilities to support the others in the future.
@@ -51,7 +52,7 @@ kotlin {
         jsMain.dependencies {
             implementation(libs.ktor.client.js)
             // temp work around for coroutines, remove later
-            implementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.10")
+            implementation(libs.kotlinx.atomicfu)
         }
     }
 }

@@ -121,6 +121,7 @@ android {
 
 dependencies {
     implementation(projects.networking)
+    implementation(projects.utils)
     implementation(kotlin("stdlib"))
 
     implementation(libs.androidx.core.ktx)

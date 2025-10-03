@@ -1,25 +1,18 @@
 package gizz.tapes
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
-import kotlinx.serialization.Serializable
+import dev.zacsweers.metro.createGraph
+import gizz.tapes.nav.GizzTapesNavController
 
 val Primary80 = Color(0xFFB5C4FF)
 val Secondary80 = Color(0xFF81D4DC)
@@ -57,6 +50,9 @@ fun GizzTapesTheme(
 @Composable
 @Preview
 fun GizzTapesApp() {
+
+    val appGraph = createGraph<AppGraph>()
+
     setSingletonImageLoaderFactory {
         ImageLoader.Builder(it)
             .crossfade(true)
@@ -65,28 +61,9 @@ fun GizzTapesApp() {
 
     GizzTapesTheme {
         val navController = rememberNavController()
-        GizzTapesNavController(navController = navController)
+        GizzTapesNavController(
+            appGraph = appGraph,
+            navController = navController
+        )
     }
 }
-
-@Composable
-fun GizzTapesNavController(navController: NavHostController) {
-    NavHost(
-        navController = navController,
-        startDestination = YearSelection
-    ) {
-        composable<YearSelection> {
-            YearSelectionScreen()
-        }
-    }
-}
-
-@Composable
-fun YearSelectionScreen(
-) {
-    Box(modifier = Modifier.fillMaxSize().background(Color.Cyan)) {
-        Text("It works!")
-    }
-}
-
-@Serializable data object YearSelection
