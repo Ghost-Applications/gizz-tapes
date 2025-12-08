@@ -7,6 +7,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metrox.viewmodel.ViewModelGraph
 import gizz.tapes.data.Settings
 import gizz.tapes.data.SettingsSerializer
 import okio.FileSystem
@@ -14,7 +15,7 @@ import okio.SYSTEM
 
 @SingleIn(AppScope::class)
 @DependencyGraph
-interface AppGraph : NetworkProviders {
+interface AppGraph : NetworkProviders, ViewModelGraph {
 
     @Provides
     @SingleIn(AppScope::class)

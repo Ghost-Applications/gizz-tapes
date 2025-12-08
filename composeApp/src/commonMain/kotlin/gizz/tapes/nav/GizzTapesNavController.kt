@@ -8,13 +8,13 @@ import gizz.tapes.AppGraph
 import gizz.tapes.ui.years.YearSelectionScreen
 
 @Composable
-fun GizzTapesNavController(appGraph: AppGraph, navController: NavHostController) {
+fun GizzTapesNavController(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = Destination.YearSelection
     ) {
         composable<Destination.YearSelection> {
-            YearSelectionScreen(appGraph)
+            YearSelectionScreen()
         }
     }
 }

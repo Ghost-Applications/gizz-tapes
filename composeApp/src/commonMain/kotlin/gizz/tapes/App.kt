@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
@@ -12,6 +13,8 @@ import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
 import dev.zacsweers.metro.createGraph
+import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
+import dev.zacsweers.metrox.viewmodel.MetroViewModelFactory
 import gizz.tapes.nav.GizzTapesNavController
 
 val Primary80 = Color(0xFFB5C4FF)
@@ -47,23 +50,21 @@ fun GizzTapesTheme(
     )
 }
 
-@Composable
 @Preview
-fun GizzTapesApp() {
+@Composable
+fun GizzTapesApp(metroViewModelFactory: MetroViewModelFactory) {
+    CompositionLocalProvider(LocalMetroViewModelFactory provides metroViewModelFactory) {
+        setSingletonImageLoaderFactory {
+            ImageLoader.Builder(it)
+                .crossfade(true)
+                .build()
+        }
 
-    val appGraph = createGraph<AppGraph>()
-
-    setSingletonImageLoaderFactory {
-        ImageLoader.Builder(it)
-            .crossfade(true)
-            .build()
-    }
-
-    GizzTapesTheme {
-        val navController = rememberNavController()
-        GizzTapesNavController(
-            appGraph = appGraph,
-            navController = navController
-        )
+        GizzTapesTheme {
+            val navController = rememberNavController()
+            GizzTapesNavController(
+                navController = navController
+            )
+        }
     }
 }

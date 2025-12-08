@@ -18,6 +18,11 @@ kotlin {
     jvmToolchain(21)
 
     sourceSets {
+        commonMain.dependencies {
+            api(libs.arrow.core)
+            implementation(libs.arrow.resilience)
+        }
+
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
