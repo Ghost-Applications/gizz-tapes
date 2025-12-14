@@ -167,7 +167,6 @@ dependencies {
     implementation(libs.bundles.arrow)
 
     debugImplementation(libs.bundles.android.debug.libs)
-    releaseImplementation(libs.bundles.android.release.libs)
 
     testImplementation(libs.bundles.android.test.libs)
     testImplementation(libs.hilt.android.testing)
