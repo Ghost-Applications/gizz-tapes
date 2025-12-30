@@ -24,7 +24,7 @@ interface MediaPlayerContainer {
 @OptIn(UnstableApi::class)
 @Singleton
 class RealMediaPlayerContainer @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ): MediaPlayerContainer {
 
     private val controllerFuture: ListenableFuture<MediaController>

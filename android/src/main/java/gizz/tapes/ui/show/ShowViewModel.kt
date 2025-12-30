@@ -37,6 +37,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
@@ -122,8 +124,8 @@ class ShowViewModel @Inject constructor(
                                 .setAlbumTitle(title.title.value)
                                 .setTitle(track.title)
                                 .setRecordingYear(show.date.year)
-                                .setRecordingMonth(show.date.monthNumber)
-                                .setRecordingDay(show.date.dayOfMonth)
+                                .setRecordingMonth(show.date.month.number)
+                                .setRecordingDay(show.date.day)
                                 .setArtworkUri(PosterUrl(show.posterUrl).toUri())
                                 .setDurationMs(track.length.inWholeMilliseconds)
                                 .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)

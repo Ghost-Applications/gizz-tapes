@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -67,7 +69,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import arrow.core.nonEmptyListOf
 import coil.compose.AsyncImage
@@ -178,7 +180,9 @@ fun ShowScreen(
                                     model = it.showPosterUrl.value,
                                     contentDescription = null,
                                     contentScale = ContentScale.FillHeight,
-                                    modifier = Modifier.padding(8.dp)
+                                    modifier = Modifier
+                                        .height(80.dp)
+                                        .padding(8.dp)
                                 )
                             }
                         }
@@ -188,7 +192,7 @@ fun ShowScreen(
                                 .clickable {
                                     scope.launch {
                                         listState.animateScrollToItem(0)
-                                        scrollBehavior.state.heightOffset = 1f
+                                        scrollBehavior.state.heightOffset = 0f
                                     }
                                 }
                                 .padding(start = 8.dp)
@@ -227,7 +231,8 @@ fun ShowScreen(
                     is LCE.Error -> "Error"
                     LCE.Loading -> "Loading"
                 }
-            }
+            },
+            modifier = Modifier.fillMaxSize()
         ) { s ->
             when(s) {
                 is LCE.Content -> ShowListWithPlayer(
@@ -246,7 +251,8 @@ fun ShowScreen(
                         }
                     },
                     modifier = Modifier.padding(innerPadding),
-                    recordingChanged = recordingChanged
+                    recordingChanged = recordingChanged,
+                    listState = listState
                 )
                 is LCE.Error -> ErrorScreen(s.userDisplayedMessage)
                 LCE.Loading -> LoadingScreen()
@@ -265,6 +271,7 @@ fun ShowListWithPlayer(
     onPlayAction: () -> Unit,
     playerError: (PlayerError) -> Unit,
     recordingChanged: (RecordingId) -> Unit,
+    listState: LazyListState,
     modifier: Modifier = Modifier
 ) {
     val (currentlyPlayingMediaId, playing) = when(playerState) {
@@ -273,12 +280,11 @@ fun ShowListWithPlayer(
     }
 
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
+            state = listState,
+            modifier = Modifier.weight(1f)
         ) {
             item {
                 ShowHeader(

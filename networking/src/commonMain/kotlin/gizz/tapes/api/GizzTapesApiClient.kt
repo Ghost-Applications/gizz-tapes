@@ -1,6 +1,7 @@
 package gizz.tapes.api
 
 import arrow.core.Either
+import arrow.core.raise.either
 import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Show
 import io.ktor.client.HttpClient
@@ -17,8 +18,8 @@ interface GizzTapesApiClient {
         operator fun invoke(client: HttpClient): GizzTapesApiClient = RealGizzTapesApiClient(client)
     }
 
-    suspend fun shows(): Either<Throwable, List<PartialShowData>>
-    suspend fun show(id: String): Either<Throwable, Show>
+    suspend fun shows(): Either<Exception, List<PartialShowData>>
+    suspend fun show(id: String): Either<Exception, Show>
 }
 
 private class RealGizzTapesApiClient(
@@ -34,11 +35,11 @@ private class RealGizzTapesApiClient(
         }
     }
 
-    override suspend fun shows(): Either<Throwable, List<PartialShowData>> = Either.catch {
+    override suspend fun shows(): Either<Exception, List<PartialShowData>> = Either.catchOrThrow {
         client.get("https://tapes.kglw.net/api/v1/shows.json").body()
     }
 
-    override suspend fun show(id: String): Either<Throwable, Show> = Either.catch {
+    override suspend fun show(id: String): Either<Exception, Show> = Either.catchOrThrow {
         client.get("https://tapes.kglw.net/api/v1/shows/$id.json").body()
     }
 }
