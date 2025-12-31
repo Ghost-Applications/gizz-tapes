@@ -139,6 +139,7 @@ dependencies {
 
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.android.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.android.material)
 

@@ -46,6 +46,7 @@ import javax.inject.Inject
 
 @UnstableApi
 @AndroidEntryPoint
+@Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
 class PlaybackService : MediaLibraryService(),
     MediaLibraryService.MediaLibrarySession.Callback {
 

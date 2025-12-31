@@ -28,6 +28,8 @@ import gizz.tapes.util.showTitle
 import gizz.tapes.util.title
 import gizz.tapes.util.toAlbumFormat
 import gizz.tapes.util.toExtrasBundle
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -175,8 +177,8 @@ class MediaItemTree @Inject constructor(
                                 .setArtist("$dateString ${show.item.title}")
                                 .setAlbumTitle(show.item.title)
                                 .setReleaseYear(showData.date.year)
-                                .setReleaseDay(showData.date.dayOfMonth)
-                                .setReleaseMonth(showData.date.monthNumber)
+                                .setReleaseDay(showData.date.day)
+                                .setReleaseMonth(showData.date.month.number)
                                 .setAlbumArtist(BandName)
                                 .setArtworkUri(PosterUrl(showData.posterUrl).toUri())
                                 .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
@@ -257,8 +259,8 @@ class MediaItemTree @Inject constructor(
                     .setAlbumTitle(show.item.title)
                     .setTitle(track.title)
                     .setRecordingYear(showData.date.year)
-                    .setRecordingMonth(showData.date.monthNumber)
-                    .setRecordingDay(showData.date.dayOfMonth)
+                    .setRecordingMonth(showData.date.month.number)
+                    .setRecordingDay(showData.date.day)
                     .setArtworkUri(PosterUrl(showData.posterUrl).toUri())
                     .setDurationMs(track.length.inWholeMilliseconds)
                     .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
@@ -275,8 +277,8 @@ class MediaItemTree @Inject constructor(
                 .setTitle(it.showTitle)
                 .setDisplayTitle("${it.date.toAlbumFormat()} ${it.showTitle}")
                 .setReleaseYear(it.date.year)
-                .setReleaseDay(it.date.dayOfMonth)
-                .setReleaseMonth(it.date.monthNumber)
+                .setReleaseDay(it.date.day)
+                .setReleaseMonth(it.date.month.number)
                 .setIsPlayable(false)
                 .setIsBrowsable(true)
                 .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)

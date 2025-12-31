@@ -423,6 +423,14 @@ class CastPlayer : Player {
         error("Not implemented in FOSS variant")
     }
 
+    override fun mute() {
+        error("Not implemented in FOSS variant")
+    }
+
+    override fun unmute() {
+        error("Not implemented in FOSS variant")
+    }
+
     override fun clearVideoSurface() {
         error("Not implemented in FOSS variant")
     }

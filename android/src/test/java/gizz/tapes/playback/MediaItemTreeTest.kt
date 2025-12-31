@@ -28,7 +28,7 @@ class MediaItemTreeTest {
     @Test
     fun `getChildren returns year media when parentId is root`() = runTest {
         val apiClient = object : GizzTapesApiClient by stub() {
-            override suspend fun shows(): Either<Throwable, List<PartialShowData>> {
+            override suspend fun shows(): Either<Exception, List<PartialShowData>> {
                 return listOf(
                     PartialShowData(
                         id = "1",
@@ -115,7 +115,7 @@ class MediaItemTreeTest {
     @Test
     fun `getChildren returns show media when parent id is year`() = runTest {
         val apiClient = object : GizzTapesApiClient by stub() {
-            override suspend fun shows(): Either<Throwable, List<PartialShowData>> {
+            override suspend fun shows(): Either<Exception, List<PartialShowData>> {
                 return listOf(
                     PartialShowData(
                         id = "1",
@@ -208,7 +208,7 @@ class MediaItemTreeTest {
     @Test
     fun `getChildren returns recording media for when parent id is show`() = runTest {
         val apiClient = object : GizzTapesApiClient {
-            override suspend fun shows(): Either<Throwable, List<PartialShowData>> {
+            override suspend fun shows(): Either<Exception, List<PartialShowData>> {
                 return listOf(
                     PartialShowData(
                         id = "1",
@@ -222,7 +222,7 @@ class MediaItemTreeTest {
                 ).right()
             }
 
-            override suspend fun show(id: String): Either<Throwable, Show> {
+            override suspend fun show(id: String): Either<Exception, Show> {
                 return Show(
                     id = id,
                     date = LocalDate(2021, 5, 20),
@@ -332,7 +332,7 @@ class MediaItemTreeTest {
     @Test
     fun `getChildren returns track media for when parent id is recording`() = runTest {
         val apiClient = object : GizzTapesApiClient {
-            override suspend fun shows(): Either<Throwable, List<PartialShowData>> {
+            override suspend fun shows(): Either<Exception, List<PartialShowData>> {
                 return listOf(
                     PartialShowData(
                         id = "1",
@@ -346,7 +346,7 @@ class MediaItemTreeTest {
                 ).right()
             }
 
-            override suspend fun show(id: String): Either<Throwable, Show> {
+            override suspend fun show(id: String): Either<Exception, Show> {
                 return Show(
                     id = id,
                     date = LocalDate(2021, 5, 20),

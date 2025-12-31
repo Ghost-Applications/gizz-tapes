@@ -13,10 +13,10 @@ import kotlin.time.Duration.Companion.seconds
  * action while waiting.
  */
 suspend inline fun <Output> retryUntilSuccessful(
-    action: () -> Either<Throwable, Output>,
-    crossinline onErrorAfter3SecondsAction: suspend (error: Throwable) -> Unit,
+    action: () -> Either<Exception, Output>,
+    crossinline onErrorAfter3SecondsAction: suspend (error: Exception) -> Unit,
 ): LCE.Content<Output> {
-    return Schedule.exponential<Throwable>(100.milliseconds).doWhile { _, duration -> duration < 3.seconds }
+    return Schedule.exponential<Exception>(100.milliseconds).doWhile { _, duration -> duration < 3.seconds }
         .andThen(
             Schedule.doWhile { error, _ ->
                 onErrorAfter3SecondsAction(error)

@@ -67,7 +67,7 @@ class ShowSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun loadShows(): Flow<LCE<List<ShowSelectionData>, Throwable>> {
+    private fun loadShows(): Flow<LCE<List<ShowSelectionData>, Exception>> {
         return flow {
             val state = retryUntilSuccessful(
                 action = {

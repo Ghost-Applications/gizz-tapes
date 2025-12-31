@@ -49,6 +49,7 @@ interface ReplaceableForwardingPlayerFactory {
 }
 
 @UnstableApi
+@Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
 class ReplaceableForwardingPlayer @AssistedInject constructor(
     private val currentlyPlayingSaver: CurrentlyPlayingSaver,
     @Assisted private var player: Player,
@@ -431,14 +432,11 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
 
     override fun getCurrentMediaItemIndex(): Int = player.currentMediaItemIndex
 
-    @Deprecated("Deprecated in Java")
     override fun getNextWindowIndex(): Int = player.nextWindowIndex
 
     override fun getNextMediaItemIndex(): Int {
         return player.nextMediaItemIndex
     }
-
-    @Deprecated("Deprecated in Java")
     override fun getPreviousWindowIndex(): Int = player.previousWindowIndex
 
     override fun getPreviousMediaItemIndex(): Int = player.previousMediaItemIndex
@@ -459,19 +457,16 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
 
     override fun getTotalBufferedDuration(): Long = player.totalBufferedDuration
 
-    @Deprecated("Deprecated in Java")
     override fun isCurrentWindowDynamic(): Boolean = player.isCurrentWindowDynamic
 
     override fun isCurrentMediaItemDynamic(): Boolean = player.isCurrentMediaItemDynamic
 
-    @Deprecated("Deprecated in Java")
     override fun isCurrentWindowLive(): Boolean = player.isCurrentWindowLive
 
     override fun isCurrentMediaItemLive(): Boolean = player.isCurrentMediaItemLive
 
     override fun getCurrentLiveOffset(): Long = player.currentLiveOffset
 
-    @Deprecated("Deprecated in Java")
     override fun isCurrentWindowSeekable(): Boolean = player.isCurrentWindowSeekable
 
     override fun isCurrentMediaItemSeekable(): Boolean = player.isCurrentMediaItemSeekable
@@ -495,6 +490,10 @@ class ReplaceableForwardingPlayer @AssistedInject constructor(
     }
 
     override fun getVolume(): Float = player.volume
+
+    override fun mute() = player.mute()
+
+    override fun unmute() = player.unmute()
 
     override fun clearVideoSurface() = player.clearVideoSurface()
 
