@@ -1,6 +1,8 @@
 = Changelog
 
-== Ice V
+== JOJAM
+
+== Ice V 2026-01-11
 
 - Updating to Android SDK 36
 - Updating libraries to latest versions
