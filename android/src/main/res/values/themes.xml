@@ -1,6 +1,0 @@
-<resources>
-    <style name="Base.Theme.Gizz" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-    </style>
-
-    <style name="Theme.Gizz" parent="Base.Theme.Gizz" />
-</resources>

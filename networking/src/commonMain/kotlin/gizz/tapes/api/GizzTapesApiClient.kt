@@ -1,7 +1,6 @@
 package gizz.tapes.api
 
 import arrow.core.Either
-import arrow.core.raise.either
 import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Show
 import io.ktor.client.HttpClient
@@ -29,9 +28,11 @@ private class RealGizzTapesApiClient(
         // default in memory cache, clients can override with disk cache.
         install(HttpCache)
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
+            json(
+                Json {
+                    ignoreUnknownKeys = true
+                }
+            )
         }
     }
 

@@ -6,13 +6,14 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 fun main() = runBlocking {
-
     val api = GizzTapesApiClient(
         client = HttpClient {
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = false
-                })
+                json(
+                    Json {
+                        ignoreUnknownKeys = false
+                    }
+                )
             }
         }
     )

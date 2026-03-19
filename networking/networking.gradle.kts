@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     alias(libs.plugins.serialization)
 }
+
 kotlin {
     // jvm and iOS targets will be priority for apps
     // with plans / abilities to support the others in the future.
@@ -37,7 +38,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.okhttp)
         }
 
         iosMain.dependencies {
@@ -50,6 +51,8 @@ kotlin {
 
         jsMain.dependencies {
             implementation(libs.ktor.client.js)
+            // temp work around for coroutines, remove later
+            implementation(libs.kotlinx.atomicfu)
         }
     }
 }

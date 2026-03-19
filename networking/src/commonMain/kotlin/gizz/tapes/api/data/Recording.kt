@@ -6,7 +6,6 @@ import arrow.core.NonEmptyList
 import arrow.core.getOrElse
 import arrow.core.serialization.NonEmptyListSerializer
 import arrow.core.toOption
-import kotlin.time.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,6 +16,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Serializable
 data class Recording(
@@ -38,16 +38,20 @@ data class Recording(
     enum class Type {
         /** Sound Board */
         SBD,
+
         /** Audience Recording */
         AUD,
+
         /** Matrix recording; are usually a combination of various AUDs or AUDs and SBD's */
         MTX,
-        /** Set if there is a value in the json but we don't recognize it in code yet. */
+
+        /** Set if there is a value in the JSON, but we don't recognize it in code yet. */
         UnknownType,
-        /** null / empty in json, shouldn't happen but here just in case */
+
+        /** null / empty in JSON, shouldn't happen but here just in case */
         None;
 
-        internal object RecordingTypeSerializer: KSerializer<Type> {
+        internal object RecordingTypeSerializer : KSerializer<Type> {
 
             private val delegatingSerializer: KSerializer<String?> = String.serializer().nullable
 
@@ -67,10 +71,8 @@ data class Recording(
             }
 
             override fun serialize(encoder: Encoder, value: Type) {
-               encoder.encodeSerializableValue(delegatingSerializer, value.name)
+                encoder.encodeSerializableValue(delegatingSerializer, value.name)
             }
         }
     }
 }
-
-

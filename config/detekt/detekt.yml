@@ -1,0 +1,55 @@
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+  AnnotationOnSeparateLine:
+    active: false
+  MultiLineIfElse:
+    active: false
+  # Disable line length — test data contains unavoidably long URLs/strings
+  MaximumLineLength:
+    active: false
+  # Wrapping auto-correction conflicts with disabled line length
+  Wrapping:
+    active: false
+  # Utility/extension files intentionally use lowercase names (e.g. retry.kt, selection.kt)
+  Filename:
+    active: false
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: false
+  WildcardImport:
+    active: true
+  MaxLineLength:
+    active: false
+  # SelectionData has 4 fields — destructuring all 4 is fine
+  DestructuringDeclarationWithTooManyEntries:
+    active: false
+complexity:
+  LongParameterList:
+    active: false
+  TooManyFunctions:
+    active: false
+  # Compose functions are inherently long
+  LongMethod:
+    active: false
+
+empty-blocks:
+  # Intentional empty bodies exist in foss stubs and initializers
+  EmptyFunctionBlock:
+    active: false
+
+naming:
+  FunctionNaming:
+    active: true
+    # Allow Composable functions to start with uppercase
+    functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
+  # FullShowTitle.fullShowTitle property name matching class name is intentional
+  MemberNameEqualsClassName:
+    active: false
+  # Disable — file naming convention conflicts with Kotlin extension file patterns
+  MatchingDeclarationName:
+    active: false

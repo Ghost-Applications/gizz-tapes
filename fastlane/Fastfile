@@ -24,7 +24,9 @@ platform :android do
   desc 'Publish a new build to open testing on Play Store'
   lane :beta do
     gradle(
-      tasks: ['build', 'bundle']
+      task: 'bundle',
+      flavor: 'full',
+      build_type: 'Release'
     )
     upload_to_play_store(
       track: 'beta',
@@ -89,8 +91,8 @@ platform :android do
     )
 
     # Find all .apk and .aab files in the specified directories
-    apk_files = Dir.glob('android/build/outputs/apk/*/release/*.apk')
-    aab_files = Dir.glob('android/build/outputs/bundle/*Release/*.aab')
+    apk_files = Dir.glob('androidApp/build/outputs/apk/*/release/*.apk')
+    aab_files = Dir.glob('androidApp/build/outputs/bundle/*Release/*.aab')
 
     # Combine all files into a single array
     upload_assets = apk_files + aab_files
