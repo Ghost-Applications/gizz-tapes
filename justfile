@@ -1,6 +1,9 @@
 # use with https://github.com/casey/just
 set shell := ['bash', '-c']
 
+test:
+    ./gradlew test allTests runIntegrationTests detekt
+
 record-screenshots:
     ./gradlew recordPaparazzi
 

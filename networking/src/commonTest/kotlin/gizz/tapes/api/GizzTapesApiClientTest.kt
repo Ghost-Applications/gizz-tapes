@@ -65,20 +65,21 @@ class GizzTapesApiClientTest {
                     "order": 1,
                     "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg"
                 }]
-            """.trimIndent(),
+                """.trimIndent(),
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
         }
 
-        val client = GizzTapesApiClient(HttpClient(mockEngine) {
-            install(ContentNegotiation) {
-                json()
+        val client = GizzTapesApiClient(
+            HttpClient(mockEngine) {
+                install(ContentNegotiation) {
+                    json()
+                }
             }
-        })
+        )
         assertIs<Throwable>(client.shows().leftOrNull(), "Default http client is overriding the provided client")
     }
-
 
     @Test
     fun default_config_should_allow_extra_unknown_fields() = runTest {
@@ -95,7 +96,7 @@ class GizzTapesApiClientTest {
                     "order": 1,
                     "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg"
                 }]
-            """.trimIndent(),
+                """.trimIndent(),
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -122,7 +123,7 @@ class GizzTapesApiClientTest {
                     "order": 1,
                     "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg"
                 }]
-            """.trimIndent(),
+                """.trimIndent(),
                 status = HttpStatusCode.OK,
                 headers = headersOf(
                     HttpHeaders.ContentType to listOf("application/json"),

@@ -1,28 +1,42 @@
+@file:Suppress("UnstableApiUsage")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
-        google()
-        gradlePluginPortal()
+        google {
+            mavenContent {
+                includeGroupAndSubgroups("androidx")
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("com.google")
+            }
+        }
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
 dependencyResolutionManagement {
     repositories {
-        google()
+        google {
+            mavenContent {
+                includeGroupAndSubgroups("androidx")
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("com.google")
+            }
+        }
         mavenCentral()
     }
 }
 
 plugins {
-    id("com.gradle.develocity") version "3.17.6"
+    id("com.gradle.develocity") version "4.3.2"
 }
 
 include(
-    ":android",
+    ":androidApp",
+    ":composeApp",
     ":networking",
-    ":networking-integration"
+    ":networking-integration",
 )
 
 rootProject.name = "gizz-tapes"

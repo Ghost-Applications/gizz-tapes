@@ -2,6 +2,8 @@
 
 == JOJAM
 
+- Converted project to kotlin multiplatform
+
 == Ice V 2026-01-11
 
 - Updating to Android SDK 36

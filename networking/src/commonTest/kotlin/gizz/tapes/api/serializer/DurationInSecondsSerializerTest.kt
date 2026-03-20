@@ -21,6 +21,5 @@ class DurationInSecondsSerializerTest {
             expected = "35.5",
             actual = Json.encodeToString(DurationInSecondsSerializer, 35.5.seconds),
         )
-
     }
 }

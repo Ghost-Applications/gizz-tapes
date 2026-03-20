@@ -43,5 +43,5 @@ kotlin {
 tasks.register("runIntegrationTests") {
     group = "verification"
     description = "runs the api with live data on all available platforms"
-    dependsOn("jvmRun", "jsNodeRun", "runReleaseExecutableMacosArm64", "runReleaseExecutableMacosX64")
+    dependsOn("jvmRun", "jsNodeProductionRun", "runReleaseExecutableMacosArm64", "runReleaseExecutableMacosX64")
 }
