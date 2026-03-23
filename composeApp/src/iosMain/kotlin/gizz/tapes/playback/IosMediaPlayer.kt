@@ -1,5 +1,6 @@
 package gizz.tapes.playback
 
+import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -41,6 +42,8 @@ import platform.Foundation.NSURL
 @OptIn(ExperimentalForeignApi::class)
 class IosMediaPlayer : GizzMediaPlayer {
 
+    private val logger = Logger.withTag("IosMediaPlayer")
+
     private val player = AVQueuePlayer()
     private val _state = MutableStateFlow<PlayerState>(PlayerState.NoMedia)
     override val state: StateFlow<PlayerState> = _state.asStateFlow()
@@ -56,7 +59,9 @@ class IosMediaPlayer : GizzMediaPlayer {
             val session = AVAudioSession.sharedInstance()
             session.setCategory(AVAudioSessionCategoryPlayback, null)
             session.setActive(true, null)
-        } catch (_: Exception) {}
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            logger.e(e) { "Error setting up AVAudioSession" }
+        }
 
         scope.launch {
             while (true) {
@@ -124,6 +129,7 @@ class IosMediaPlayer : GizzMediaPlayer {
             val url = NSURL.URLWithString(item.url) ?: return@forEach
             player.insertItem(AVPlayerItem(url), afterItem = null)
         }
+        player.play()
         updateState()
     }
 

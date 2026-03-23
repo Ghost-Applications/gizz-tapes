@@ -68,7 +68,7 @@ fun ShowSelectionScreen(
     onPlayAction: () -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
-    val selectionData = remember(state) {
+    val selectionData = remember(state, sortOrder) {
         state.mapCollection {
             SelectionData(
                 title = it.showTitle,

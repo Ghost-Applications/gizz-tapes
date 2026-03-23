@@ -90,7 +90,7 @@ fun YearSelectionScreen(
     onPlayAction: () -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
-    val selectionData = remember(yearData) {
+    val selectionData = remember(yearData, sortOrder) {
         yearData.mapCollection {
             SelectionData(
                 title = Title(it.year.value),

@@ -69,7 +69,8 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
-vlcj = { module = "uk.co.caprica:vlcj", version = "4.12.1" }
+javacv = { module = "org.bytedeco:javacv", version = "1.5.13" }
+ffmpeg-platform = { module = "org.bytedeco:ffmpeg-platform", version = "8.0.1-1.5.13" }
 kermit = { module = "co.touchlab:kermit", version = "2.1.0" }
 
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }

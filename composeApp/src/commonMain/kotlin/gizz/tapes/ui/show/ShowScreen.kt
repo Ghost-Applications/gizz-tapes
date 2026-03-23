@@ -5,6 +5,7 @@ package gizz.tapes.ui.show
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -104,55 +106,77 @@ fun ShowScreen(
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
 ) {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val platformActions = LocalPlatformActions.current
+    BoxWithConstraints {
+        val isLandscape = maxWidth > maxHeight
+        val platformActions = LocalPlatformActions.current
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        text = title.fullShowTitle.value,
-                        maxLines = 1,
-                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
-                    )
-                },
-                navigationIcon = navigationUpIcon(navigateUp),
-                actions = { platformActions() },
-                scrollBehavior = scrollBehavior
-            )
-        }
-    ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            Box(modifier = Modifier.weight(1f)) {
-                when (showState) {
-                    LCE.Loading -> LoadingScreen()
-                    is LCE.Error -> ErrorScreen(showState.userDisplayedMessage)
-                    is LCE.Content -> ShowContent(
-                        state = showState.value,
-                        playerState = playerState,
-                        onRecordingChange = onRecordingChange,
-                        onPlayAll = {
-                            showState.value.removeOldMediaItemsAndAddNew(0)
-                            onPlayerClick(title)
+        // Both scroll behaviors are always created so remember calls are unconditional.
+        val portraitScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+        val landscapeScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+        val scrollBehavior = if (isLandscape) landscapeScrollBehavior else portraitScrollBehavior
+
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                if (isLandscape) {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = title.fullShowTitle.value,
+                                maxLines = 1,
+                                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                            )
                         },
-                        onTrackClick = { index ->
-                            showState.value.removeOldMediaItemsAndAddNew(index)
-                            onPlayerClick(title)
-                        }
+                        navigationIcon = navigationUpIcon(navigateUp),
+                        actions = { platformActions() },
+                        scrollBehavior = scrollBehavior
+                    )
+                } else {
+                    LargeTopAppBar(
+                        title = {
+                            Text(
+                                text = title.fullShowTitle.value,
+                                maxLines = 1,
+                                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                            )
+                        },
+                        navigationIcon = navigationUpIcon(navigateUp),
+                        actions = { platformActions() },
+                        scrollBehavior = scrollBehavior
                     )
                 }
             }
+        ) { padding ->
+            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    when (showState) {
+                        LCE.Loading -> LoadingScreen()
+                        is LCE.Error -> ErrorScreen(showState.userDisplayedMessage)
+                        is LCE.Content -> ShowContent(
+                            state = showState.value,
+                            playerState = playerState,
+                            isLandscape = isLandscape,
+                            onRecordingChange = onRecordingChange,
+                            onPlayAll = {
+                                showState.value.removeOldMediaItemsAndAddNew(0)
+                                onPlayerClick(title)
+                            },
+                            onTrackClick = { index ->
+                                showState.value.removeOldMediaItemsAndAddNew(index)
+                                onPlayerClick(title)
+                            }
+                        )
+                    }
+                }
 
-            MiniPlayer(
-                playerState = playerState,
-                onClick = onMiniPlayerClick,
-                onPlayAction = onPlayAction,
-                onPauseAction = onPauseAction,
-                playerError = {}
-            )
+                MiniPlayer(
+                    playerState = playerState,
+                    onClick = onMiniPlayerClick,
+                    onPlayAction = onPlayAction,
+                    onPauseAction = onPauseAction,
+                    playerError = {}
+                )
+            }
         }
     }
 }
@@ -161,6 +185,7 @@ fun ShowScreen(
 private fun ShowContent(
     state: ShowScreenState,
     playerState: PlayerState,
+    isLandscape: Boolean,
     onRecordingChange: (RecordingId) -> Unit,
     onPlayAll: () -> Unit,
     onTrackClick: (Int) -> Unit,
@@ -169,13 +194,15 @@ private fun ShowContent(
     var showMetadata by remember { mutableStateOf(false) }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            AsyncImage(
-                model = state.showPosterUrl.value,
-                contentDescription = "Show poster",
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier.fillMaxWidth().height(220.dp)
-            )
+        if (!isLandscape) {
+            item {
+                AsyncImage(
+                    model = state.showPosterUrl.value,
+                    contentDescription = "Show poster",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier.fillMaxWidth().height(220.dp)
+                )
+            }
         }
 
         item {
