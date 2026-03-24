@@ -53,7 +53,7 @@ xiZ0n/Q1d2gt6MgUzTJM0tiSk48HVQE=
 == License
 
 ....
-Copyright 2024 Andrew Reitz
+Copyright 2026 Ghost Apps LLC
 
 Licensed to the Apache Software Foundation (ASF) under one or more contributor
 license agreements.  See the NOTICE file distributed with this work for
