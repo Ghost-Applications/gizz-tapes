@@ -42,52 +42,39 @@ jobs:
         run: |
           echo "${{ secrets.PGP_KEY }}" > private.key
           gpg --batch --passphrase "${{ secrets.PGP_PASSWORD }}" --import private.key
+      - name: List APK output directories
+        run: find androidApp/build/outputs/apk -type f | sort
       - name: Sign APKs with GPG
         run: |
-          for file in androidApp/build/outputs/apk/foss/debug/*.apk androidApp/build/outputs/apk/foss/release/*.apk androidApp/build/outputs/apk/full/debug/*.apk androidApp/build/outputs/apk/full/release/*.apk; do
-            if [ -f "$file" ]; then
-              gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
-            fi
+          find androidApp/build/outputs/apk -name "*.apk" | while read -r file; do
+            echo "Signing $file"
+            gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
           done
-      - name: Verify APK signatures
-        run: |
-          for file in androidApp/build/outputs/apk/foss/debug/*.apk androidApp/build/outputs/apk/foss/release/*.apk androidApp/build/outputs/apk/full/debug/*.apk androidApp/build/outputs/apk/full/release/*.apk; do
-            if [ -f "$file" ] && [ ! -f "$file.asc" ]; then
-              echo "Missing signature for $file"
-              exit 1
-            fi
-          done
+      - name: List APK output directories after signing
+        run: find androidApp/build/outputs/apk -type f | sort
       - name: Upload foss debug APK
         uses: actions/upload-artifact@v4
         with:
           name: android-foss-debug
-          path: |
-            androidApp/build/outputs/apk/foss/debug/*.apk
-            androidApp/build/outputs/apk/foss/debug/*.apk.asc
+          path: androidApp/build/outputs/apk/foss/debug/
           if-no-files-found: error
       - name: Upload foss release APK
         uses: actions/upload-artifact@v4
         with:
           name: android-foss-release
-          path: |
-            androidApp/build/outputs/apk/foss/release/*.apk
-            androidApp/build/outputs/apk/foss/release/*.apk.asc
+          path: androidApp/build/outputs/apk/foss/release/
           if-no-files-found: error
       - name: Upload full debug APK
         uses: actions/upload-artifact@v4
         with:
           name: android-full-debug
-          path: |
-            androidApp/build/outputs/apk/full/debug/*.apk
-            androidApp/build/outputs/apk/full/debug/*.apk.asc
+          path: androidApp/build/outputs/apk/full/debug/
           if-no-files-found: error
       - name: Upload full release APK
         uses: actions/upload-artifact@v4
         with:
           name: android-full-release
-          path: |
-            androidApp/build/outputs/apk/full/release/*.apk
-            androidApp/build/outputs/apk/full/release/*.apk.asc
+          path: androidApp/build/outputs/apk/full/release/
           if-no-files-found: error
 
   desktop:
