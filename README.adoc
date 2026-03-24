@@ -33,6 +33,23 @@ Standard gradle commands.
 Add `systemProp.GIZZ_TAPES_ACCEPT_BUILD_SCAN_AGREEMENT=yes` gradle.properties
 to enable build scans on every build.
 
+=== Apk Verifications
+
+....
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+For verification with [AppVerifier](https://github.com/soupslurpr/AppVerifier)
+SHA-256 digest: 7a23ebcce8a6e1b7235d28376e02dc976ebe3bd5e56358aa8882ecd919304619
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQQyOd8AW98s0niYV69Z+EL3O68qjQUCacK6FQAKCRBZ+EL3O68q
+jS2BAP49croufyu4lRHrJg45rBNaH/3YJIvqKAdaqY9rjkwzNQEAkH4kb8WX8ExJ
+xiZ0n/Q1d2gt6MgUzTJM0tiSk48HVQE=
+=vS0R
+-----END PGP SIGNATURE-----
+....
+
 == License
 
 ....

@@ -38,29 +38,48 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEYSTORE_LOCATION: ${{ secrets.KEYSTORE_LOCATION }}
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.PGP_KEY }}" > private.key
+          gpg --batch --passphrase "${{ secrets.PGP_PASSWORD }}" --import private.key
+      - name: Sign APKs with GPG
+        run: |
+          for file in androidApp/build/outputs/apk/foss/debug/*.apk androidApp/build/outputs/apk/foss/release/*.apk androidApp/build/outputs/apk/full/debug/*.apk androidApp/build/outputs/apk/full/release/*.apk; do
+            if [ -f "$file" ]; then
+              gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
+            fi
+          done
       - name: Upload foss debug APK
         uses: actions/upload-artifact@v4
         with:
           name: android-foss-debug
-          path: androidApp/build/outputs/apk/foss/debug/*.apk
+          path: |
+            androidApp/build/outputs/apk/foss/debug/*.apk
+            androidApp/build/outputs/apk/foss/debug/*.apk.asc
           if-no-files-found: error
       - name: Upload foss release APK
         uses: actions/upload-artifact@v4
         with:
           name: android-foss-release
-          path: androidApp/build/outputs/apk/foss/release/*.apk
+          path: |
+            androidApp/build/outputs/apk/foss/release/*.apk
+            androidApp/build/outputs/apk/foss/release/*.apk.asc
           if-no-files-found: error
       - name: Upload full debug APK
         uses: actions/upload-artifact@v4
         with:
           name: android-full-debug
-          path: androidApp/build/outputs/apk/full/debug/*.apk
+          path: |
+            androidApp/build/outputs/apk/full/debug/*.apk
+            androidApp/build/outputs/apk/full/debug/*.apk.asc
           if-no-files-found: error
       - name: Upload full release APK
         uses: actions/upload-artifact@v4
         with:
           name: android-full-release
-          path: androidApp/build/outputs/apk/full/release/*.apk
+          path: |
+            androidApp/build/outputs/apk/full/release/*.apk
+            androidApp/build/outputs/apk/full/release/*.apk.asc
           if-no-files-found: error
 
   desktop:
@@ -109,6 +128,19 @@ jobs:
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4G -Dfile.encoding=UTF-8"
         run: ./gradlew :composeApp:${{ matrix.package-task }}
+      - name: Import GPG key
+        shell: bash
+        run: |
+          echo "${{ secrets.PGP_KEY }}" > private.key
+          gpg --batch --passphrase "${{ secrets.PGP_PASSWORD }}" --import private.key
+      - name: Sign desktop artifact with GPG
+        shell: bash
+        run: |
+          for file in ${{ matrix.artifact-path }}*; do
+            if [ -f "$file" ]; then
+              gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
+            fi
+          done
       - name: Upload desktop artifact
         uses: actions/upload-artifact@v4
         with:
