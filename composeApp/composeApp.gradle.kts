@@ -15,6 +15,8 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(21)
+
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
@@ -85,7 +87,8 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.vlcj)
+            implementation(libs.javacv)
+            implementation(libs.ffmpeg.platform)
         }
 
         iosMain.dependencies {
@@ -109,6 +112,10 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "gizz.tapes"
             packageVersion = "1.0.0"
+
+            macOS { iconFile.set(project.file("src/desktopMain/resources/icon.icns")) }
+            windows { iconFile.set(project.file("src/desktopMain/resources/icon.ico")) }
+            linux { iconFile.set(project.file("src/desktopMain/resources/icon.png")) }
         }
     }
 }

@@ -3,10 +3,12 @@ package gizz.tapes.ui.player
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -152,9 +154,27 @@ private fun FullPlayerContent(
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
 ) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        if (maxWidth > maxHeight) {
+            LandscapePlayerContent(state, onPlay, onPause, onSeek, onSkipPrevious, onSkipNext)
+        } else {
+            PortraitPlayerContent(state, onPlay, onPause, onSeek, onSkipPrevious, onSkipNext)
+        }
+    }
+}
+
+@Composable
+private fun PortraitPlayerContent(
+    state: PlayerState.MediaLoaded,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
+    onSeek: (Int, Long) -> Unit,
+    onSkipPrevious: () -> Unit,
+    onSkipNext: () -> Unit,
+) {
     val platformActions = LocalPlatformActions.current
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -236,6 +256,113 @@ private fun FullPlayerContent(
             }
 
             platformActions()
+        }
+    }
+}
+
+@Composable
+private fun LandscapePlayerContent(
+    state: PlayerState.MediaLoaded,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
+    onSeek: (Int, Long) -> Unit,
+    onSkipPrevious: () -> Unit,
+    onSkipNext: () -> Unit,
+) {
+    val platformActions = LocalPlatformActions.current
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AsyncImage(
+            model = state.artworkUri,
+            contentDescription = "Album artwork",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxHeight()
+                .aspectRatio(1f)
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(start = 24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = state.title,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .basicMarquee(iterations = Int.MAX_VALUE),
+            )
+            Text(
+                text = state.albumTitle,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .basicMarquee(iterations = Int.MAX_VALUE),
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            Slider(
+                value = state.durationInfo.currentPositionFloat,
+                onValueChange = { fraction ->
+                    val duration = state.durationInfo.duration
+                    if (duration > 0) {
+                        onSeek(state.currentTrackIndex, (fraction * duration).toLong())
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(state.durationInfo.elapsedTimeString, style = MaterialTheme.typography.labelSmall)
+                Text(state.durationInfo.durationTimeString, style = MaterialTheme.typography.labelSmall)
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onSkipPrevious, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.SkipPrevious, contentDescription = "Previous", modifier = Modifier.size(36.dp))
+                }
+
+                if (state is PlayerState.MediaLoaded.Loading) {
+                    CircularProgressIndicator(modifier = Modifier.size(56.dp))
+                } else {
+                    IconButton(
+                        onClick = if (state.isPlaying) onPause else onPlay,
+                        modifier = Modifier.size(56.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = if (state.isPlaying) "Pause" else "Play",
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                }
+
+                IconButton(onClick = onSkipNext, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.SkipNext, contentDescription = "Next", modifier = Modifier.size(36.dp))
+                }
+
+                platformActions()
+            }
         }
     }
 }

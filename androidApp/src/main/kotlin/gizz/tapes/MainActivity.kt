@@ -12,7 +12,6 @@ import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.android.ActivityKey
 import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
 import dev.zacsweers.metrox.viewmodel.MetroViewModelFactory
-import gizz.tapes.playback.GizzMediaPlayer
 import gizz.tapes.ui.components.CastButton
 
 @Inject
@@ -20,7 +19,6 @@ import gizz.tapes.ui.components.CastButton
 @ContributesIntoMap(AppScope::class, binding<Activity>())
 class MainActivity(
     private val metroViewModelFactory: MetroViewModelFactory,
-    private val mediaPlayer: GizzMediaPlayer,
 ) : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,10 +31,5 @@ class MainActivity(
                 GizzTapesApp()
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer.release()
     }
 }

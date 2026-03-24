@@ -2,6 +2,7 @@ package gizz.tapes.playback
 
 import android.content.ComponentName
 import android.content.Context
+import androidx.core.content.ContextCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -9,7 +10,6 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import co.touchlab.kermit.Logger
-import com.google.common.util.concurrent.MoreExecutors
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -42,13 +42,14 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
 
     override val currentPosition: Long get() = mediaController?.currentPosition ?: 0L
 
-    private var mediaController: MediaController? = null
+    @Volatile private var mediaController: MediaController? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var pollingJob: Job? = null
 
     init {
-        val sessionToken = SessionToken(context, ComponentName(context, "gizz.tapes.PlaybackService"))
-        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+        val appContext = context.applicationContext
+        val sessionToken = SessionToken(appContext, ComponentName(appContext, "gizz.tapes.PlaybackService"))
+        val controllerFuture = MediaController.Builder(appContext, sessionToken).buildAsync()
         controllerFuture.addListener({
             val controller = try {
                 controllerFuture.get()
@@ -77,7 +78,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
                     updateStateWithError(error.localizedMessage ?: "Playback error")
                 }
             })
-        }, MoreExecutors.directExecutor())
+        }, ContextCompat.getMainExecutor(appContext))
     }
 
     private fun startPolling() {
@@ -170,5 +171,6 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
     override fun release() {
         scope.cancel()
         mediaController?.release()
+        mediaController = null
     }
 }
