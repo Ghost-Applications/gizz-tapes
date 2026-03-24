@@ -103,6 +103,14 @@ platform :android do
       UI.success("Found the following files to upload: #{upload_assets.join(', ')}")
     end
 
+    # Sign all assets with GPG and include .asc files in the release
+    asc_files = []
+    upload_assets.each do |file|
+      sh("gpg --batch --yes --armor --detach-sign \"#{file}\"")
+      asc_files << "#{file}.asc"
+    end
+    upload_assets = upload_assets + asc_files
+
     set_github_release(
       repository_name: 'Ghost-Applications/gizz-tapes',
       api_token: keys_properties['github_token'],
