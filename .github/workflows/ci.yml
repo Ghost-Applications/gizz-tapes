@@ -49,6 +49,14 @@ jobs:
               gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
             fi
           done
+      - name: Verify APK signatures
+        run: |
+          for file in androidApp/build/outputs/apk/foss/debug/*.apk androidApp/build/outputs/apk/foss/release/*.apk androidApp/build/outputs/apk/full/debug/*.apk androidApp/build/outputs/apk/full/release/*.apk; do
+            if [ -f "$file" ] && [ ! -f "$file.asc" ]; then
+              echo "Missing signature for $file"
+              exit 1
+            fi
+          done
       - name: Upload foss debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -139,6 +147,15 @@ jobs:
           for file in ${{ matrix.artifact-path }}*; do
             if [ -f "$file" ]; then
               gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
+            fi
+          done
+      - name: Verify desktop signatures
+        shell: bash
+        run: |
+          for file in ${{ matrix.artifact-path }}*; do
+            if [ -f "$file" ] && [[ "$file" != *.asc ]] && [ ! -f "$file.asc" ]; then
+              echo "Missing signature for $file"
+              exit 1
             fi
           done
       - name: Upload desktop artifact
