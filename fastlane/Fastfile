@@ -40,15 +40,6 @@ platform :android do
     # make sure we only publish on main
     ensure_git_branch(branch: 'main')
 
-    # Get the current version from Google Play
-    current_version = google_play_track_version_codes(track: 'beta')[0]
-
-    upload_to_play_store(
-      track: 'beta',
-      track_promote_to: 'production',
-      version_code: current_version
-    )
-
     # Read properties from gradle.properties
     properties = {}
     gradle_properties_lines = File.readlines('../gradle.properties')
@@ -61,6 +52,7 @@ platform :android do
       properties[key] = value.strip if key && value
     end
 
+    current_version = properties['gizz.tapes.defaultBuildNumber'].to_i
     version_name = properties['gizz.tapes.versionName']
 
     keys_properties = {}
@@ -78,7 +70,6 @@ platform :android do
     description = sections[1].strip
 
     # write new version and commit and push it
-    properties['gizz.tapes.defaultBuildNumber'] = current_version
     update_gradle_properties(properties)
     git_commit(path: './gradle.properties', message: 'Version Bump')
     push_to_git_remote()
@@ -88,6 +79,12 @@ platform :android do
       properties: {
         'gizz.tapes.buildNumber' => current_version
       }
+    )
+
+    upload_to_play_store(
+      track: 'production',
+      skip_upload_apk: true,
+      aab: lane_context[:GRADLE_AAB_OUTPUT_PATH]
     )
 
     # Find all .apk and .aab files in the specified directories
