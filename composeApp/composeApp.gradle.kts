@@ -110,8 +110,9 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "gizz.tapes"
-            packageVersion = "1.0.0"
+            packageName = "Gizz Tapes"
+            packageVersion = "1.0.${project.property("gizz.tapes.defaultBuildNumber")}"
+            description = project.property("gizz.tapes.versionName") as String
 
             macOS { iconFile.set(project.file("src/desktopMain/resources/icon.icns")) }
             windows { iconFile.set(project.file("src/desktopMain/resources/icon.ico")) }
