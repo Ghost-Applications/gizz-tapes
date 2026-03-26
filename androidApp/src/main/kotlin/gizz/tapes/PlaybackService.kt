@@ -121,6 +121,7 @@ class PlaybackService(
                     }
                 } else {
                     pollingJob?.cancel()
+                    serviceScope.launch { saveState() }
                 }
             }
         })
@@ -158,10 +159,10 @@ class PlaybackService(
         mediaSession?.player?.run {
             val isCasting = deviceInfo.playbackType == DeviceInfo.PLAYBACK_TYPE_REMOTE
             val shouldStop = playWhenReady || mediaItemCount == 0 || playbackState == Player.STATE_ENDED
-            if (!isCasting && shouldStop) {
+            if (!isCasting) {
                 serviceScope.launch {
                     saveState()
-                    stopSelf()
+                    if (shouldStop) stopSelf()
                 }
             }
         }

@@ -58,6 +58,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
                 return@addListener
             }
             mediaController = controller
+            updateState()
 
             controller.addListener(object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
