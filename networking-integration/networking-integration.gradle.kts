@@ -18,11 +18,6 @@ kotlin {
             entryPoint = "main"
         }
     }
-    macosX64 {
-        binaries.executable {
-            entryPoint = "main"
-        }
-    }
     js {
         nodejs()
         binaries.executable()
@@ -45,5 +40,5 @@ kotlin {
 tasks.register("runIntegrationTests") {
     group = "verification"
     description = "runs the api with live data on all available platforms"
-    dependsOn("jvmRun", "jsNodeProductionRun", "runReleaseExecutableMacosArm64", "runReleaseExecutableMacosX64")
+    dependsOn("jvmRun", "jsNodeProductionRun", "runReleaseExecutableMacosArm64")
 }
