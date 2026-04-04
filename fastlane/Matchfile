@@ -1,0 +1,4 @@
+git_url("git@github.com:Ghost-Applications/apple-code-signing.git")
+storage_mode("git")
+type("appstore")
+app_identifier("gizz.tapes.GizzTapes")

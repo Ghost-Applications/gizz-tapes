@@ -172,6 +172,7 @@ obj/
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+.idea/deploymentTargetSelector.xml
 
 # OS-specific files
 .DS_Store
@@ -230,3 +231,4 @@ keys/
 
 # Xcode user-specific files
 xcuserdata/
+*.xcuserstate
