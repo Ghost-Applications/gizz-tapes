@@ -7,7 +7,7 @@ platform :ios do
       key_id: ENV['ASC_KEY_ID'],
       issuer_id: ENV['ASC_ISSUER_ID'],
       key_content: ENV['ASC_KEY_CONTENT'],
-      is_base64: true
+      is_key_content_base64: true
     )
     match(
       type: 'appstore',
