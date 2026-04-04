@@ -14,6 +14,14 @@ platform :ios do
       readonly: true,
       api_key: api_key
     )
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: 'iosApp/iosApp.xcodeproj',
+      team_id: 'QHJAD8Z2WL',
+      bundle_identifier: 'gizz.tapes.GizzTapes',
+      code_sign_identity: 'Apple Distribution',
+      profile_name: 'match AppStore gizz.tapes.GizzTapes'
+    )
     build_app(
       project: 'iosApp/iosApp.xcodeproj',
       scheme: 'iosApp',
