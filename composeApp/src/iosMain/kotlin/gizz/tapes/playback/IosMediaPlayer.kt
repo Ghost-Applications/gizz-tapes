@@ -74,10 +74,6 @@ class IosMediaPlayer(
     private var playlist: List<PlaybackItem> = emptyList()
     private var currentIndex = -1
 
-    // Tracks AVPlayerItem references so we can detect when the queue auto-advances.
-    // Always corresponds to playlist[queueStartIndex..end].
-    private var playerItems: List<AVPlayerItem> = emptyList()
-    private var queueStartIndex: Int = 0
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private var lastArtworkUrl: String? = null
@@ -100,10 +96,9 @@ class IosMediaPlayer(
             if (stored.items.isNotEmpty()) {
                 playlist = stored.items
                 currentIndex = stored.currentTrack.coerceIn(0, (stored.items.size - 1).coerceAtLeast(0))
-                queueStartIndex = currentIndex
-                playerItems = stored.items.drop(currentIndex).mapNotNull { item ->
+                stored.items.drop(currentIndex).forEach { item ->
                     NSURL.URLWithString(item.url)?.let { url ->
-                        AVPlayerItem(url).also { player.insertItem(it, afterItem = null) }
+                        player.insertItem(AVPlayerItem(url), afterItem = null)
                     }
                 }
                 val cmTime = CMTimeMake(stored.currentTime, 1000)
@@ -205,12 +200,13 @@ class IosMediaPlayer(
     private fun updateState() {
         // Sync currentIndex with what AVQueuePlayer is actually playing — it auto-advances
         // through the queue when tracks finish, so we need to detect that here.
-        // playerItems[i] corresponds to playlist[queueStartIndex + i].
-        val avItem = player.currentItem()
-        val playerItemIndex = playerItems.indexOfFirst { it === avItem }
-        if (playerItemIndex != -1) {
-            currentIndex = queueStartIndex + playerItemIndex
+        // items() returns all remaining items including the current one, so the current
+        // index is derived from how many items have been consumed from the playlist.
+        val remainingItems = player.items()
+        if (remainingItems.isNotEmpty()) {
+            currentIndex = playlist.size - remainingItems.size
         }
+        val avItem = player.currentItem()
 
         val item = playlist.getOrNull(currentIndex)
         if (item == null) {
@@ -267,10 +263,9 @@ class IosMediaPlayer(
         playlist = items
         currentIndex = startIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0))
         player.removeAllItems()
-        queueStartIndex = currentIndex
-        playerItems = items.drop(currentIndex).mapNotNull { item ->
+        items.drop(currentIndex).forEach { item ->
             NSURL.URLWithString(item.url)?.let { url ->
-                AVPlayerItem(url).also { player.insertItem(it, afterItem = null) }
+                player.insertItem(AVPlayerItem(url), afterItem = null)
             }
         }
         player.play()
@@ -301,10 +296,9 @@ class IosMediaPlayer(
             // AVQueuePlayer has no way to jump to an arbitrary position in the queue,
             // so we rebuild it starting from the new index
             player.removeAllItems()
-            queueStartIndex = currentIndex
-            playerItems = playlist.drop(currentIndex).mapNotNull { item ->
+            playlist.drop(currentIndex).forEach { item ->
                 NSURL.URLWithString(item.url)?.let { url ->
-                    AVPlayerItem(url).also { player.insertItem(it, afterItem = null) }
+                    player.insertItem(AVPlayerItem(url), afterItem = null)
                 }
             }
 
