@@ -53,7 +53,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Inject
 @UnstableApi
-@ServiceKey(PlaybackService::class)
+@ServiceKey
 @ContributesIntoMap(AppScope::class, binding<Service>())
 class PlaybackService(
     private val playerFactory: PlayerFactory,

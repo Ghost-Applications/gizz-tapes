@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(PlayerViewModel::class)
+@ViewModelKey
 class PlayerViewModel(
     private val mediaPlayer: GizzMediaPlayer,
 ) : ViewModel() {

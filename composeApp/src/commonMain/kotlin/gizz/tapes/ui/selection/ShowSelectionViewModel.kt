@@ -16,7 +16,6 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import gizz.tapes.api.GizzTapesApiClient
-import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Settings
@@ -42,7 +41,6 @@ import kotlinx.coroutines.launch
 @AssistedInject
 class ShowSelectionViewModel(
     private val apiClient: GizzTapesApiClient,
-    private val apiErrorMessage: ApiErrorMessage,
     private val settingsDataStore: DataStore<Settings>,
     @Assisted savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -92,7 +90,7 @@ class ShowSelectionViewModel(
             },
             onErrorAfter3SecondsAction = { error ->
                 logger.d(error) { "Error retrieving shows" }
-                emit(LCE.Error(userDisplayedMessage = apiErrorMessage.value, error = error))
+                emit(LCE.Error(error = error))
             }
         )
         emit(state)

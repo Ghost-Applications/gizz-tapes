@@ -20,7 +20,7 @@ class LCETest {
 
     @Test
     fun `contentOrNull returns null for Error`() {
-        assertNull(LCE.Error("oops", Exception()).contentOrNull())
+        assertNull(LCE.Error(Exception()).contentOrNull())
     }
 
     // onContent
@@ -42,7 +42,7 @@ class LCETest {
     @Test
     fun `onContent does not invoke action for Error`() {
         var called = false
-        LCE.Error("oops", Exception()).onContent { called = true }
+        LCE.Error(Exception()).onContent { called = true }
         assertEquals(false, called)
     }
 
@@ -61,7 +61,7 @@ class LCETest {
 
     @Test
     fun `map passes through Error`() {
-        val error = LCE.Error("oops", Exception())
+        val error = LCE.Error(Exception())
         val result = error.map { "transformed" }
         assertEquals(error, result)
     }
@@ -82,7 +82,7 @@ class LCETest {
 
     @Test
     fun `mapCollection passes through Error`() {
-        val error: LCE.Error<Exception> = LCE.Error("oops", Exception())
+        val error: LCE.Error<Exception> = LCE.Error(Exception())
         val result = error.mapCollection<String, String, Exception> { "x" }
         assertEquals(error, result)
     }

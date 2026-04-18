@@ -20,14 +20,14 @@ import kotlinx.coroutines.launch
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(SettingsViewModel::class)
+@ViewModelKey
 class SettingsViewModel(
     private val dataStore: DataStore<Settings>,
 ) : ViewModel() {
 
     val settingsState: StateFlow<LCE<SettingsScreenState, Nothing>> = loadSettings().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(),
+        started = SharingStarted.WhileSubscribed(),
         initialValue = LCE.Loading
     )
 

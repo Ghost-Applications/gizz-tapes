@@ -10,8 +10,6 @@ import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metrox.viewmodel.ViewModelGraph
 import gizz.tapes.api.GizzTapesApiClient
-import gizz.tapes.api.GizzTapesApiClient.Companion.invoke
-import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.Settings
 import gizz.tapes.data.SettingsSerializer
 import gizz.tapes.playback.CurrentlyPlayingSaver
@@ -60,11 +58,6 @@ interface AppGraph : ViewModelGraph {
     @SingleIn(AppScope::class)
     fun provideCurrentlyPlayingSaver(dataStore: DataStore<StoredMediaSession>): CurrentlyPlayingSaver =
         CurrentlyPlayingSaver(dataStore)
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideApiErrorMessage(): ApiErrorMessage =
-        ApiErrorMessage("Unable to load data. Please check your connection.")
 
     @Provides
     @SingleIn(AppScope::class)

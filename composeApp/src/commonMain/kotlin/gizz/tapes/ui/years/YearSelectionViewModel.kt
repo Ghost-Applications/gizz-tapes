@@ -9,7 +9,6 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import gizz.tapes.api.GizzTapesApiClient
-import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Settings
 import gizz.tapes.data.SortOrder
@@ -28,10 +27,9 @@ import kotlinx.coroutines.launch
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(YearSelectionViewModel::class)
+@ViewModelKey
 class YearSelectionViewModel(
     private val apiClient: GizzTapesApiClient,
-    private val apiErrorMessage: ApiErrorMessage,
     private val settingsDataStore: DataStore<Settings>
 ) : ViewModel() {
 
@@ -67,7 +65,7 @@ class YearSelectionViewModel(
                                 YearSelectionData(
                                     year = Year(year),
                                     showCount = shows.count(),
-                                    randomShowPoster = PosterUrl.Companion(shows.random().posterUrl)
+                                    randomShowPoster = PosterUrl(shows.random().posterUrl)
                                 )
                             }
                             .reversed()
@@ -76,10 +74,7 @@ class YearSelectionViewModel(
                 onErrorAfter3SecondsAction = { error ->
                     logger.d(error) { "Error loading years." }
                     emit(
-                        LCE.Error(
-                            userDisplayedMessage = apiErrorMessage.value,
-                            error = error
-                        )
+                        LCE.Error(error = error)
                     )
                 }
             )

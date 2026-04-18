@@ -5,7 +5,7 @@ package gizz.tapes.util
 sealed interface LCE<out CONTENT, out ERROR> {
     data object Loading : LCE<Nothing, Nothing>
     data class Content<out C>(val value: C) : LCE<C, Nothing>
-    data class Error<E>(val userDisplayedMessage: String, val error: E) : LCE<Nothing, E>
+    data class Error<E>(val error: E) : LCE<Nothing, E>
 }
 
 fun <CONTENT, E> LCE<CONTENT, E>.contentOrNull(): CONTENT? = when (this) {

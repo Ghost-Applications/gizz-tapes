@@ -151,7 +151,7 @@ fun ShowScreen(
                 Box(modifier = Modifier.weight(1f)) {
                     when (showState) {
                         LCE.Loading -> LoadingScreen()
-                        is LCE.Error -> ErrorScreen(showState.userDisplayedMessage)
+                        is LCE.Error -> ErrorScreen(error = showState.error)
                         is LCE.Content -> ShowContent(
                             state = showState.value,
                             playerState = playerState,
