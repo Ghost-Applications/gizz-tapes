@@ -15,7 +15,7 @@ import dev.zacsweers.metrox.viewmodel.MetroViewModelFactory
 import gizz.tapes.ui.components.CastButton
 
 @Inject
-@ActivityKey(MainActivity::class)
+@ActivityKey
 @ContributesIntoMap(AppScope::class, binding<Activity>())
 class MainActivity(
     private val metroViewModelFactory: MetroViewModelFactory,

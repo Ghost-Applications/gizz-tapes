@@ -18,7 +18,6 @@ import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.api.data.Show
-import gizz.tapes.data.ApiErrorMessage
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.RecordingData
@@ -49,7 +48,6 @@ import kotlinx.coroutines.launch
 class ShowViewModel(
     private val apiClient: GizzTapesApiClient,
     private val mediaPlayer: GizzMediaPlayer,
-    private val apiErrorMessage: ApiErrorMessage,
     private val datastore: DataStore<Settings>,
     @Assisted savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -83,7 +81,7 @@ class ShowViewModel(
             onErrorAfter3SecondsAction = { error ->
                 logger.d(error) { "Error retrieving show" }
                 errorFlow.emit(
-                    LCE.Error(userDisplayedMessage = apiErrorMessage.value, error = error)
+                    LCE.Error(error = error)
                 )
             }
         )

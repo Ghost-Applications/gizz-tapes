@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun <T> GizzScaffold(
     title: Title,
-    state: LCE<T, Any>,
+    state: LCE<T, Throwable>,
     navigateUp: (NavigateUp)?,
     actions: @Composable RowScope.() -> Unit,
     content: @Composable (value: T, playerError: (PlayerError) -> Unit) -> Unit
@@ -68,7 +68,7 @@ fun <T> GizzScaffold(
                 .fillMaxSize()
         ) { s ->
             when (s) {
-                is LCE.Error -> ErrorScreen(s.userDisplayedMessage)
+                is LCE.Error -> ErrorScreen(error = s.error)
                 is LCE.Content -> content(s.value) {
                     scope.launch {
                         snackbarHostState.showSnackbar(

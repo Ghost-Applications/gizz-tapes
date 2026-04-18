@@ -49,7 +49,7 @@ data class SelectionData(
 @Composable
 fun SelectionScreen(
     title: Title = Title(stringResource(Res.string.app_name)),
-    state: LCE<List<SelectionData>, Any>,
+    state: LCE<List<SelectionData>, Throwable>,
     playerState: PlayerState,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,

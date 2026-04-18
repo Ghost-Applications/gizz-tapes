@@ -17,12 +17,16 @@ formatting:
     active: false
 
 style:
+  UnusedPrivateMember:
+    active: true
+    # Preview composables are used by the IDE, not by code
+    ignoreAnnotated: ['Preview']
   MagicNumber:
     active: false
   ReturnCount:
     active: false
   WildcardImport:
-    active: true
+    active: false
   MaxLineLength:
     active: false
   # SelectionData has 4 fields — destructuring all 4 is fine
