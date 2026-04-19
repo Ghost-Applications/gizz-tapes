@@ -10,6 +10,9 @@ detekt:
 build:
     ./gradlew build bundle
 
+build-ios:
+    xcodebuild -workspace iosApp/iosApp.xcworkspace -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive
+
 build-debug:
     ./gradlew assembleFullDebug
 

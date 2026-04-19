@@ -32,7 +32,7 @@ platform :ios do
       profile_name: 'match AppStore gizz.tapes.GizzTapes'
     )
     build_app(
-      project: 'iosApp/iosApp.xcodeproj',
+      workspace: 'iosApp/iosApp.xcworkspace',
       scheme: 'iosApp',
       configuration: 'Release',
       export_method: 'app-store'
