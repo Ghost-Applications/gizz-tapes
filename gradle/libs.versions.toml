@@ -16,6 +16,7 @@ coil = "3.4.0"
 metro = "0.12.1"
 media3 = "1.10.0"
 firebase-bom = "34.11.0"
+gitlive-firebase = "2.4.0"
 
 [libraries]
 kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0"
@@ -61,8 +62,9 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3"}
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}
-firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+
+gitlive-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitlive-firebase" }
 
 javacv = { module = "org.bytedeco:javacv", version = "1.5.13" }
 ffmpeg-platform = { module = "org.bytedeco:ffmpeg-platform", version = "8.0.1-1.5.13" }
@@ -83,7 +85,6 @@ compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.r
 
 [bundles]
 firebase = [
-    "firebase-analytics",
     "firebase-crashlytics"
 ]
 

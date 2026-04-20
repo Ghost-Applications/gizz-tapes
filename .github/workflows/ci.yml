@@ -177,10 +177,14 @@ jobs:
         run: >
           ./gradlew :composeApp:iosSimulatorArm64Test
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+      - name: Generate dummy Kotlin framework for CocoaPods
+        run: ./gradlew :composeApp:generateDummyFramework
+      - name: Install CocoaPods dependencies
+        run: pod install --project-directory=iosApp
       - name: Build iOS simulator app
         run: |
           xcodebuild \
-            -project iosApp/iosApp.xcodeproj \
+            -workspace iosApp/iosApp.xcworkspace \
             -scheme iosApp \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \

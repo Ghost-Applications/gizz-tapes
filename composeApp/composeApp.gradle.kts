@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.multiplatform.android.library)
+    kotlin("native.cocoapods")
 
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
@@ -42,6 +43,22 @@ kotlin {
             isStatic = true
             binaryOption("bundleId", "gizz.tapes")
         }
+    }
+
+    cocoapods {
+        version = "1.0"
+        summary = "Gizz Tapes KMP framework"
+        homepage = "https://github.com/Ghost-Applications/gizz-tapes"
+        ios.deploymentTarget = "15.3"
+        podfile = project.file("../iosApp/Podfile")
+
+        framework {
+            baseName = "GizzTapes"
+            isStatic = true
+            binaryOption("bundleId", "gizz.tapes")
+        }
+
+        pod("FirebaseCrashlytics") { linkOnly = true }
     }
 
     jvm("desktop")
@@ -93,6 +110,7 @@ kotlin {
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.gitlive.firebase.crashlytics)
         }
 
         androidMain.dependencies {
