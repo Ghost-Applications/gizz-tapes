@@ -170,14 +170,23 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Compile KMP iOS framework
+        env:
+          SDK_NAME: iphonesimulator
+          ARCHS: arm64
         run: >
           ./gradlew :composeApp:compileKotlinIosSimulatorArm64
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
       - name: Run iOS tests
+        env:
+          SDK_NAME: iphonesimulator
+          ARCHS: arm64
         run: >
           ./gradlew :composeApp:iosSimulatorArm64Test
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
       - name: Generate dummy Kotlin framework for CocoaPods
+        env:
+          SDK_NAME: iphonesimulator
+          ARCHS: arm64
         run: ./gradlew :composeApp:generateDummyFramework
       - name: Install CocoaPods dependencies
         run: pod install --project-directory=iosApp
