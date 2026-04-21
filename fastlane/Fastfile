@@ -32,13 +32,12 @@ platform :ios do
       profile_name: 'match AppStore gizz.tapes.GizzTapes'
     )
     ENV.delete("RUBYOPT")
-    ENV.delete("BUNDLE_BIN_PATH")
-    ENV.delete("BUNDLE_GEMFILE")
     build_app(
       workspace: 'iosApp/iosApp.xcworkspace',
       scheme: 'iosApp',
       configuration: 'Release',
-      export_method: 'app-store'
+      export_method: 'app-store',
+      xcargs: 'OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED=YES'
     )
     upload_to_testflight(
       api_key: api_key,

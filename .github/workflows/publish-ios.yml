@@ -33,6 +33,13 @@ jobs:
         run: >
           ./gradlew :composeApp:podInstall
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+      - name: Build KMP framework for iOS release
+        run: >
+          ./gradlew :composeApp:syncFramework
+          -Pkotlin.native.cocoapods.platform=iphoneos
+          -Pkotlin.native.cocoapods.archs=arm64
+          -Pkotlin.native.cocoapods.configuration=Release
+          -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
       - name: Build and upload to TestFlight
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
