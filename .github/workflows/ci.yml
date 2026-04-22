@@ -172,6 +172,7 @@ jobs:
       - name: Compile KMP iOS framework
         env:
           SDK_NAME: iphonesimulator
+          PLATFORM_NAME: iphonesimulator
           ARCHS: arm64
         run: >
           ./gradlew :composeApp:compileKotlinIosSimulatorArm64
@@ -179,6 +180,7 @@ jobs:
       - name: Run iOS tests
         env:
           SDK_NAME: iphonesimulator
+          PLATFORM_NAME: iphonesimulator
           ARCHS: arm64
         run: >
           ./gradlew :composeApp:iosSimulatorArm64Test
@@ -186,6 +188,7 @@ jobs:
       - name: Generate dummy Kotlin framework for CocoaPods
         env:
           SDK_NAME: iphonesimulator
+          PLATFORM_NAME: iphonesimulator
           ARCHS: arm64
         run: ./gradlew :composeApp:generateDummyFramework
       - name: Install CocoaPods dependencies

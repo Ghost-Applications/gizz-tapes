@@ -34,6 +34,10 @@ jobs:
           ./gradlew :composeApp:podInstall
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
       - name: Build KMP framework for iOS release
+        env:
+          SDK_NAME: iphoneos
+          PLATFORM_NAME: iphoneos
+          ARCHS: arm64
         run: >
           ./gradlew :composeApp:syncFramework
           -Pkotlin.native.cocoapods.platform=iphoneos
