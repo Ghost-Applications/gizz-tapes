@@ -29,21 +29,6 @@ jobs:
         with:
           ruby-version: '3.3.6'
           bundler-cache: true
-      - name: Install CocoaPods dependencies
-        run: >
-          ./gradlew :composeApp:podInstall
-          -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-      - name: Build KMP framework for iOS release
-        env:
-          SDK_NAME: iphoneos
-          PLATFORM_NAME: iphoneos
-          ARCHS: arm64
-        run: >
-          ./gradlew :composeApp:syncFramework
-          -Pkotlin.native.cocoapods.platform=iphoneos
-          -Pkotlin.native.cocoapods.archs=arm64
-          -Pkotlin.native.cocoapods.configuration=Release
-          -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
       - name: Build and upload to TestFlight
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

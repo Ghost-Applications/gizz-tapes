@@ -31,13 +31,11 @@ platform :ios do
       code_sign_identity: 'Apple Distribution',
       profile_name: 'match AppStore gizz.tapes.GizzTapes'
     )
-    ENV.delete("RUBYOPT")
     build_app(
-      workspace: 'iosApp/iosApp.xcworkspace',
+      project: 'iosApp/iosApp.xcodeproj',
       scheme: 'iosApp',
       configuration: 'Release',
-      export_method: 'app-store',
-      xcargs: 'OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED=YES'
+      export_method: 'app-store'
     )
     upload_to_testflight(
       api_key: api_key,
