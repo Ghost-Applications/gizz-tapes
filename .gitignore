@@ -232,7 +232,3 @@ keys/
 # Xcode user-specific files
 xcuserdata/
 *.xcuserstate
-
-# CocoaPods
-iosApp/Pods/
-composeApp/composeApp.podspec

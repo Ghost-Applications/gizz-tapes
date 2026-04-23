@@ -10,11 +10,11 @@ detekt:
 build:
     ./gradlew build bundle
 
-build-ios:
-    xcodebuild -workspace iosApp/iosApp.xcworkspace -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive
-
 build-debug:
     ./gradlew assembleFullDebug
+
+build-ios:
+    xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -destination 'generic/platform=iOS' -configuration Release archive -archivePath build/iosApp.xcarchive
 
 release:
     bundle exe fastlane release
