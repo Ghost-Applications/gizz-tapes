@@ -232,3 +232,5 @@ keys/
 # Xcode user-specific files
 xcuserdata/
 *.xcuserstate
+
+ci-artifacts/

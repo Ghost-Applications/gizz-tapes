@@ -20,6 +20,10 @@ platform :ios do
       api_key: api_key,
       app_identifier: 'gizz.tapes.GizzTapes'
     )
+    increment_version_number(
+      version_number: read_gradle_properties['gizz.tapes.iosVersion'],
+      xcodeproj: 'iosApp/iosApp.xcodeproj'
+    )
     increment_build_number(
       build_number: current_build + 1,
       xcodeproj: 'iosApp/iosApp.xcodeproj'
@@ -63,6 +67,10 @@ platform :ios do
       api_key: api_key,
       app_identifier: 'gizz.tapes.GizzTapes'
     )
+    increment_version_number(
+      version_number: read_gradle_properties['gizz.tapes.iosVersion'],
+      xcodeproj: 'iosApp/iosApp.xcodeproj'
+    )
     increment_build_number(
       build_number: current_build + 1,
       xcodeproj: 'iosApp/iosApp.xcodeproj'
@@ -86,6 +94,16 @@ platform :ios do
       skip_waiting_for_build_processing: true
     )
   end
+end
+
+def read_gradle_properties
+  properties = {}
+  File.readlines('../gradle.properties').each do |line|
+    next if line.strip.empty? || line.strip.start_with?('#')
+    key, value = line.strip.split('=', 2)
+    properties[key] = value.strip if key && value
+  end
+  properties
 end
 
 def update_gradle_properties(properties)
