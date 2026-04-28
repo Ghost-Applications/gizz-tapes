@@ -13,6 +13,27 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+## iOS
+
+### ios release
+
+```sh
+[bundle exec] fastlane ios release
+```
+
+Build and submit to App Store for review
+
+### ios beta
+
+```sh
+[bundle exec] fastlane ios beta
+```
+
+Build and upload to TestFlight
+
+----
+
+
 ## Android
 
 ### android beta

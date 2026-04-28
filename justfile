@@ -17,4 +17,5 @@ build-ios:
     xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -destination 'generic/platform=iOS' -configuration Release archive -archivePath build/iosApp.xcarchive
 
 release:
-    bundle exe fastlane release
+    bundle exec fastlane android release
+    bundle exec fastlane ios release

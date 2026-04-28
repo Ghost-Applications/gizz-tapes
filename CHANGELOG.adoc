@@ -3,6 +3,8 @@
 == JOJAM
 
 - Converted project to kotlin multiplatform
+- iOS App 1.0 Released
+- Desktop App Beta available
 
 == Ice V 2026-01-11
 
