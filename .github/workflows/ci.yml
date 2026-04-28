@@ -25,33 +25,35 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Decode release keystore
-        if: ${{ env.KEYSTORE_BASE64 != '' }}
-        run: echo "$KEYSTORE_BASE64" | base64 --decode > keys/release.keystore
+        if: ${{ env.GIZZ_TAPES_ENCODED_KEY != '' }}
+        run: echo -n $GIZZ_TAPES_ENCODED_KEY | base64 --decode > keys/release.jks
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          GIZZ_TAPES_ENCODED_KEY: ${{ secrets.GIZZ_TAPES_ENCODED_KEY }}
       - name: Build and test
         run: >
-          ./gradlew :androidApp:test :androidApp:assemble
+          ./gradlew :androidApp:test :androidApp:assemble :androidApp:bundleRelease
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEYSTORE_LOCATION: ${{ secrets.KEYSTORE_LOCATION }}
+          GIZZ_TAPES_KEYSTORE_PASSWORD: ${{ secrets.GIZZ_TAPES_KEYSTORE_PASSWORD }}
+          GIZZ_TAPES_KEY_PASSWORD: ${{ secrets.GIZZ_TAPES_KEY_PASSWORD }}
+          GIZZ_TAPES_KEY_ALIAS: ${{ secrets.GIZZ_TAPES_KEY_ALIAS }}
+          GIZZ_TAPES_KEYSTORE_LOCATION: keys/release.jks
       - name: Import GPG key
         run: |
           echo "${{ secrets.PGP_KEY }}" > private.key
           gpg --batch --passphrase "${{ secrets.PGP_PASSWORD }}" --import private.key
-      - name: List APK output directories
-        run: find androidApp/build/outputs/apk -type f | sort
       - name: Sign APKs with GPG
         run: |
           find androidApp/build/outputs/apk -name "*.apk" | while read -r file; do
             echo "Signing $file"
             gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
           done
-      - name: List APK output directories after signing
-        run: find androidApp/build/outputs/apk -type f | sort
+      - name: Sign AABs with GPG
+        run: |
+          find androidApp/build/outputs/bundle -name "*release*.aab" | while read -r file; do
+            echo "Signing $file"
+            gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
+          done
       - name: Upload foss debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -75,6 +77,18 @@ jobs:
         with:
           name: android-full-release
           path: androidApp/build/outputs/apk/full/release/
+          if-no-files-found: error
+      - name: Upload foss release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-foss-release-aab
+          path: androidApp/build/outputs/bundle/fossRelease/
+          if-no-files-found: error
+      - name: Upload full release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-full-release-aab
+          path: androidApp/build/outputs/bundle/fullRelease/
           if-no-files-found: error
 
   desktop:

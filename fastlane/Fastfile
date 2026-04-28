@@ -41,8 +41,7 @@ platform :ios do
     upload_to_app_store(
       api_key: api_key,
       submit_for_review: true,
-      automatic_release: false,
-      skip_waiting_for_build_processing: true
+      automatic_release: false
     )
   end
 
@@ -152,50 +151,41 @@ platform :android do
       keys_properties[key] = value.strip if key && value
     end
 
-    github_token = keys_properties['github_token']
-
     content = File.read('../CHANGELOG.adoc')
     sections = content.split(/^== .*/)
     description = sections[1].strip
 
-    # write new version and commit and push it
-    update_gradle_properties(properties)
-    git_commit(path: './gradle.properties', message: 'Version Bump')
-    push_to_git_remote()
+    current_sha = sh("git rev-parse HEAD", log: false).strip
+    run_id = sh(
+      "gh run list --repo Ghost-Applications/gizz-tapes --workflow ci.yml --commit #{current_sha} --status success --limit 1 --json databaseId --jq '.[0].databaseId'",
+      log: false
+    ).strip
+    UI.user_error!("No successful CI run found for commit #{current_sha}") if run_id.empty?
 
-    gradle(
-      task: 'build',
-      properties: {
-        'gizz.tapes.buildNumber' => current_version
-      }
-    )
+    download_dir = File.expand_path('../ci-artifacts')
+    sh("rm -rf \"#{download_dir}\"")
+    sh("gh run download #{run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release -n android-foss-release -n android-full-release-aab -n android-foss-release-aab --dir \"#{download_dir}\"")
+
+    full_release_aab = Dir.glob("#{download_dir}/android-full-release-aab/*.aab").first
+    UI.user_error!("Could not find full release AAB in downloaded artifacts") unless full_release_aab
 
     upload_to_play_store(
       track: 'production',
       skip_upload_apk: true,
-      aab: lane_context[:GRADLE_AAB_OUTPUT_PATH]
+      skip_upload_changelogs: true,
+      aab: full_release_aab
     )
 
-    # Find all .apk and .aab files in the specified directories
-    apk_files = Dir.glob('androidApp/build/outputs/apk/*/release/*.apk')
-    aab_files = Dir.glob('androidApp/build/outputs/bundle/*Release/*.aab')
-
-    # Combine all files into a single array
-    upload_assets = apk_files + aab_files
+    apk_files = Dir.glob("#{download_dir}/**/*.apk")
+    aab_files = Dir.glob("#{download_dir}/**/*.aab")
+    asc_files = Dir.glob("#{download_dir}/**/*.asc")
+    upload_assets = apk_files + aab_files + asc_files
 
     if upload_assets.empty?
-      UI.error("No APK or AAB files found to upload!")
+      UI.error("No files found to upload!")
     else
       UI.success("Found the following files to upload: #{upload_assets.join(', ')}")
     end
-
-    # Sign all assets with GPG and include .asc files in the release
-    asc_files = []
-    upload_assets.each do |file|
-      sh("gpg --batch --yes --armor --detach-sign \"#{file}\"")
-      asc_files << "#{file}.asc"
-    end
-    upload_assets = upload_assets + asc_files
 
     set_github_release(
       repository_name: 'Ghost-Applications/gizz-tapes',
@@ -226,5 +216,10 @@ platform :android do
     properties['gizz.tapes.versionName'] = next_release_name.split.join("")
     properties['gizz.tapes.defaultBuildNumber'] = current_version + 1
     update_gradle_properties(properties)
+    git_commit(
+      path: [File.expand_path('../gradle.properties'), File.expand_path('../CHANGELOG.adoc')],
+      message: 'Version Bump'
+    )
+    push_to_git_remote()
   end
 end
