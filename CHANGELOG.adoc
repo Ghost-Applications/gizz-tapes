@@ -1,6 +1,8 @@
 = Changelog
 
-== JOJAM
+== KGLW
+
+== JOJAM 2026-04-28
 
 - Converted project to kotlin multiplatform
 - iOS App 1.0 Released
