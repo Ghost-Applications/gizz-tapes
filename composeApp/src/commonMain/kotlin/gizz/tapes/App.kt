@@ -12,6 +12,7 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
+import coil3.svg.SvgDecoder
 import gizz.tapes.nav.GizzTapesNavController
 
 val Primary80 = Color(0xFFB5C4FF)
@@ -49,6 +50,7 @@ fun GizzTapesTheme(
 fun GizzTapesApp() {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context)
+            .components { add(SvgDecoder.Factory()) }
             .crossfade(true)
             .memoryCache {
                 MemoryCache.Builder()

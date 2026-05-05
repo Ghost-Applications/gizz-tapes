@@ -2,6 +2,8 @@
 
 == KGLW
 
+- Fix App Icon Not Loading
+
 == JOJAM 2026-04-28
 
 - Converted project to kotlin multiplatform

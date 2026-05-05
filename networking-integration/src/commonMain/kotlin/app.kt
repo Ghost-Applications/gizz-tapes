@@ -1,4 +1,5 @@
 import arrow.fx.coroutines.parMap
+import gizz.tapes.api.API
 import gizz.tapes.api.GizzTapesApiClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -7,6 +8,7 @@ import kotlinx.serialization.json.Json
 
 fun main() = runBlocking {
     val api = GizzTapesApiClient(
+        api = API.STAGING,
         client = HttpClient {
             install(ContentNegotiation) {
                 json(

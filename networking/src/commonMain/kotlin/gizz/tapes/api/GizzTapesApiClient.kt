@@ -11,10 +11,20 @@ import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+enum class API(val url: String) {
+    PRODUCTION("https://tapes.kglw.net"),
+    STAGING("https://gizztapes2-staging.fly.dev"),
+}
+
 interface GizzTapesApiClient {
     companion object {
-        operator fun invoke(): GizzTapesApiClient = RealGizzTapesApiClient()
-        operator fun invoke(client: HttpClient): GizzTapesApiClient = RealGizzTapesApiClient(client)
+        operator fun invoke(api: API = API.PRODUCTION): GizzTapesApiClient {
+            return RealGizzTapesApiClient(api)
+        }
+
+        operator fun invoke(client: HttpClient, api: API = API.PRODUCTION): GizzTapesApiClient {
+            return RealGizzTapesApiClient(api, client)
+        }
     }
 
     suspend fun shows(): Either<Exception, List<PartialShowData>>
@@ -22,6 +32,7 @@ interface GizzTapesApiClient {
 }
 
 private class RealGizzTapesApiClient(
+    api: API,
     client: HttpClient = HttpClient(),
 ) : GizzTapesApiClient {
     private val client = client.config {
