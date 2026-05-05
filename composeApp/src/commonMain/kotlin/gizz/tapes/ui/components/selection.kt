@@ -119,7 +119,9 @@ fun SelectionRow(
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
             onError = {
-                logger.e { "Error loading image: ${it.result.throwable}" }
+                logger.e(it.result.throwable) {
+                    "Error loading image: ${it.result.request.data}"
+                }
             },
             modifier = Modifier
                 .width(80.dp)
