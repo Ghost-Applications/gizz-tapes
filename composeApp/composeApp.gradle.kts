@@ -74,6 +74,7 @@ kotlin {
             implementation(libs.coil.network.ktor3)
 
             implementation(libs.arrow.resilience)
+            implementation(libs.arrow.fx)
 
             api(libs.metro.viewmodel)
         }
@@ -81,6 +82,7 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.compose.ui.test)
         }
 
         desktopMain.dependencies {
@@ -97,6 +99,8 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.metro.android)
+
+            implementation(libs.compose.ui.tooling)
 
             implementation(libs.media3.exoplayer)
             implementation(libs.media3.session)

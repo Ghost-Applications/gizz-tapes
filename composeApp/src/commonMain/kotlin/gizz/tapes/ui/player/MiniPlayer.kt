@@ -26,23 +26,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import coil3.compose.AsyncImage
 import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.ui.components.PlaybackError
+import gizz.tapes.ui.components.PosterImage
 
 @Composable
 fun MiniPlayer(
+    modifier: Modifier = Modifier,
     playerState: PlayerState,
+    playerActions: PlayerActions,
+    playerError: PlaybackError,
     onClick: (FullShowTitle) -> Unit,
-    onPlayAction: () -> Unit,
-    onPauseAction: () -> Unit,
-    playerError: (PlayerError) -> Unit,
 ) {
     Logger.d { "MiniPlayer: playerState=$playerState" }
 
     AnimatedVisibility(
+        modifier = modifier,
         visible = playerState is PlayerState.MediaLoaded,
         enter = slideInVertically { it },
         exit = slideOutVertically { it },
@@ -56,8 +61,13 @@ fun MiniPlayer(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .shadow(
+                    elevation = 4.dp,
+                    ambientColor = Color.Black,
+                    spotColor = Color.Black
+                )
                 .background(MaterialTheme.colorScheme.surfaceContainer)
-                .clickable { onClick(state.showTitle) }
+                .clickable { onClick(state.showTitle) },
         ) {
             Row(
                 modifier = Modifier
@@ -65,8 +75,8 @@ fun MiniPlayer(
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                AsyncImage(
-                    model = state.artworkUri,
+                PosterImage(
+                    posterUrl = PosterUrl(state.artworkUri),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(48.dp)
@@ -98,7 +108,13 @@ fun MiniPlayer(
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )
 
-                IconButton(onClick = if (state.isPlaying) onPauseAction else onPlayAction) {
+                IconButton(
+                    onClick = if (state.isPlaying) {
+                        playerActions.pause
+                    } else {
+                        playerActions.play
+                    }
+                ) {
                     Icon(
                         imageVector = if (state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = if (state.isPlaying) "Pause" else "Play"

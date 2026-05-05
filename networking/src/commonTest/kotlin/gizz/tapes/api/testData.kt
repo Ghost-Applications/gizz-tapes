@@ -3,58 +3,126 @@ package gizz.tapes.api
 val showsJson = """
 [    
     {
-        "id": "2024-09-08",
-        "date": "2024-09-08",
+        "id": "2022-10-07",
+        "date": "2022-10-07",
+        "venuename": "KEXP Studios",
+        "location": "Seattle, WA, USA",
+        "title": null,
+        "order": 1,
+        "poster_url": null,
+        "average_rating": 4.5,
+        "count_ratings": 6,
+        "weighted_rating": 4.475755593392184
+    },
+    {
+        "id": "2022-10-10",
+        "date": "2022-10-10",
         "venuename": "Red Rocks Amphitheatre",
         "location": "Morrison, CO, USA",
-        "title": "",
+        "title": "Marathon Night 1",
         "order": 1,
-        "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg"
+        "poster_url": "https://i.songfishapp.com/kglw/650a917b532a1-red_rocks_2022.jpg",
+        "average_rating": 4.7,
+        "count_ratings": 43,
+        "weighted_rating": 4.6782138438796474
     },
     {
-        "id": "2024-09-09early",
-        "date": "2024-09-09",
+        "id": "2022-10-11",
+        "date": "2022-10-11",
         "venuename": "Red Rocks Amphitheatre",
         "location": "Morrison, CO, USA",
-        "title": "Early Show",
+        "title": "Marathon Night 2",
         "order": 1,
-        "poster_url": "https://kglw.net/i/poster-art-1699403422.png"
+        "poster_url": "https://i.songfishapp.com/kglw/650a917b532a1-red_rocks_2022.jpg",
+        "average_rating": 4.8,
+        "count_ratings": 40,
+        "weighted_rating": 4.767823558723091
     },
     {
-        "id": "2024-09-09late",
-        "date": "2024-09-09",
-        "venuename": "Red Rocks Amphitheatre",
-        "location": "Morrison, CO, USA",
-        "title": "Late Show",
-        "order": 2,
-        "poster_url": "https://kglw.net/i/poster-art-1699403442.jpeg"
+        "id": "2022-10-14",
+        "date": "2022-10-14",
+        "venuename": "Palace Theatre",
+        "location": "St. Paul, MN, USA",
+        "title": null,
+        "order": 1,
+        "poster_url": "https://kglw.net/i/poster-art-1678284680.jpeg",
+        "average_rating": 4.8,
+        "count_ratings": 6,
+        "weighted_rating": 4.6574150676958315
     },
     {
-        "id": "2024-09-11",
-        "date": "2024-09-11",
-        "venuename": "Edgefield Amphitheater",
-        "location": "Troutdale, OR, USA",
-        "title": "",
+        "id": "2022-10-15",
+        "date": "2022-10-15",
+        "venuename": "Radius",
+        "location": "Chicago, IL, USA",
+        "title": null,
         "order": 1,
-        "poster_url": "https://kglw.net/i/poster-art-1699403482.jpeg"
+        "poster_url": "https://i.songfishapp.com/kglw/650a9248536a5-chicago_2022.jpg",
+        "average_rating": 4.4,
+        "count_ratings": 8,
+        "weighted_rating": 4.412649259852024
+    }
+]
+""".trimIndent()
+
+val heroPhotosJson = """
+[
+    {
+        "credit": "John Doe",
+        "url": "https://example.com/photo.jpg",
+        "vPosition": 50
+    }
+]
+""".trimIndent()
+
+val yearsJson = """
+[
+    {
+        "year": 2022,
+        "show_count": 5,
+        "poster_url": "https://example.com/poster.jpg"
     },
     {
-        "id": "2024-09-12",
-        "date": "2024-09-12",
-        "venuename": "Pacific Coliseum",
-        "location": "Vancouver, BC, Canada",
-        "title": "",
-        "order": 1,
-        "poster_url": "https://kglw.net/i/poster-art-1699403518.jpeg"
-    },
+        "year": 2023,
+        "show_count": 10,
+        "poster_url": null
+    }
+]
+""".trimIndent()
+
+val statsJson = """
+{
+    "latest_year": 2024,
+    "earliest_year": 2012,
+    "total_shows": 100,
+    "total_recordings": 200,
+    "hours": 500,
+    "minutes": 30,
+    "sbd_count": 150,
+    "aud_count": 50
+}
+""".trimIndent()
+
+val countriesJson = """
+[
     {
-        "id": "2024-09-14",
-        "date": "2024-09-14",
-        "venuename": "The Gorge Amphitheatre",
-        "location": "Quincy, WA, USA",
-        "title": "Marathon Show",
-        "order": 1,
-        "poster_url": "https://kglw.net/i/poster-art-1694538149.jpeg"
+        "id": 1,
+        "name": "USA",
+        "show_count": 100
+    }
+]
+""".trimIndent()
+
+val venuesJson = """
+[
+    {
+        "id": 726,
+        "slug": "edgefield-amphitheater",
+        "name": "Edgefield Amphitheater",
+        "city": "Troutdale",
+        "region": "OR",
+        "country_id": 1,
+        "show_count": 5
     }
 ]
 """.trimIndent()
@@ -73,6 +141,9 @@ val showJson = """
         },
         "venue_id": 726,
         "tour_id": 52,
+        "average_rating": 3.7,
+        "count_ratings": 3,
+        "weighted_rating": 4.117837112143297
         "recordings": [
             {
                 "id": "kglw2024-09-11.bandcampbootlegger",

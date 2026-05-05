@@ -30,9 +30,36 @@ fun <IN, OUT, E> LCE<IN, E>.map(transform: (IN) -> OUT): LCE<OUT, E> =
         LCE.Loading -> this as LCE<OUT, E>
     }
 
+fun <IN, OUT, E> LCE<IN, E>.flatMap(transform: (IN) -> LCE<OUT, E>): LCE<OUT, E> = when (this) {
+    is LCE.Error -> this
+    is LCE.Content -> transform(value)
+    LCE.Loading -> this as LCE<OUT, E>
+}
+
+suspend fun <IN, OUT, E> LCE<IN, E>.suspendMap(transform: suspend (IN) -> OUT): LCE<OUT, E> =
+    when (this) {
+        is LCE.Error -> this
+        is LCE.Content -> LCE.Content(transform(value))
+        LCE.Loading -> this as LCE<OUT, E>
+    }
+
+suspend fun <IN, OUT, E> LCE<IN, E>.suspendFlatMap(transform: suspend (IN) -> LCE<OUT, E>): LCE<OUT, E> =
+    when (this) {
+        is LCE.Error -> this
+        is LCE.Content -> transform(value)
+        LCE.Loading -> this as LCE<OUT, E>
+    }
+
 fun <IN, OUT, E> LCE<List<IN>, E>.mapCollection(transform: (IN) -> OUT): LCE<List<OUT>, E> =
     when (this) {
         is LCE.Error -> this
         is LCE.Content -> LCE.Content(value.map(transform))
         LCE.Loading -> this as LCE<List<OUT>, E>
     }
+
+sealed interface LC<out CONTENT> {
+    data object Loading : LC<Nothing>
+    data class Content<out C>(
+        val content: C
+    ) : LC<C>
+}

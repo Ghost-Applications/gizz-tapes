@@ -3,7 +3,7 @@ package gizz.tapes.ui.settings
 import androidx.datastore.core.DataStore
 import gizz.tapes.api.data.Recording.Type
 import gizz.tapes.data.Settings
-import gizz.tapes.util.LCE
+import gizz.tapes.util.LC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -40,7 +40,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when datastore is loading from disc screen state should be loading`() = runTest {
-        val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
+        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
         val classUnderTest = SettingsViewModel(
             dataStore = object : DataStore<Settings> {
                 override val data: Flow<Settings> = flow { }
@@ -54,15 +54,15 @@ class SettingsViewModelTest {
         }
         advanceUntilIdle()
         job.cancelAndJoin()
-        assertEquals<List<LCE<SettingsScreenState, Nothing>>>(
-            expected = listOf(LCE.Loading),
+        assertEquals<List<LC<SettingsScreenState>>>(
+            expected = listOf(LC.Loading),
             actual = emittedValues
         )
     }
 
     @Test
     fun `when datastore data is loaded the value should be returned in the state`() = runTest {
-        val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
+        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
         val classUnderTest = SettingsViewModel(
             dataStore = object : DataStore<Settings> {
                 val dataStateFlow = MutableStateFlow(Settings())
@@ -77,15 +77,15 @@ class SettingsViewModelTest {
         }
         advanceUntilIdle()
         job.cancelAndJoin()
-        assertEquals<List<LCE<SettingsScreenState, Nothing>>>(
-            expected = listOf(LCE.Content(SettingsScreenState(Type.SBD))),
+        assertEquals<List<LC<SettingsScreenState>>>(
+            expected = listOf(LC.Content(SettingsScreenState(Type.SBD))),
             actual = emittedValues
         )
     }
 
     @Test
     fun `updatePreferredRecordingType should update saved preferred recording type`() = runTest {
-        val emittedValues = mutableListOf<LCE<SettingsScreenState, Nothing>>()
+        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
         val classUnderTest = SettingsViewModel(
             dataStore = object : DataStore<Settings> {
                 val dataStateFlow = MutableStateFlow(Settings())
@@ -105,10 +105,10 @@ class SettingsViewModelTest {
         classUnderTest.updatePreferredRecordingType(Type.MTX)
         advanceUntilIdle()
         job.cancelAndJoin()
-        assertEquals<List<LCE<SettingsScreenState, Nothing>>>(
+        assertEquals<List<LC<SettingsScreenState>>>(
             expected = listOf(
-                LCE.Content(SettingsScreenState(Type.SBD)),
-                LCE.Content(SettingsScreenState(Type.MTX))
+                LC.Content(SettingsScreenState(Type.SBD)),
+                LC.Content(SettingsScreenState(Type.MTX))
             ),
             actual = emittedValues
         )

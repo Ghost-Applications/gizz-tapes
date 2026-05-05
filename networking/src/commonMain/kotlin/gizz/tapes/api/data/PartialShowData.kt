@@ -14,5 +14,11 @@ data class PartialShowData(
     val title: String?,
     val order: UShort,
     @SerialName("poster_url")
-    val posterUrl: String?
+    val posterUrl: String?,
+    @SerialName("average_rating")
+    val averageRating: Float?,
+    @SerialName("count_ratings")
+    val countRatings: Float,
+    @SerialName("weighted_rating")
+    val weightedRating: Float?,
 )

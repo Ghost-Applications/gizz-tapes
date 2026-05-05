@@ -9,7 +9,7 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import gizz.tapes.api.data.Recording
 import gizz.tapes.data.Settings
-import gizz.tapes.util.LCE
+import gizz.tapes.util.LC
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,16 +25,16 @@ class SettingsViewModel(
     private val dataStore: DataStore<Settings>,
 ) : ViewModel() {
 
-    val settingsState: StateFlow<LCE<SettingsScreenState, Nothing>> = loadSettings().stateIn(
+    val settingsState: StateFlow<LC<SettingsScreenState>> = loadSettings().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
-        initialValue = LCE.Loading
+        initialValue = LC.Loading
     )
 
-    private fun loadSettings(): Flow<LCE<SettingsScreenState, Nothing>> = flow {
+    private fun loadSettings(): Flow<LC<SettingsScreenState>> = flow {
         dataStore.data
             .map { SettingsScreenState(it.preferredRecordingType) }
-            .map { LCE.Content(it) }
+            .map { LC.Content(it) }
             .collect { emit(it) }
     }
 

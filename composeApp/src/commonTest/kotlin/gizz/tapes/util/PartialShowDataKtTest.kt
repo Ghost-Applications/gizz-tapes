@@ -15,7 +15,10 @@ class PartialShowDataKtTest {
             location = "Minneapolis, MN, USA",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg",
+            averageRating = 1f,
+            countRatings = 1f,
+            weightedRating = 1f,
         )
 
         assertEquals("The Armory - Minneapolis, MN, USA", partialShowData.showTitle)
@@ -30,7 +33,10 @@ class PartialShowDataKtTest {
             location = "Minneapolis, MN, USA",
             title = null,
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         )
 
         assertEquals("The Armory - Minneapolis, MN, USA", partialShowData.showTitle)
@@ -45,7 +51,10 @@ class PartialShowDataKtTest {
             location = "Minneapolis, MN, USA",
             title = "Greatest Show Ever",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         )
 
         assertEquals("The Armory - Greatest Show Ever - Minneapolis, MN, USA", partialShowData.showTitle)

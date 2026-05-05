@@ -1,5 +1,7 @@
 package gizz.tapes.ui.components
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,16 +34,18 @@ fun navigationUpIcon(navigateUp: NavigateUp): @Composable () -> Unit = {
 }
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalCoilApi::class)
-fun gizzIcon(): @Composable () -> Unit = {
+fun gizzIcon(modifier: Modifier = Modifier): @Composable () -> Unit = {
     val previewHandler = AsyncImagePreviewHandler {
         ColorImage(Color.Cyan.toArgb())
     }
 
     CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
-        AsyncImage(
-            model = Res.getUri("drawable/gizz_tapes_logo.svg"),
-            contentDescription = null,
-            modifier = Modifier.size(36.dp)
-        )
+        Box(modifier = Modifier.padding(start = 16.dp)) {
+            AsyncImage(
+                model = Res.getUri("drawable/gizz_tapes_logo.svg"),
+                contentDescription = null,
+                modifier = modifier.size(32.dp)
+            )
+        }
     }
 }

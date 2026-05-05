@@ -1,9 +1,8 @@
 package gizz.tapes.ui.components
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -18,26 +17,40 @@ import gizz.tapes.LocalPlatformActions
 import gizz.tapes.data.Title
 import gizz.tapes.nav.NavigateUp
 import gizz.tapes.ui.player.PlayerError
-import gizz.tapes.util.LCE
 import kotlinx.coroutines.launch
+
+fun interface GizzScaffoldContent {
+    @Composable
+    operator fun invoke(innerPadding: PaddingValues, onPlaybackError: PlaybackError)
+}
+
+fun interface PlaybackError {
+    operator fun invoke(error: PlayerError)
+}
+
+fun interface TopAppBar {
+    @Composable
+    operator fun invoke()
+}
+
+fun interface BottomBar {
+    @Composable
+    operator fun invoke()
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> GizzScaffold(
+fun GizzScaffold(
     title: Title,
-    state: LCE<T, Throwable>,
     navigateUp: (NavigateUp)?,
     actions: @Composable RowScope.() -> Unit,
-    content: @Composable (value: T, playerError: (PlayerError) -> Unit) -> Unit
+    content: GizzScaffoldContent
 ) {
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val titleComposable: @Composable () -> Unit = { TopAppBarText(title) }
-
     val platformActions = LocalPlatformActions.current
-    val appBar: @Composable () -> Unit = {
+
+    val topAppBar: @Composable () -> Unit = {
         TopAppBar(
-            title = titleComposable,
+            title = { TopAppBarText(title) },
             navigationIcon = if (navigateUp == null) gizzIcon() else navigationUpIcon(navigateUp),
             actions = {
                 platformActions()
@@ -46,38 +59,37 @@ fun <T> GizzScaffold(
         )
     }
 
+    GizzScaffold(
+        topAppBar = topAppBar,
+        bottomBar = null,
+        content = content
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GizzScaffold(
+    topAppBar: TopAppBar,
+    bottomBar: BottomBar?,
+    content: GizzScaffoldContent
+) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = {
             SnackbarHost(snackbarHostState)
         },
-        topBar = appBar,
+        topBar = topAppBar::invoke,
+        bottomBar = bottomBar?.let { bottomBar::invoke } ?: {}
     ) { innerPadding ->
-        AnimatedContent(
-            label = "Gizz Scaffold",
-            targetState = state,
-            contentKey = { current ->
-                when (current) {
-                    is LCE.Content -> "Content"
-                    is LCE.Error -> "Error"
-                    LCE.Loading -> "Loading"
-                }
-            },
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) { s ->
-            when (s) {
-                is LCE.Error -> ErrorScreen(error = s.error)
-                is LCE.Content -> content(s.value) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            it.message,
-                            duration = SnackbarDuration.Long
-                        )
-                    }
-                }
-                LCE.Loading -> LoadingScreen()
+        content(innerPadding) { playerError ->
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = playerError.message,
+                    duration = SnackbarDuration.Long
+                )
             }
         }
     }

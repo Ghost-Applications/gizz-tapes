@@ -9,12 +9,18 @@ import arrow.core.nonEmptyListOf
 import arrow.core.right
 import com.google.common.truth.Truth.assertThat
 import gizz.tapes.api.GizzTapesApiClient
+import gizz.tapes.api.data.Country
+import gizz.tapes.api.data.HeroPhoto
 import gizz.tapes.api.data.InternetArchive
 import gizz.tapes.api.data.KglwFile
 import gizz.tapes.api.data.KglwNet
 import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Recording
+import gizz.tapes.api.data.SetType
 import gizz.tapes.api.data.Show
+import gizz.tapes.api.data.Stats
+import gizz.tapes.api.data.Venue
+import gizz.tapes.api.data.YearData
 import gizz.tapes.stub
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
@@ -37,7 +43,10 @@ class MediaItemTreeTest {
                         location = "Location 1",
                         title = "Title 1",
                         posterUrl = "https://example.com/poster1.jpg",
-                        order = 1U
+                        order = 1U,
+                        averageRating = 0f,
+                        countRatings = 0f,
+                        weightedRating = 0f,
                     ),
                     PartialShowData(
                         id = "2",
@@ -46,7 +55,10 @@ class MediaItemTreeTest {
                         location = "Location 2",
                         title = "Title 2",
                         posterUrl = "https://example.com/poster2.jpg",
-                        order = 2U
+                        order = 2U,
+                        averageRating = 0f,
+                        countRatings = 0f,
+                        weightedRating = 0f,
                     ),
                     PartialShowData(
                         id = "3",
@@ -55,13 +67,23 @@ class MediaItemTreeTest {
                         location = "Location 3",
                         title = "Title 3",
                         posterUrl = "https://example.com/poster3.jpg",
-                        order = 3U
+                        order = 3U,
+                        averageRating = 0f,
+                        countRatings = 0f,
+                        weightedRating = 0f,
                     )
                 ).right()
             }
         }
 
-        data class ShowTestData(val mediaId: String, val title: String, val albumArtwork: Uri?, val isPlayable: Boolean?, val isBrowsable: Boolean?, val mediaType: Int?)
+        data class ShowTestData(
+            val mediaId: String,
+            val title: String,
+            val albumArtwork: Uri?,
+            val isPlayable: Boolean?,
+            val isBrowsable: Boolean?,
+            val mediaType: Int?
+        )
 
         val result = MediaItemTree(apiClient).getChildren(MediaId.RootId).map {
             ShowTestData(
@@ -114,7 +136,10 @@ class MediaItemTreeTest {
                         location = "Location 1",
                         title = "Title 1",
                         posterUrl = "https://example.com/poster1.jpg",
-                        order = 1U
+                        order = 1U,
+                        averageRating = 0f,
+                        countRatings = 0f,
+                        weightedRating = 0f,
                     ),
                     PartialShowData(
                         id = "2",
@@ -123,7 +148,10 @@ class MediaItemTreeTest {
                         location = "Location 2",
                         title = "Title 2",
                         posterUrl = "https://example.com/poster2.jpg",
-                        order = 2U
+                        order = 2U,
+                        averageRating = 0f,
+                        countRatings = 0f,
+                        weightedRating = 0f,
                     ),
                     PartialShowData(
                         id = "3",
@@ -132,13 +160,24 @@ class MediaItemTreeTest {
                         location = "Location 3",
                         title = "Title 3",
                         posterUrl = "https://example.com/poster3.jpg",
-                        order = 3U
+                        order = 3U,
+                        averageRating = 0f,
+                        countRatings = 0f,
+                        weightedRating = 0f,
                     )
                 ).right()
             }
         }
 
-        data class ShowTestData(val mediaId: String, val title: String, val displayTitle: String, val artworkUri: Uri?, val isPlayable: Boolean?, val isBrowsable: Boolean?, val mediaType: Int?)
+        data class ShowTestData(
+            val mediaId: String,
+            val title: String,
+            val displayTitle: String,
+            val artworkUri: Uri?,
+            val isPlayable: Boolean?,
+            val isBrowsable: Boolean?,
+            val mediaType: Int?
+        )
 
         val result = MediaItemTree(apiClient).getChildren(MediaId.YearId("2021")).map {
             ShowTestData(
@@ -194,22 +233,38 @@ class MediaItemTreeTest {
                     location = "Location 1",
                     title = "Title 1",
                     posterUrl = "https://example.com/poster1.jpg",
-                    order = 1U
+                    order = 1U,
+                    averageRating = 0f,
+                    countRatings = 0f,
+                    weightedRating = 0f,
                 )
             ).right()
 
             override suspend fun show(id: String): Either<Exception, Show> = Show(
-                id = id, date = LocalDate(
+                id = id,
+                date = LocalDate(
                     2021,
                     5,
                     20
-                ), title = "Title 1", posterUrl = "https://example.com/poster1.jpg",
-                order = 1U, notes = "show notes", kglwNet = KglwNet(id = 10U, permalink = "http://example.com"),
-                venueId = 10U, tourId = 1U,
+                ),
+                title = "Title 1",
+                posterUrl = "https://example.com/poster1.jpg",
+                order = 1U,
+                notes = "show notes",
+                kglwNet = KglwNet(id = 10U, permalink = "http://example.com"),
+                venueId = 10U,
+                tourId = 1U,
+                averageRating = 0f,
+                countRatings = 0f,
+                weightedRating = 0f,
                 recordings = nonEmptyListOf(
                     Recording(
-                        id = "kglw2024-11-20archie", uploadedAt = Instant.fromEpochMilliseconds(2000),
-                        type = Recording.Type.SBD, source = null, lineage = null, taper = null,
+                        id = "kglw2024-11-20archie",
+                        uploadedAt = Instant.fromEpochMilliseconds(2000),
+                        type = Recording.Type.SBD,
+                        source = null,
+                        lineage = null,
+                        taper = null,
                         files = nonEmptyListOf(
                             KglwFile("01-Intro.mp3", 10.seconds, "Intro"),
                             KglwFile("02-Rattlesnake.mp3", 629.seconds, "Rattlesnake"),
@@ -220,28 +275,103 @@ class MediaItemTreeTest {
                     )
                 )
             ).right()
+
+            override suspend fun search(query: String): Either<Exception, List<PartialShowData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun search(
+                query: String,
+                vararg setTypeId: Int
+            ): Either<Exception, List<PartialShowData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun search(
+                query: String,
+                setTypeIds: Set<Int>
+            ): Either<Exception, List<PartialShowData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun heroPhotos(): Either<Exception, List<HeroPhoto>> {
+                error("Not implemented")
+            }
+
+            override suspend fun years(): Either<Exception, List<YearData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun stats(): Either<Exception, Stats> {
+                error("Not implemented")
+            }
+
+            override suspend fun countries(): Either<Exception, List<Country>> {
+                error("Not implemented")
+            }
+
+            override suspend fun venues(): Either<Exception, List<Venue>> {
+                error("Not implemented")
+            }
+
+            override suspend fun setTypes(): Either<Exception, List<SetType>> {
+                error("Not implemented")
+            }
         }
 
-        data class TestData(val mediaId: String, val title: String, val displayTitle: String, val artist: String, val albumTitle: String, val albumArtist: String, val releaseYear: Int?, val releaseMonth: Int?, val releaseDay: Int?, val artworkUri: Uri?, val isBrowsable: Boolean?, val isPlayable: Boolean?, val mediaType: Int?)
+        data class TestData(
+            val mediaId: String,
+            val title: String,
+            val displayTitle: String,
+            val artist: String,
+            val albumTitle: String,
+            val albumArtist: String,
+            val releaseYear: Int?,
+            val releaseMonth: Int?,
+            val releaseDay: Int?,
+            val artworkUri: Uri?,
+            val isBrowsable: Boolean?,
+            val isPlayable: Boolean?,
+            val mediaType: Int?
+        )
 
         val result = MediaItemTree(apiClient)
             .getChildren(MediaId.ShowId(parent = MediaId.YearId("2021"), showId = "1"))
             .map {
                 TestData(
-                    it.mediaId, it.mediaMetadata.title.toString(), it.mediaMetadata.displayTitle.toString(),
-                    it.mediaMetadata.artist.toString(), it.mediaMetadata.albumTitle.toString(), it.mediaMetadata.albumArtist.toString(),
-                    it.mediaMetadata.releaseYear, it.mediaMetadata.releaseMonth, it.mediaMetadata.releaseDay,
-                    it.mediaMetadata.artworkUri, it.mediaMetadata.isBrowsable, it.mediaMetadata.isPlayable, it.mediaMetadata.mediaType
+                    it.mediaId,
+                    it.mediaMetadata.title.toString(),
+                    it.mediaMetadata.displayTitle.toString(),
+                    it.mediaMetadata.artist.toString(),
+                    it.mediaMetadata.albumTitle.toString(),
+                    it.mediaMetadata.albumArtist.toString(),
+                    it.mediaMetadata.releaseYear,
+                    it.mediaMetadata.releaseMonth,
+                    it.mediaMetadata.releaseDay,
+                    it.mediaMetadata.artworkUri,
+                    it.mediaMetadata.isBrowsable,
+                    it.mediaMetadata.isPlayable,
+                    it.mediaMetadata.mediaType
                 )
             }
 
         assertThat(result).containsExactly(
             TestData(
-                "root/2021/1/kglw2024-11-20archie", "Title 1", "SBD: kglw2024-11-20archie ",
-                "2021/5/20 Venue 1 - Title 1 - Location 1", "Venue 1 - Title 1 - Location 1", "King Gizzard & The Lizard Wizard",
-                2021, 5, 20, Uri.parse(
+                "root/2021/1/kglw2024-11-20archie",
+                "Title 1",
+                "SBD: kglw2024-11-20archie ",
+                "2021/5/20 Venue 1 - Title 1 - Location 1",
+                "Venue 1 - Title 1 - Location 1",
+                "King Gizzard & The Lizard Wizard",
+                2021,
+                5,
+                20,
+                Uri.parse(
                     "https://example.com/poster1.jpg"
-                ), true, true, MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
+                ),
+                true,
+                true,
+                MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
             )
         )
     }
@@ -257,22 +387,38 @@ class MediaItemTreeTest {
                     location = "Location 1",
                     title = "Title 1",
                     posterUrl = "https://example.com/poster1.jpg",
-                    order = 1U
+                    order = 1U,
+                    averageRating = 0f,
+                    countRatings = 0f,
+                    weightedRating = 0f,
                 )
             ).right()
 
             override suspend fun show(id: String): Either<Exception, Show> = Show(
-                id = id, date = LocalDate(
+                id = id,
+                date = LocalDate(
                     2021,
                     5,
                     20
-                ), title = "Title 1", posterUrl = "https://example.com/poster1.jpg",
-                order = 1U, notes = "show notes", kglwNet = KglwNet(id = 10U, permalink = "http://example.com"),
-                venueId = 10U, tourId = 1U,
+                ),
+                title = "Title 1",
+                posterUrl = "https://example.com/poster1.jpg",
+                order = 1U,
+                notes = "show notes",
+                kglwNet = KglwNet(id = 10U, permalink = "http://example.com"),
+                venueId = 10U,
+                tourId = 1U,
+                averageRating = 0f,
+                countRatings = 0f,
+                weightedRating = 0f,
                 recordings = nonEmptyListOf(
                     Recording(
-                        id = "kglw2024-11-20archie", uploadedAt = Instant.fromEpochMilliseconds(2000),
-                        type = Recording.Type.SBD, source = null, lineage = null, taper = null,
+                        id = "kglw2024-11-20archie",
+                        uploadedAt = Instant.fromEpochMilliseconds(2000),
+                        type = Recording.Type.SBD,
+                        source = null,
+                        lineage = null,
+                        taper = null,
                         files = nonEmptyListOf(
                             KglwFile("01-Intro.mp3", 10.seconds, "Intro"),
                             KglwFile("02-Rattlesnake.mp3", 629.seconds, "Rattlesnake"),
@@ -283,9 +429,65 @@ class MediaItemTreeTest {
                     )
                 )
             ).right()
+
+            override suspend fun search(query: String): Either<Exception, List<PartialShowData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun search(
+                query: String,
+                vararg setTypeId: Int
+            ): Either<Exception, List<PartialShowData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun search(
+                query: String,
+                setTypeIds: Set<Int>
+            ): Either<Exception, List<PartialShowData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun heroPhotos(): Either<Exception, List<HeroPhoto>> {
+                error("Not implemented")
+            }
+
+            override suspend fun years(): Either<Exception, List<YearData>> {
+                error("Not implemented")
+            }
+
+            override suspend fun stats(): Either<Exception, Stats> {
+                error("Not implemented")
+            }
+
+            override suspend fun countries(): Either<Exception, List<Country>> {
+                error("Not implemented")
+            }
+
+            override suspend fun venues(): Either<Exception, List<Venue>> {
+                error("Not implemented")
+            }
+
+            override suspend fun setTypes(): Either<Exception, List<SetType>> {
+                error("Not implemented")
+            }
         }
 
-        data class TestData(val mediaId: String, val title: String, val artist: String, val albumTitle: String, val albumArtist: String, val duration: Long?, val artworkUri: Uri?, val isBrowsable: Boolean?, val isPlayable: Boolean?, val recordingYear: Int?, val recordingMonth: Int?, val recordingDay: Int?, val mediaType: Int?)
+        data class TestData(
+            val mediaId: String,
+            val title: String,
+            val artist: String,
+            val albumTitle: String,
+            val albumArtist: String,
+            val duration: Long?,
+            val artworkUri: Uri?,
+            val isBrowsable: Boolean?,
+            val isPlayable: Boolean?,
+            val recordingYear: Int?,
+            val recordingMonth: Int?,
+            val recordingDay: Int?,
+            val mediaType: Int?
+        )
 
         val result = MediaItemTree(apiClient)
             .getChildren(
@@ -296,23 +498,74 @@ class MediaItemTreeTest {
             )
             .map {
                 TestData(
-                    it.mediaId, it.mediaMetadata.title.toString(), it.mediaMetadata.artist.toString(),
-                    it.mediaMetadata.albumTitle.toString(), it.mediaMetadata.albumArtist.toString(), it.mediaMetadata.durationMs,
-                    it.mediaMetadata.artworkUri, it.mediaMetadata.isBrowsable, it.mediaMetadata.isPlayable,
-                    it.mediaMetadata.recordingYear, it.mediaMetadata.recordingMonth, it.mediaMetadata.recordingDay, it.mediaMetadata.mediaType
+                    it.mediaId,
+                    it.mediaMetadata.title.toString(),
+                    it.mediaMetadata.artist.toString(),
+                    it.mediaMetadata.albumTitle.toString(),
+                    it.mediaMetadata.albumArtist.toString(),
+                    it.mediaMetadata.durationMs,
+                    it.mediaMetadata.artworkUri,
+                    it.mediaMetadata.isBrowsable,
+                    it.mediaMetadata.isPlayable,
+                    it.mediaMetadata.recordingYear,
+                    it.mediaMetadata.recordingMonth,
+                    it.mediaMetadata.recordingDay,
+                    it.mediaMetadata.mediaType
                 )
             }
 
         assertThat(result).containsExactly(
-            TestData("root/2021/1/kglw2024-11-20archie/01-Intro.mp3", "Intro", "2021/5/20 Title 1", "Title 1", "King Gizzard & The Lizard Wizard", 10000L, Uri.parse(
-                "https://example.com/poster1.jpg"
-            ), false, true, 2021, 5, 20, MediaMetadata.MEDIA_TYPE_MUSIC),
-            TestData("root/2021/1/kglw2024-11-20archie/02-Rattlesnake.mp3", "Rattlesnake", "2021/5/20 Title 1", "Title 1", "King Gizzard & The Lizard Wizard", 629000L, Uri.parse(
-                "https://example.com/poster1.jpg"
-            ), false, true, 2021, 5, 20, MediaMetadata.MEDIA_TYPE_MUSIC),
-            TestData("root/2021/1/kglw2024-11-20archie/03-O.N.E..mp3", "O.N.E.", "2021/5/20 Title 1", "Title 1", "King Gizzard & The Lizard Wizard", 229000L, Uri.parse(
-                "https://example.com/poster1.jpg"
-            ), false, true, 2021, 5, 20, MediaMetadata.MEDIA_TYPE_MUSIC)
+            TestData(
+                "root/2021/1/kglw2024-11-20archie/01-Intro.mp3",
+                "Intro",
+                "2021/5/20 Title 1",
+                "Title 1",
+                "King Gizzard & The Lizard Wizard",
+                10000L,
+                Uri.parse(
+                    "https://example.com/poster1.jpg"
+                ),
+                false,
+                true,
+                2021,
+                5,
+                20,
+                MediaMetadata.MEDIA_TYPE_MUSIC
+            ),
+            TestData(
+                "root/2021/1/kglw2024-11-20archie/02-Rattlesnake.mp3",
+                "Rattlesnake",
+                "2021/5/20 Title 1",
+                "Title 1",
+                "King Gizzard & The Lizard Wizard",
+                629000L,
+                Uri.parse(
+                    "https://example.com/poster1.jpg"
+                ),
+                false,
+                true,
+                2021,
+                5,
+                20,
+                MediaMetadata.MEDIA_TYPE_MUSIC
+            ),
+            TestData(
+                "root/2021/1/kglw2024-11-20archie/03-O.N.E..mp3",
+                "O.N.E.",
+                "2021/5/20 Title 1",
+                "Title 1",
+                "King Gizzard & The Lizard Wizard",
+                229000L,
+                Uri.parse(
+                    "https://example.com/poster1.jpg"
+                ),
+                false,
+                true,
+                2021,
+                5,
+                20,
+                MediaMetadata.MEDIA_TYPE_MUSIC
+            )
         )
     }
 }
