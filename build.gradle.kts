@@ -1,10 +1,7 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import gizz.gradle.isNonStable
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    alias(libs.plugins.version.check)
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.compose.multiplatform) apply false
     alias(libs.plugins.kotlin.multiplatform.android.library) apply false
@@ -44,11 +41,5 @@ tasks.withType<Detekt>().configureEach {
         html.required = true
         xml.required = false
         txt.required = false
-    }
-}
-
-tasks.withType<DependencyUpdatesTask> {
-    rejectVersionIf {
-        isNonStable(candidate.version)
     }
 }

@@ -2,23 +2,23 @@
 # values used in build scripts
 compose-compiler = "1.5.15"
 compose = "1.10.3"
-android-sdk = "36"
+android-sdk = "37"
 android-min-sdk = "28"
 
-agp = "9.1.0"
+agp = "9.1.1"
 detekt = "1.23.8"
-kotlin = "2.3.20"
+kotlin = "2.3.21"
 coroutines = "1.10.2"
-ktor = "3.4.2"
+ktor = "3.4.3"
 arrow = "2.2.2.1"
 androidx-lifecycle = "2.10.0"
 coil = "3.4.0"
-metro = "0.12.1"
+metro = "1.0.0"
 media3 = "1.10.0"
-firebase-bom = "34.11.0"
+firebase-bom = "34.12.0"
 
 [libraries]
-kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0"
+kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0"
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test",  version.ref = "coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
@@ -93,9 +93,8 @@ kotlin-multiplatform-android-library = { id = "com.android.kotlin.multiplatform.
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = "org.jetbrains.compose:1.10.3"
-version-check = "com.github.ben-manes.versions:0.53.0"
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 google-services = "com.google.gms.google-services:4.4.4"
-firebase-crashlytics = "com.google.firebase.crashlytics:3.0.6"
+firebase-crashlytics = "com.google.firebase.crashlytics:3.0.7"
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
