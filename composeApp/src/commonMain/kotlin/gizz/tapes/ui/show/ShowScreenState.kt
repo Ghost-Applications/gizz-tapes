@@ -1,6 +1,10 @@
-package gizz.tapes.data
+package gizz.tapes.ui.show
 
 import arrow.core.NonEmptyList
+import gizz.tapes.data.PosterUrl
+import gizz.tapes.data.RecordingData
+import gizz.tapes.data.TrackDuration
+import gizz.tapes.data.TrackTitle
 
 data class ShowScreenState(
     val removeOldMediaItemsAndAddNew: (startIndex: Int) -> Unit,

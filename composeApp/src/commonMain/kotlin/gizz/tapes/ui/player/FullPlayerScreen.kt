@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Pause
@@ -40,14 +41,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import gizz.tapes.LocalPlatformActions
 import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.ShowId
 import gizz.tapes.nav.NavigateUp
+import gizz.tapes.ui.components.PosterImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -180,13 +183,14 @@ private fun PortraitPlayerContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        AsyncImage(
-            model = state.artworkUri,
+        PosterImage(
+            posterUrl = PosterUrl(state.artworkUri),
             contentDescription = "Album artwork",
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.FillHeight,
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .aspectRatio(1f)
+                .clip(RoundedCornerShape(4.dp))
         )
 
         Spacer(Modifier.height(24.dp))
@@ -276,8 +280,8 @@ private fun LandscapePlayerContent(
             .padding(horizontal = 24.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        AsyncImage(
-            model = state.artworkUri,
+        PosterImage(
+            posterUrl = PosterUrl(state.artworkUri),
             contentDescription = "Album artwork",
             contentScale = ContentScale.Crop,
             modifier = Modifier

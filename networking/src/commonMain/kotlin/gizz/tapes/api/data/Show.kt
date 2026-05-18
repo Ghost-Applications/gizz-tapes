@@ -22,5 +22,12 @@ data class Show(
     @SerialName("tour_id")
     val tourId: UInt,
     @Serializable(NonEmptyListSerializer::class)
-    val recordings: NonEmptyList<Recording>
+    val recordings: NonEmptyList<Recording>,
+    val sets: List<ShowSet> = emptyList(),
+    @SerialName("average_rating")
+    val averageRating: Float?,
+    @SerialName("count_ratings")
+    val countRatings: Float,
+    @SerialName("weighted_rating")
+    val weightedRating: Float?,
 )

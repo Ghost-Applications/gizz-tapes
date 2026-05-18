@@ -10,7 +10,11 @@ import platform.UIKit.UIViewController
 @Suppress("FunctionName", "unused")
 fun MainViewController(): UIViewController {
     val appGraph = createGraphFactory<IosAppGraph.Factory>().create(AppContext())
-    return ComposeUIViewController {
+    return ComposeUIViewController(
+        configure = {
+            enforceStrictPlistSanityCheck = false
+        }
+    ) {
         CompositionLocalProvider(LocalMetroViewModelFactory provides appGraph.metroViewModelFactory) {
             GizzTapesApp()
         }

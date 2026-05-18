@@ -2,9 +2,13 @@ package gizz.tapes.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,8 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,23 +30,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
-import coil3.compose.AsyncImage
+import gizz.tapes.GizzTapesTheme
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.nav.NavigateUp
 import gizz.tapes.ui.player.MiniPlayer
+import gizz.tapes.ui.player.PlayerActions
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.util.LCE
 import gizz_tapes.composeapp.generated.resources.Res
 import gizz_tapes.composeapp.generated.resources.app_name
 import org.jetbrains.compose.resources.stringResource
-
-private val logger = Logger.withTag("SelectionScreen")
 
 data class SelectionData(
     val title: Title,
@@ -49,52 +56,67 @@ data class SelectionData(
 @Composable
 fun SelectionScreen(
     title: Title = Title(stringResource(Res.string.app_name)),
-    state: LCE<List<SelectionData>, Throwable>,
+    state: LCE<List<SelectionData>, Exception>,
     playerState: PlayerState,
-    onPauseAction: () -> Unit,
-    onPlayAction: () -> Unit,
+    playerActions: PlayerActions,
     navigateUp: NavigateUp?,
     onMiniPlayerClick: (FullShowTitle) -> Unit,
     actions: @Composable RowScope.() -> Unit,
 ) {
     GizzScaffold(
         title = title,
-        state = state,
         navigateUp = navigateUp,
         actions = actions
-    ) { value, playerError ->
+    ) { innerPadding, playerError ->
         Column {
-            SelectionList(
-                Modifier.weight(1f),
-                value
-            )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+                    .weight(1f).padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                    ),
+                contentPadding = PaddingValues(
+                    top = 16.dp,
+                    bottom = 16.dp,
+                    start = 8.dp,
+                    end = 8.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                when (state) {
+                    is LCE.Content<List<SelectionData>> -> selectionList(state.value)
+                    is LCE.Error<Exception> -> item {
+                        ErrorScreen(
+                            error = state.error,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    LCE.Loading -> loadingRows()
+                }
+            }
             MiniPlayer(
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
                 playerState = playerState,
                 onClick = onMiniPlayerClick,
-                onPauseAction = onPauseAction,
-                onPlayAction = onPlayAction,
+                playerActions = playerActions,
                 playerError = playerError
             )
         }
     }
 }
 
-@Composable
-fun SelectionList(
-    modifier: Modifier = Modifier,
+private fun LazyListScope.selectionList(
     data: List<SelectionData>,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize()
-    ) {
-        items(data) { (title, subtitle, imageUrl, onClick) ->
-            SelectionRow(
-                title = title,
-                subtitle = subtitle,
-                posterUrl = imageUrl,
-                onClick = onClick
-            )
-        }
+    items(data) { (title, subtitle, imageUrl, onClick) ->
+        SelectionRow(
+            title = title,
+            subtitle = subtitle,
+            posterUrl = imageUrl,
+            onClick = onClick
+        )
     }
 }
 
@@ -105,52 +127,47 @@ fun SelectionRow(
     posterUrl: PosterUrl,
     onClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .padding(4.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .fillMaxWidth()
-            .height(96.dp)
-            .clickable(onClick = onClick)
+    Card(
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        AsyncImage(
-            model = posterUrl.value,
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            onError = {
-                logger.e(it.result.throwable) {
-                    "Error loading image: ${it.result.request.data}"
-                }
-            },
+        Row(
             modifier = Modifier
-                .width(80.dp)
-                .fillMaxHeight()
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .align(Alignment.CenterVertically)
+                .clip(RoundedCornerShape(GizzTapesTheme.size.selectionRowCorner))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .fillMaxWidth()
+                .height(GizzTapesTheme.size.selectionRowSize)
+                .clickable(onClick = onClick)
         ) {
-            Text(
-                text = title.value,
-                style = MaterialTheme.typography.bodyLarge
+            PosterImage(
+                posterUrl = posterUrl,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .width(80.dp)
+                    .fillMaxHeight()
             )
-            Text(
-                text = subtitle.value,
-                style = MaterialTheme.typography.bodySmall
-            )
+
+            Column(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = title.value,
+                    style = MaterialTheme.typography.titleMedium,
+                    autoSize = TextAutoSize.StepBased(
+                        maxFontSize = MaterialTheme.typography.titleMedium.fontSize
+                    ),
+                    modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
+                )
+                Text(
+                    text = subtitle.value,
+                    style = MaterialTheme.typography.titleSmall,
+                    autoSize = TextAutoSize.StepBased(
+                        maxFontSize = MaterialTheme.typography.titleSmall.fontSize
+                    ),
+                    modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
+                )
+            }
         }
     }
-}
-
-@Preview
-@Composable
-fun SelectionRowPreview() {
-    SelectionRow(
-        title = Title("Great State Park - Bonnaroo Music & Arts Festival Manchester, TN, USA"),
-        subtitle = Subtitle("Subtitle"),
-        posterUrl = PosterUrl(null)
-    ) { }
 }

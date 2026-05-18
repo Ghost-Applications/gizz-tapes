@@ -31,7 +31,7 @@ import gizz.tapes.api.data.Recording
 import gizz.tapes.nav.NavigateUp
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.navigationUpIcon
-import gizz.tapes.util.LCE
+import gizz.tapes.util.LC
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +50,7 @@ fun SettingsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    state: LCE<SettingsScreenState, Nothing>,
+    state: LC<SettingsScreenState>,
     onRecordingTypeSelected: (Recording.Type) -> Unit,
     navigateUp: NavigateUp,
 ) {
@@ -65,10 +65,9 @@ fun SettingsScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (state) {
-                is LCE.Error -> error("This should never happen: $state")
-                LCE.Loading -> LoadingScreen()
-                is LCE.Content -> SettingsContent(
-                    state = state.value,
+                LC.Loading -> LoadingScreen()
+                is LC.Content -> SettingsContent(
+                    state = state.content,
                     onRecordingTypeSelected = onRecordingTypeSelected
                 )
             }

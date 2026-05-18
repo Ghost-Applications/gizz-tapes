@@ -31,6 +31,7 @@ kotlin {
 
             implementation(libs.ktor.json)
             implementation(libs.ktor.content.negotiation)
+            implementation(libs.ktor.logging)
 
             implementation(libs.arrow.fx)
         }

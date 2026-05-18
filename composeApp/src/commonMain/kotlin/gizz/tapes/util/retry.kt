@@ -3,6 +3,7 @@ package gizz.tapes.util
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.resilience.Schedule
+import arrow.resilience.retry
 import arrow.resilience.retryEither
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -16,7 +17,8 @@ suspend inline fun <Output> retryUntilSuccessful(
     action: () -> Either<Exception, Output>,
     crossinline onErrorAfter3SecondsAction: suspend (error: Exception) -> Unit,
 ): LCE.Content<Output> {
-    return Schedule.exponential<Exception>(100.milliseconds).doWhile { _, duration -> duration < 3.seconds }
+    return Schedule.exponential<Exception>(100.milliseconds)
+        .doWhile { _, duration -> duration < 3.seconds }
         .andThen(
             Schedule.doWhile { error, _ ->
                 onErrorAfter3SecondsAction(error)
@@ -27,4 +29,12 @@ suspend inline fun <Output> retryUntilSuccessful(
         .retryEither(action)
         .map { LCE.Content(it) }
         .getOrElse { throw it }
+}
+
+suspend inline fun <Output> retry(
+    times: Long = 3,
+    noinline action: suspend () -> Either<Exception, Output>
+): Either<Exception, Output> {
+    return Schedule.recurs<Exception>(times)
+        .retry(action)
 }

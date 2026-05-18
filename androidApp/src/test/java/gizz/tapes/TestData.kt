@@ -16,7 +16,6 @@ import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.RecordingData
 import gizz.tapes.data.RecordingId
 import gizz.tapes.data.ShowId
-import gizz.tapes.data.ShowScreenState
 import gizz.tapes.data.ShowSelectionData
 import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
@@ -27,6 +26,7 @@ import gizz.tapes.data.YearSelectionData
 import gizz.tapes.playback.MediaId
 import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerState
+import gizz.tapes.ui.show.ShowScreenState
 import gizz.tapes.util.LCE.Content
 import gizz.tapes.util.map
 import gizz.tapes.util.showTitle
@@ -77,27 +77,27 @@ val yearData = Content(
         YearSelectionData(
             year = Year("2024"),
             showCount = 32,
-            randomShowPoster = PosterUrl("https://kglw.net/i/poster-art-1699403231.jpeg")
+            poster = PosterUrl("https://kglw.net/i/poster-art-1699403231.jpeg")
         ),
         YearSelectionData(
             year = Year("2023"),
             showCount = 10,
-            randomShowPoster = PosterUrl("https://kglw.net/i/poster-art-1699403282.jpeg")
+            poster = PosterUrl("https://kglw.net/i/poster-art-1699403282.jpeg")
         ),
         YearSelectionData(
             year = Year("2022"),
             showCount = 5,
-            randomShowPoster = PosterUrl(null)
+            poster = PosterUrl(null)
         ),
         YearSelectionData(
             year = Year("2021"),
             showCount = 32,
-            randomShowPoster = PosterUrl(null)
+            poster = PosterUrl(null)
         ),
         YearSelectionData(
             year = Year("2020"),
             showCount = 32,
-            randomShowPoster = PosterUrl(null)
+            poster = PosterUrl(null)
         )
     )
 )
@@ -111,7 +111,10 @@ val partialShowData = Content(
             location = "Minneapolis, MN, USA",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-04",
@@ -120,7 +123,10 @@ val partialShowData = Content(
             location = "Milwaukee, WI, USA",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403282.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403282.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-05",
@@ -129,7 +135,10 @@ val partialShowData = Content(
             location = "St. Louis, MO, USA",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403317.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403317.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-06",
@@ -138,7 +147,10 @@ val partialShowData = Content(
             location = "Omaha, NE, USA",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403370.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403370.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-08",
@@ -147,7 +159,10 @@ val partialShowData = Content(
             location = "Morrison, CO, USA",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403394.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403394.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-09early",
@@ -156,7 +171,10 @@ val partialShowData = Content(
             location = "Morrison, CO, USA",
             title = "Early Show",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403422.png"
+            posterUrl = "https://kglw.net/i/poster-art-1699403422.png",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-09late",
@@ -165,7 +183,10 @@ val partialShowData = Content(
             location = "Morrison, CO, USA",
             title = "Late Show",
             order = 2.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403442.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403442.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-11",
@@ -174,7 +195,10 @@ val partialShowData = Content(
             location = "Troutdale, OR, USA",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403482.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403482.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-12",
@@ -183,7 +207,10 @@ val partialShowData = Content(
             location = "Vancouver, BC, Canada",
             title = "",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1699403518.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1699403518.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         ),
         PartialShowData(
             id = "2024-09-14",
@@ -192,7 +219,10 @@ val partialShowData = Content(
             location = "Quincy, WA, USA",
             title = "Marathon Show",
             order = 1.toUShort(),
-            posterUrl = "https://kglw.net/i/poster-art-1694538149.jpeg"
+            posterUrl = "https://kglw.net/i/poster-art-1694538149.jpeg",
+            averageRating = null,
+            countRatings = 0f,
+            weightedRating = null
         )
     )
 )
@@ -211,6 +241,9 @@ val show = Show(
     ),
     venueId = 726.toUInt(),
     tourId = 52.toUInt(),
+    averageRating = null,
+    countRatings = 0f,
+    weightedRating = null,
     recordings = nonEmptyListOf(
         Recording(
             id = "kglw2024-09-11.bandcampbootlegger",

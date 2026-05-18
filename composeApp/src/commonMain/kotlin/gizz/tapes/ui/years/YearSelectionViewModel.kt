@@ -17,9 +17,11 @@ import gizz.tapes.data.YearSelectionData
 import gizz.tapes.util.ForViewModel
 import gizz.tapes.util.LCE
 import gizz.tapes.util.retryUntilSuccessful
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -35,50 +37,61 @@ class YearSelectionViewModel(
 
     private val logger = Logger.withTag("YearSelectionViewModel")
 
-    val sortOrder: StateFlow<SortOrder> = settingsDataStore.data
+    private val sortOrder: StateFlow<SortOrder> = settingsDataStore.data
         .map { it.yearSortOrder }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = SortOrder.Ascending
+            initialValue = SortOrder.Descending
         )
 
-    val years = loadYears().stateIn(
+    val years = loadSortedYears().stateIn(
         scope = viewModelScope,
         started = SharingStarted.ForViewModel,
         initialValue = LCE.Loading
     )
 
-    fun updateSortOrder(sortOrder: SortOrder) {
+    fun toggleSortOrder() {
         viewModelScope.launch {
-            settingsDataStore.updateData { it.copy(yearSortOrder = sortOrder) }
+            settingsDataStore.updateData { it.copy(yearSortOrder = !sortOrder.value) }
         }
     }
 
-    private fun loadYears(): Flow<LCE<List<YearSelectionData>, Throwable>> {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun loadSortedYears(): Flow<LCE<List<YearSelectionData>, Exception>> {
+        return settingsDataStore.data
+            .map { it.yearSortOrder }
+            .flatMapLatest {
+                loadYears(it)
+            }
+    }
+
+    private fun loadYears(sortOrder: SortOrder): Flow<LCE<List<YearSelectionData>, Exception>> {
         return flow {
-            val state = retryUntilSuccessful(
+            val years = retryUntilSuccessful(
                 action = {
-                    apiClient.shows().map {
-                        it.groupBy { show -> show.date.year }
-                            .map { (year, shows) ->
-                                YearSelectionData(
-                                    year = Year(year),
-                                    showCount = shows.count(),
-                                    randomShowPoster = PosterUrl(shows.random().posterUrl)
-                                )
-                            }
-                            .reversed()
+                    apiClient.years().map { years ->
+                        if (sortOrder == SortOrder.Ascending) {
+                            years.sortedBy { it.year }
+                        } else {
+                            years.sortedByDescending { it.year }
+                        }.map {
+                            YearSelectionData(
+                                year = Year(it.year),
+                                showCount = it.showCount,
+                                poster = PosterUrl(it.posterUrl)
+                            )
+                        }
                     }
                 },
                 onErrorAfter3SecondsAction = { error ->
                     logger.d(error) { "Error loading years." }
                     emit(
-                        LCE.Error(error = error)
+                        LCE.Error(error)
                     )
                 }
             )
-            emit(state)
+            emit(years)
         }
     }
 }

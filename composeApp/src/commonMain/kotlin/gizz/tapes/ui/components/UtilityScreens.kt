@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import gizz_tapes.composeapp.generated.resources.Res
 import gizz_tapes.composeapp.generated.resources.api_error_message
 import org.jetbrains.compose.resources.stringResource
 
+// TODO switch to shimmer
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
     Box(
@@ -31,6 +33,12 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
+    }
+}
+
+fun LazyListScope.loadingRows() {
+    items(10) {
+        SelectionItemRowShimmer()
     }
 }
 

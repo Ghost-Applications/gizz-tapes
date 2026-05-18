@@ -9,29 +9,53 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import gizz.tapes.nav.Destination.ShowSelection.SelectionType
+import gizz.tapes.nav.Destination.ShowSelection.SelectionType.ByYear
+import gizz.tapes.ui.MainScreen
+import gizz.tapes.ui.MainScreenNavigation
 import gizz.tapes.ui.about.AboutScreen
 import gizz.tapes.ui.player.FullPlayerScreen
 import gizz.tapes.ui.selection.ShowSelectionScreen
 import gizz.tapes.ui.settings.SettingsScreen
 import gizz.tapes.ui.show.ShowScreen
-import gizz.tapes.ui.years.YearSelectionScreen
+import gizz.tapes.ui.venue.VenueSelectionScreen
 
 @Composable
 fun GizzTapesNavController(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Destination.YearSelection
+        startDestination = Destination.Main
     ) {
-        composable<Destination.YearSelection> {
-            YearSelectionScreen(
-                onYearClicked = { year ->
-                    navController.navigate(Destination.ShowSelection(year))
-                },
-                onMiniPlayerClick = { title ->
-                    navController.navigate(Destination.Player(title))
-                },
-                onAboutClick = { navController.navigate(Destination.About) },
-                onSettingsClick = { navController.navigate(Destination.Settings) },
+        composable<Destination.Main> {
+            MainScreen(
+                navigation = MainScreenNavigation(
+                    navigateToSettingsScreen = { navController.navigate(Destination.Settings) },
+                    navigateToAboutScreen = { navController.navigate(Destination.About) },
+                    navigateToShow = { id, title ->
+                        navController.navigate(
+                            Destination.Show(
+                                id,
+                                title
+                            )
+                        )
+                    },
+                    navigateToShowsInYear = {
+                        navController.navigate(
+                            Destination.ShowSelection(ByYear(it))
+                        )
+                    },
+                    navigateToCountryVenues = { id, name ->
+                        navController.navigate(
+                            Destination.CountryVenues(
+                                countryId = id,
+                                countryName = name
+                            )
+                        )
+                    },
+                    navigateToMusicPlayer = {
+                        navController.navigate(Destination.Player(it))
+                    }
+                )
             )
         }
 
@@ -72,6 +96,15 @@ fun GizzTapesNavController(navController: NavHostController) {
         composable<Destination.Settings> {
             SettingsScreen(navigateUp = { navController.navigateUp() })
         }
+
+        composable<Destination.CountryVenues> {
+            VenueSelectionScreen(
+                navigateUp = { navController.navigateUp() },
+                onVenueClicked = {
+                    navController.navigate(Destination.ShowSelection(SelectionType.ByVenue(it)))
+                }
+            )
+        }
     }
 }
 
@@ -95,7 +128,7 @@ private fun NavGraphBuilder.fullPlayerNavigation(navController: NavHostControlle
             navigateToShow = { showId, title ->
                 navController.clearBackStack<Destination.Player>()
                 navController.navigate(Destination.Show(showId, title)) {
-                    popUpTo(Destination.YearSelection)
+                    popUpTo(Destination.Main)
                 }
             },
             navigateUp = { navController.navigateUp() },

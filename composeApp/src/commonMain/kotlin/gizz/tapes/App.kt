@@ -6,6 +6,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
@@ -26,7 +27,8 @@ val Tertiary40 = Color(0xFF7F4D7B)
 private val DarkColorScheme = darkColorScheme(
     primary = Primary80,
     secondary = Secondary80,
-    tertiary = Tertiary80
+    tertiary = Tertiary80,
+    inverseOnSurface = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -34,6 +36,18 @@ private val LightColorScheme = lightColorScheme(
     secondary = Secondary40,
     tertiary = Tertiary40
 )
+
+object GizzTapesTheme {
+    object Sizes {
+        val gridCardSize = 188.dp
+        val selectionRowSize = 112.dp
+        val selectionRowCorner = 8.dp
+        val headerSize = 300.dp
+        val gridCellMinSize = 160.dp
+    }
+
+    val size = Sizes
+}
 
 @Composable
 fun GizzTapesTheme(

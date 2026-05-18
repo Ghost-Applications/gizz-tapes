@@ -1,117 +1,62 @@
 package gizz.tapes.ui.years
 
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import dev.zacsweers.metrox.viewmodel.metroViewModel
-import gizz.tapes.data.FullShowTitle
-import gizz.tapes.data.SortOrder
-import gizz.tapes.data.Subtitle
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import gizz.tapes.GizzTapesTheme
 import gizz.tapes.data.Title
-import gizz.tapes.data.Year
 import gizz.tapes.data.YearSelectionData
-import gizz.tapes.ui.components.SelectionData
-import gizz.tapes.ui.components.SelectionScreen
-import gizz.tapes.ui.player.PlayerState
-import gizz.tapes.ui.player.PlayerViewModel
+import gizz.tapes.ui.components.ErrorScreen
+import gizz.tapes.ui.components.GridItemCard
+import gizz.tapes.ui.components.loadingCards
 import gizz.tapes.util.LCE
-import gizz.tapes.util.map
-import gizz.tapes.util.mapCollection
 
 @Composable
 fun YearSelectionScreen(
-    viewModel: YearSelectionViewModel = metroViewModel(),
-    playerViewModel: PlayerViewModel = metroViewModel(),
-    onYearClicked: (Year) -> Unit,
-    onMiniPlayerClick: (FullShowTitle) -> Unit,
-    onAboutClick: () -> Unit,
-    onSettingsClick: () -> Unit,
+    state: LCE<List<YearSelectionData>, Exception>,
+    onYearClicked: YearClicked,
+    modifier: Modifier = Modifier
 ) {
-    val state by viewModel.years.collectAsState()
-    val sortOrder by viewModel.sortOrder.collectAsState()
-    val playerState by playerViewModel.playerState.collectAsState()
-    var showMenu by remember { mutableStateOf(false) }
+    LazyVerticalGrid(
+        state = rememberLazyGridState(),
+        columns = GridCells.Adaptive(
+            minSize = GizzTapesTheme.size.gridCellMinSize
+        ),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.fillMaxSize()
+    ) {
+        when (state) {
+            is LCE.Content<List<YearSelectionData>> -> content(state.value, onYearClicked)
+            is LCE.Error<Exception> -> item(span = { GridItemSpan(maxLineSpan) }) {
+                ErrorScreen(state.error)
+            }
 
-    YearSelectionScreen(
-        yearData = state,
-        sortOrder = sortOrder,
-        playerState = playerState,
-        onYearClicked = onYearClicked,
-        onMiniPlayerClick = onMiniPlayerClick,
-        onPauseAction = playerViewModel::pause,
-        onPlayAction = playerViewModel::play,
-        actions = {
-            IconButton(onClick = { viewModel.updateSortOrder(!sortOrder) }) {
-                Icon(Icons.Default.SortByAlpha, contentDescription = "Sort")
-            }
-            IconButton(onClick = { showMenu = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More")
-            }
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                DropdownMenuItem(
-                    text = { Text("About") },
-                    onClick = {
-                        showMenu = false
-                        onAboutClick()
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Settings") },
-                    onClick = {
-                        showMenu = false
-                        onSettingsClick()
-                    }
-                )
-            }
-        }
-    )
-}
-
-@Composable
-fun YearSelectionScreen(
-    yearData: LCE<List<YearSelectionData>, Throwable>,
-    sortOrder: SortOrder,
-    playerState: PlayerState,
-    onYearClicked: (year: Year) -> Unit,
-    onMiniPlayerClick: (title: FullShowTitle) -> Unit,
-    onPauseAction: () -> Unit,
-    onPlayAction: () -> Unit,
-    actions: @Composable RowScope.() -> Unit,
-) {
-    val selectionData = remember(yearData, sortOrder) {
-        yearData.mapCollection {
-            SelectionData(
-                title = Title(it.year.value),
-                subtitle = Subtitle("${it.showCount} shows"),
-                posterUrl = it.randomShowPoster,
-            ) { onYearClicked(it.year) }
-        }.let {
-            when (sortOrder) {
-                SortOrder.Ascending -> it
-                SortOrder.Descending -> it.map { data -> data.reversed() }
-            }
+            LCE.Loading -> loadingCards()
         }
     }
+}
 
-    SelectionScreen(
-        state = selectionData,
-        navigateUp = null,
-        onMiniPlayerClick = onMiniPlayerClick,
-        onPauseAction = onPauseAction,
-        onPlayAction = onPlayAction,
-        playerState = playerState,
-        actions = actions
-    )
+private fun LazyGridScope.content(
+    years: List<YearSelectionData>,
+    onYearClicked: YearClicked
+) {
+    items(years) { item ->
+        GridItemCard(
+            title = Title(item.year.value),
+            subtitle = null,
+            posterUrl = item.poster,
+            onClick = { onYearClicked(item.year) }
+        )
+    }
 }

@@ -14,15 +14,14 @@ import dev.zacsweers.metrox.viewmodel.metroViewModel
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.ShowSelectionData
-import gizz.tapes.data.SortOrder
 import gizz.tapes.data.Title
 import gizz.tapes.nav.NavigateUp
 import gizz.tapes.ui.components.SelectionData
 import gizz.tapes.ui.components.SelectionScreen
+import gizz.tapes.ui.player.PlayerActions
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.player.PlayerViewModel
 import gizz.tapes.util.LCE
-import gizz.tapes.util.map
 import gizz.tapes.util.mapCollection
 
 @Composable
@@ -35,20 +34,20 @@ internal fun ShowSelectionScreen(
 ) {
     val playerState by playerViewModel.playerState.collectAsState()
     val state by viewModel.shows.collectAsState()
-    val sortOrder by viewModel.sortOrder.collectAsState()
 
     ShowSelectionScreen(
-        screenTitle = Title(viewModel.showYear.value),
+        screenTitle = Title(viewModel.selectionType.title),
         state = state,
         playerState = playerState,
-        sortOrder = sortOrder,
         navigateUp = navigateUp,
         onShowClicked = onShowClicked,
         onMiniPlayerClick = onMiniPlayerClick,
-        onPauseAction = playerViewModel::pause,
-        onPlayAction = playerViewModel::play,
+        playerActions = PlayerActions(
+            pause = playerViewModel::pause,
+            play = playerViewModel::play,
+        ),
         actions = {
-            IconButton(onClick = { viewModel.updateSortOrder(!sortOrder) }) {
+            IconButton(onClick = { viewModel.toggleSortOrder() }) {
                 Icon(Icons.Default.SortByAlpha, contentDescription = "Sort by date")
             }
         }
@@ -58,28 +57,21 @@ internal fun ShowSelectionScreen(
 @Composable
 fun ShowSelectionScreen(
     screenTitle: Title,
-    state: LCE<List<ShowSelectionData>, Throwable>,
-    sortOrder: SortOrder,
+    state: LCE<List<ShowSelectionData>, Exception>,
     playerState: PlayerState,
     navigateUp: NavigateUp,
     onShowClicked: (ShowId, FullShowTitle) -> Unit,
     onMiniPlayerClick: (FullShowTitle) -> Unit,
-    onPauseAction: () -> Unit,
-    onPlayAction: () -> Unit,
+    playerActions: PlayerActions,
     actions: @Composable RowScope.() -> Unit,
 ) {
-    val selectionData = remember(state, sortOrder) {
+    val selectionData = remember(state) {
         state.mapCollection {
             SelectionData(
                 title = it.showTitle,
                 subtitle = it.showSubTitle,
                 posterUrl = it.posterUrl,
             ) { onShowClicked(it.showId, it.fullShowTitle) }
-        }.let { lce ->
-            when (sortOrder) {
-                SortOrder.Ascending -> lce
-                SortOrder.Descending -> lce.map { it.reversed() }
-            }
         }
     }
 
@@ -89,8 +81,7 @@ fun ShowSelectionScreen(
         navigateUp = navigateUp,
         onMiniPlayerClick = onMiniPlayerClick,
         playerState = playerState,
-        onPauseAction = onPauseAction,
-        onPlayAction = onPlayAction,
+        playerActions = playerActions,
         actions = actions
     )
 }
