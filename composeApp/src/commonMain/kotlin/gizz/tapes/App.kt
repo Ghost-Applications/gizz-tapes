@@ -43,7 +43,7 @@ object GizzTapesTheme {
         val selectionRowSize = 112.dp
         val selectionRowCorner = 8.dp
         val headerSize = 300.dp
-        val gridCellMinSize = 160.dp
+        val gridCellMinSize = 152.dp
     }
 
     val size = Sizes
