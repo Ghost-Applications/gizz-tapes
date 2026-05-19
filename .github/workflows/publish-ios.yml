@@ -31,6 +31,7 @@ jobs:
           bundler-cache: true
       - name: Build and upload to TestFlight
         env:
+          CHANGELOG: ${{ github.event.head_commit.message }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
