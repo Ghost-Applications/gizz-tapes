@@ -98,8 +98,15 @@ class ShowSelectionViewModel(
     ) { showsLce, sortOrder ->
         showsLce.map { shows ->
             when (sortOrder) {
-                SortOrder.Ascending -> shows.sortedBy { it.showTitle.value }
-                SortOrder.Descending -> shows.sortedByDescending { it.showTitle.value }
+                SortOrder.Ascending -> when (selectionType) {
+                    is SelectionType.ByVenue -> shows.sortedBy { it.showTitle.value }
+                    is SelectionType.ByYear -> shows.sortedBy { it.fullShowTitle.date }
+                }
+
+                SortOrder.Descending -> when (selectionType) {
+                    is SelectionType.ByVenue -> shows.sortedByDescending { it.showTitle.value }
+                    is SelectionType.ByYear -> shows.sortedByDescending { it.fullShowTitle.date }
+                }
             }
         }
     }.stateIn(

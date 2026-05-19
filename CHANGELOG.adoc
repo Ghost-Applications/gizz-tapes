@@ -3,6 +3,7 @@
 == KGLW
 
 - Fix App Icon Not Loading
+- Updated UI to new layout. Includes today is gizztory, venues, and search
 
 == JOJAM 2026-04-28
 
