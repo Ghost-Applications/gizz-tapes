@@ -29,7 +29,6 @@ fun PosterImage(
             }
         },
         error = painterResource(Res.drawable.missing),
-        placeholder = painterResource(Res.drawable.missing),
         modifier = modifier
     )
 }
