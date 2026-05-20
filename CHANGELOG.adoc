@@ -4,6 +4,7 @@
 
 - Fix App Icon Not Loading
 - Updated UI to new layout. Includes today is gizztory, venues, and search
+- added themed icon for Android 13+
 
 == JOJAM 2026-04-28
 
