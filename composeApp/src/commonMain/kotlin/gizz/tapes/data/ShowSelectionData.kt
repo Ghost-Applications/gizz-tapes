@@ -9,6 +9,7 @@ data class ShowSelectionData(
     val showTitle: Title,
     val showSubTitle: Subtitle,
     val posterUrl: PosterUrl,
+    val showOrder: UShort,
 ) {
     companion object {
         operator fun invoke(showData: PartialShowData): ShowSelectionData {
@@ -18,7 +19,8 @@ data class ShowSelectionData(
                 fullShowTitle = FullShowTitle(date = showData.date, title = title),
                 showTitle = title,
                 showSubTitle = Subtitle(showData.date),
-                posterUrl = PosterUrl.Companion(showData.posterUrl)
+                posterUrl = PosterUrl.Companion(showData.posterUrl),
+                showOrder = showData.order
             )
         }
     }

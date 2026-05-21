@@ -100,7 +100,7 @@ class HomeViewModel(
         fetchedShows.collect { showLce ->
             val latestShows = showLce.map { shows ->
                 shows.take(10)
-                    .map { show -> ShowSelectionData.Companion(show) }
+                    .map { show -> ShowSelectionData(show) }
                     .toNonEmptyListOrThrow()
             }
             emit(latestShows)

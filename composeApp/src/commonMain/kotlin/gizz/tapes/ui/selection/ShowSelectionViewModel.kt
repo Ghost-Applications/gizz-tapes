@@ -75,7 +75,8 @@ class ShowSelectionViewModel(
                             fullShowTitle = FullShowTitle(date = show.date, title = title),
                             showTitle = title,
                             showSubTitle = Subtitle(show.date),
-                            posterUrl = PosterUrl(show.posterUrl)
+                            posterUrl = PosterUrl(show.posterUrl),
+                            showOrder = show.order
                         )
                     }
                 }
@@ -98,15 +99,14 @@ class ShowSelectionViewModel(
     ) { showsLce, sortOrder ->
         showsLce.map { shows ->
             when (sortOrder) {
-                SortOrder.Ascending -> when (selectionType) {
-                    is SelectionType.ByVenue -> shows.sortedBy { it.showTitle.value }
-                    is SelectionType.ByYear -> shows.sortedBy { it.fullShowTitle.date }
-                }
-
-                SortOrder.Descending -> when (selectionType) {
-                    is SelectionType.ByVenue -> shows.sortedByDescending { it.showTitle.value }
-                    is SelectionType.ByYear -> shows.sortedByDescending { it.fullShowTitle.date }
-                }
+                SortOrder.Ascending -> shows.sortedWith(
+                    compareBy<ShowSelectionData> { it.fullShowTitle.date }
+                        .thenBy { it.showOrder }
+                )
+                SortOrder.Descending -> shows.sortedWith(
+                    compareByDescending<ShowSelectionData> { it.fullShowTitle.date }
+                        .thenByDescending { it.showOrder }
+                )
             }
         }
     }.stateIn(
