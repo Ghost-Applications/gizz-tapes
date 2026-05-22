@@ -12,7 +12,8 @@ val showsJson = """
         "poster_url": null,
         "average_rating": 4.5,
         "count_ratings": 6,
-        "weighted_rating": 4.475755593392184
+        "weighted_rating": 4.475755593392184,
+        "tags": []
     },
     {
         "id": "2022-10-10",
@@ -24,7 +25,8 @@ val showsJson = """
         "poster_url": "https://i.songfishapp.com/kglw/650a917b532a1-red_rocks_2022.jpg",
         "average_rating": 4.7,
         "count_ratings": 43,
-        "weighted_rating": 4.6782138438796474
+        "weighted_rating": 4.6782138438796474,
+        "tags": [3]
     },
     {
         "id": "2022-10-11",
@@ -36,7 +38,8 @@ val showsJson = """
         "poster_url": "https://i.songfishapp.com/kglw/650a917b532a1-red_rocks_2022.jpg",
         "average_rating": 4.8,
         "count_ratings": 40,
-        "weighted_rating": 4.767823558723091
+        "weighted_rating": 4.767823558723091,
+        "tags": [3, 2, 1]
     },
     {
         "id": "2022-10-14",
@@ -48,7 +51,8 @@ val showsJson = """
         "poster_url": "https://kglw.net/i/poster-art-1678284680.jpeg",
         "average_rating": 4.8,
         "count_ratings": 6,
-        "weighted_rating": 4.6574150676958315
+        "weighted_rating": 4.6574150676958315,
+        "tags": []
     },
     {
         "id": "2022-10-15",
@@ -60,7 +64,8 @@ val showsJson = """
         "poster_url": "https://i.songfishapp.com/kglw/650a9248536a5-chicago_2022.jpg",
         "average_rating": 4.4,
         "count_ratings": 8,
-        "weighted_rating": 4.412649259852024
+        "weighted_rating": 4.412649259852024,
+        "tags": []
     }
 ]
 """.trimIndent()
@@ -143,7 +148,8 @@ val showJson = """
         "tour_id": 52,
         "average_rating": 3.7,
         "count_ratings": 3,
-        "weighted_rating": 4.117837112143297
+        "weighted_rating": 4.117837112143297,
+        "tags": []
         "recordings": [
             {
                 "id": "kglw2024-09-11.bandcampbootlegger",

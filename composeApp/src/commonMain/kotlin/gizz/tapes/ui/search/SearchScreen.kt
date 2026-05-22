@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import gizz.tapes.api.data.PartialShowData
-import gizz.tapes.api.data.SetType
+import gizz.tapes.api.data.ShowTag
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.ShowId
@@ -68,7 +68,7 @@ fun SearchScreen(
 fun SearchScreen(
     modifier: Modifier = Modifier,
     state: SearchViewModel.State,
-    onSetTypeSelection: (Int) -> Unit,
+    onSetTypeSelection: (UInt) -> Unit,
     onSearch: (String) -> Unit,
     onShowClicked: ShowClick,
 ) {
@@ -122,10 +122,10 @@ fun SearchScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
-                when (state.setTypes) {
-                    is LC.Content<List<SetType>> -> {
+                when (state.showTags) {
+                    is LC.Content<List<ShowTag>> -> {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            state.setTypes.content.fastForEach {
+                            state.showTags.content.fastForEach {
                                 FilterChip(
                                     selected = it.id in state.selectedSetTypeIds,
                                     text = "${it.name} (${it.showCount})",

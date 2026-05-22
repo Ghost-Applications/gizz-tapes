@@ -19,6 +19,7 @@ class PartialShowDataKtTest {
             averageRating = 1f,
             countRatings = 1f,
             weightedRating = 1f,
+            tags = emptyList(),
         )
 
         assertEquals("The Armory - Minneapolis, MN, USA", partialShowData.showTitle)
@@ -36,7 +37,8 @@ class PartialShowDataKtTest {
             posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         )
 
         assertEquals("The Armory - Minneapolis, MN, USA", partialShowData.showTitle)
@@ -54,7 +56,8 @@ class PartialShowDataKtTest {
             posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         )
 
         assertEquals("The Armory - Greatest Show Ever - Minneapolis, MN, USA", partialShowData.showTitle)

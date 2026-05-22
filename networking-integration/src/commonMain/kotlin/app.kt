@@ -78,7 +78,7 @@ fun main() = runBlocking {
         }.let { add(it) }
 
         async {
-            api.setTypes().onLeft {
+            api.showTags().onLeft {
                 throw it
             }
         }.let { add(it) }

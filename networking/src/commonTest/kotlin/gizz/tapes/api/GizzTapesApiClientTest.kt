@@ -203,7 +203,8 @@ class GizzTapesApiClientTest {
                     "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg",
                     "average_rating": 3.7,
                     "count_ratings": 3,
-                    "weighted_rating": 4.117837112143297
+                    "weighted_rating": 4.117837112143297,
+                    "tags": []
                 }]
                 """.trimIndent(),
                 status = HttpStatusCode.OK,
@@ -233,7 +234,8 @@ class GizzTapesApiClientTest {
                     "poster_url": "https://kglw.net/i/poster-art-1699403394.jpeg",
                     "average_rating": 3.7,
                     "count_ratings": 3,
-                    "weighted_rating": 4.117837112143297
+                    "weighted_rating": 4.117837112143297,
+                    "tags": []
                 }]
                 """.trimIndent(),
                 status = HttpStatusCode.OK,

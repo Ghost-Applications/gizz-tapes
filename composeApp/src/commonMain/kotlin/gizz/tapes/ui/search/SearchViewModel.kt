@@ -9,7 +9,7 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.api.data.PartialShowData
-import gizz.tapes.api.data.SetType
+import gizz.tapes.api.data.ShowTag
 import gizz.tapes.util.ForViewModel
 import gizz.tapes.util.LC
 import gizz.tapes.util.LCE
@@ -32,18 +32,16 @@ class SearchViewModel(
     private val logger = Logger.withTag("SearchViewModel")
 
     data class State(
-        val setTypes: LC<List<SetType>>,
-        val selectedSetTypeIds: Set<Int>,
+        val showTags: LC<List<ShowTag>>,
+        val selectedSetTypeIds: Set<UInt>,
         val searchResults: LCE<List<PartialShowData>, Exception>,
         val query: String,
     )
 
-    private val setTypesLc = flow {
+    private val showTagsLce = flow {
         val setsLce = retryUntilSuccessful(
             action = {
-                apiClient.setTypes().map {
-                    it.filterNot { setType -> setType.name.equals("set", ignoreCase = true) }
-                }
+                apiClient.showTags()
             },
             onErrorAfter3SecondsAction = { error ->
                 logger.e(error) { "Error loading set types" }
@@ -57,10 +55,10 @@ class SearchViewModel(
     )
 
     private val searchQueryStateFlow = MutableStateFlow("")
-    private val searchSetTypeIds = MutableStateFlow(emptySet<Int>())
+    private val searchShowTagIds = MutableStateFlow(emptySet<UInt>())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val searchResultsLce = combine(searchQueryStateFlow, searchSetTypeIds) { searchQuery, setIds ->
+    private val searchResultsLce = combine(searchQueryStateFlow, searchShowTagIds) { searchQuery, setIds ->
         searchQuery to setIds
     }.flatMapLatest { (searchQuery, setIds) ->
         flow {
@@ -79,12 +77,12 @@ class SearchViewModel(
 
     val state = combine(
         searchResultsLce,
-        setTypesLc,
-        searchSetTypeIds,
+        showTagsLce,
+        searchShowTagIds,
         searchQueryStateFlow
-    ) { search, setTypes, selectedIds, query ->
+    ) { search, showTags, selectedIds, query ->
         State(
-            setTypes = setTypes,
+            showTags = showTags,
             selectedSetTypeIds = selectedIds,
             searchResults = search,
             query = query,
@@ -93,19 +91,19 @@ class SearchViewModel(
         scope = viewModelScope,
         started = SharingStarted.ForViewModel,
         initialValue = State(
-            setTypes = LC.Loading,
+            showTags = LC.Loading,
             selectedSetTypeIds = emptySet(),
             searchResults = LCE.Loading,
             query = ""
         )
     )
 
-    fun toggleSetTypeId(setTypeId: Int) {
-        searchSetTypeIds.update {
-            if (it.contains(setTypeId)) {
-                it - setTypeId
+    fun toggleSetTypeId(showTypeId: UInt) {
+        searchShowTagIds.update {
+            if (it.contains(showTypeId)) {
+                it - showTypeId
             } else {
-                it + setTypeId
+                it + showTypeId
             }
         }
     }
