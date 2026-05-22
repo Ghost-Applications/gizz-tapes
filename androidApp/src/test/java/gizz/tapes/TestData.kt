@@ -16,8 +16,6 @@ import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.RecordingData
 import gizz.tapes.data.RecordingId
 import gizz.tapes.data.ShowId
-import gizz.tapes.data.ShowSelectionData
-import gizz.tapes.data.Subtitle
 import gizz.tapes.data.Title
 import gizz.tapes.data.TrackDuration
 import gizz.tapes.data.TrackTitle
@@ -31,6 +29,7 @@ import gizz.tapes.util.LCE.Content
 import gizz.tapes.util.map
 import gizz.tapes.util.showTitle
 import kotlinx.datetime.LocalDate
+import kotlin.collections.emptyList
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -114,7 +113,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403231.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-04",
@@ -126,7 +126,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403282.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-05",
@@ -138,7 +139,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403317.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-06",
@@ -150,7 +152,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403370.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-08",
@@ -162,7 +165,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403394.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-09early",
@@ -174,7 +178,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403422.png",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-09late",
@@ -186,7 +191,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403442.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-11",
@@ -198,7 +204,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403482.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-12",
@@ -210,7 +217,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1699403518.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         ),
         PartialShowData(
             id = "2024-09-14",
@@ -222,7 +230,8 @@ val partialShowData = Content(
             posterUrl = "https://kglw.net/i/poster-art-1694538149.jpeg",
             averageRating = null,
             countRatings = 0f,
-            weightedRating = null
+            weightedRating = null,
+            tags = emptyList()
         )
     )
 )
@@ -244,6 +253,7 @@ val show = Show(
     averageRating = null,
     countRatings = 0f,
     weightedRating = null,
+    tags = emptyList(),
     recordings = nonEmptyListOf(
         Recording(
             id = "kglw2024-09-11.bandcampbootlegger",
@@ -303,15 +313,3 @@ val showContent = Content(
         )
     )
 )
-
-val showListContent = partialShowData.map { showData ->
-    showData.map { data ->
-        ShowSelectionData(
-            showTitle = Title(data.showTitle),
-            showId = ShowId(data.id),
-            fullShowTitle = FullShowTitle(date = data.date, title = Title(data.showTitle)),
-            showSubTitle = Subtitle(data.date),
-            posterUrl = PosterUrl(data.posterUrl)
-        )
-    }
-}

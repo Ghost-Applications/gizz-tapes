@@ -21,4 +21,5 @@ data class PartialShowData(
     val countRatings: Float,
     @SerialName("weighted_rating")
     val weightedRating: Float?,
+    val tags: List<UInt>,
 )

@@ -2,6 +2,9 @@
 set shell := ['bash', '-c']
 
 test:
+    ./gradlew test allTests detekt
+
+fullTest:
     ./gradlew test allTests runIntegrationTests detekt
 
 detekt:
@@ -15,6 +18,9 @@ build-debug:
 
 build-ios:
     xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -destination 'generic/platform=iOS' -configuration Release archive -archivePath build/iosApp.xcarchive
+
+runIntegrationTest:
+    ./gradlew :networking-integration:jvmRun
 
 release:
     bundle exec fastlane android release

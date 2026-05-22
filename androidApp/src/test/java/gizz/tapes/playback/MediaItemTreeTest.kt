@@ -16,8 +16,8 @@ import gizz.tapes.api.data.KglwFile
 import gizz.tapes.api.data.KglwNet
 import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Recording
-import gizz.tapes.api.data.SetType
 import gizz.tapes.api.data.Show
+import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
 import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
@@ -25,6 +25,7 @@ import gizz.tapes.stub
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import org.junit.Test
+import kotlin.collections.emptyList
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -47,6 +48,7 @@ class MediaItemTreeTest {
                         averageRating = 0f,
                         countRatings = 0f,
                         weightedRating = 0f,
+                        tags = emptyList(),
                     ),
                     PartialShowData(
                         id = "2",
@@ -59,6 +61,7 @@ class MediaItemTreeTest {
                         averageRating = 0f,
                         countRatings = 0f,
                         weightedRating = 0f,
+                        tags = emptyList()
                     ),
                     PartialShowData(
                         id = "3",
@@ -71,6 +74,7 @@ class MediaItemTreeTest {
                         averageRating = 0f,
                         countRatings = 0f,
                         weightedRating = 0f,
+                        tags = emptyList(),
                     )
                 ).right()
             }
@@ -140,6 +144,7 @@ class MediaItemTreeTest {
                         averageRating = 0f,
                         countRatings = 0f,
                         weightedRating = 0f,
+                        tags = emptyList(),
                     ),
                     PartialShowData(
                         id = "2",
@@ -152,6 +157,7 @@ class MediaItemTreeTest {
                         averageRating = 0f,
                         countRatings = 0f,
                         weightedRating = 0f,
+                        tags = emptyList(),
                     ),
                     PartialShowData(
                         id = "3",
@@ -164,6 +170,7 @@ class MediaItemTreeTest {
                         averageRating = 0f,
                         countRatings = 0f,
                         weightedRating = 0f,
+                        tags = emptyList(),
                     )
                 ).right()
             }
@@ -193,31 +200,31 @@ class MediaItemTreeTest {
 
         assertThat(result).containsExactly(
             ShowTestData(
-                "root/2021/3",
-                "Venue 3 - Title 3 - Location 3",
-                "2021/12/10 Venue 3 - Title 3 - Location 3",
-                Uri.parse("https://example.com/poster3.jpg"),
-                false,
-                true,
-                MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
+                mediaId = "root/2021/3",
+                title = "Venue 3 - Title 3 - Location 3",
+                displayTitle = "2021/12/10 Venue 3 - Title 3 - Location 3",
+                artworkUri = Uri.parse("https://example.com/poster3.jpg"),
+                isPlayable = false,
+                isBrowsable = true,
+                mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
             ),
             ShowTestData(
-                "root/2021/2",
-                "Venue 2 - Title 2 - Location 2",
-                "2021/8/15 Venue 2 - Title 2 - Location 2",
-                Uri.parse("https://example.com/poster2.jpg"),
-                false,
-                true,
-                MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
+                mediaId = "root/2021/2",
+                title = "Venue 2 - Title 2 - Location 2",
+                displayTitle = "2021/8/15 Venue 2 - Title 2 - Location 2",
+                artworkUri = Uri.parse("https://example.com/poster2.jpg"),
+                isPlayable = false,
+                isBrowsable = true,
+                mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
             ),
             ShowTestData(
-                "root/2021/1",
-                "Venue 1 - Title 1 - Location 1",
-                "2021/5/20 Venue 1 - Title 1 - Location 1",
-                Uri.parse("https://example.com/poster1.jpg"),
-                false,
-                true,
-                MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
+                mediaId = "root/2021/1",
+                title = "Venue 1 - Title 1 - Location 1",
+                displayTitle = "2021/5/20 Venue 1 - Title 1 - Location 1",
+                artworkUri = Uri.parse("https://example.com/poster1.jpg"),
+                isPlayable = false,
+                isBrowsable = true,
+                mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
             )
         )
     }
@@ -237,6 +244,7 @@ class MediaItemTreeTest {
                     averageRating = 0f,
                     countRatings = 0f,
                     weightedRating = 0f,
+                    tags = emptyList(),
                 )
             ).right()
 
@@ -257,6 +265,7 @@ class MediaItemTreeTest {
                 averageRating = 0f,
                 countRatings = 0f,
                 weightedRating = 0f,
+                tags = emptyList(),
                 recordings = nonEmptyListOf(
                     Recording(
                         id = "kglw2024-11-20archie",
@@ -282,14 +291,7 @@ class MediaItemTreeTest {
 
             override suspend fun search(
                 query: String,
-                vararg setTypeId: Int
-            ): Either<Exception, List<PartialShowData>> {
-                error("Not implemented")
-            }
-
-            override suspend fun search(
-                query: String,
-                setTypeIds: Set<Int>
+                showTagIds: Set<UInt>
             ): Either<Exception, List<PartialShowData>> {
                 error("Not implemented")
             }
@@ -314,7 +316,7 @@ class MediaItemTreeTest {
                 error("Not implemented")
             }
 
-            override suspend fun setTypes(): Either<Exception, List<SetType>> {
+            override suspend fun showTags(): Either<Exception, List<ShowTag>> {
                 error("Not implemented")
             }
         }
@@ -357,21 +359,21 @@ class MediaItemTreeTest {
 
         assertThat(result).containsExactly(
             TestData(
-                "root/2021/1/kglw2024-11-20archie",
-                "Title 1",
-                "SBD: kglw2024-11-20archie ",
-                "2021/5/20 Venue 1 - Title 1 - Location 1",
-                "Venue 1 - Title 1 - Location 1",
-                "King Gizzard & The Lizard Wizard",
-                2021,
-                5,
-                20,
-                Uri.parse(
+                mediaId = "root/2021/1/kglw2024-11-20archie",
+                title = "Title 1",
+                displayTitle = "SBD: kglw2024-11-20archie ",
+                artist = "2021/5/20 Venue 1 - Title 1 - Location 1",
+                albumTitle = "Venue 1 - Title 1 - Location 1",
+                albumArtist = "King Gizzard & The Lizard Wizard",
+                releaseYear = 2021,
+                releaseMonth = 5,
+                releaseDay = 20,
+                artworkUri = Uri.parse(
                     "https://example.com/poster1.jpg"
                 ),
-                true,
-                true,
-                MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
+                isBrowsable = true,
+                isPlayable = true,
+                mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
             )
         )
     }
@@ -391,6 +393,7 @@ class MediaItemTreeTest {
                     averageRating = 0f,
                     countRatings = 0f,
                     weightedRating = 0f,
+                    tags = emptyList(),
                 )
             ).right()
 
@@ -411,6 +414,7 @@ class MediaItemTreeTest {
                 averageRating = 0f,
                 countRatings = 0f,
                 weightedRating = 0f,
+                tags = emptyList(),
                 recordings = nonEmptyListOf(
                     Recording(
                         id = "kglw2024-11-20archie",
@@ -436,14 +440,7 @@ class MediaItemTreeTest {
 
             override suspend fun search(
                 query: String,
-                vararg setTypeId: Int
-            ): Either<Exception, List<PartialShowData>> {
-                error("Not implemented")
-            }
-
-            override suspend fun search(
-                query: String,
-                setTypeIds: Set<Int>
+                showTagIds: Set<UInt>
             ): Either<Exception, List<PartialShowData>> {
                 error("Not implemented")
             }
@@ -468,7 +465,7 @@ class MediaItemTreeTest {
                 error("Not implemented")
             }
 
-            override suspend fun setTypes(): Either<Exception, List<SetType>> {
+            override suspend fun showTags(): Either<Exception, List<ShowTag>> {
                 error("Not implemented")
             }
         }

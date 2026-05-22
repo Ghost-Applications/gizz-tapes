@@ -4,8 +4,8 @@ import arrow.core.Either
 import gizz.tapes.api.data.Country
 import gizz.tapes.api.data.HeroPhoto
 import gizz.tapes.api.data.PartialShowData
-import gizz.tapes.api.data.SetType
 import gizz.tapes.api.data.Show
+import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
 import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
@@ -37,14 +37,10 @@ interface GizzTapesApiClient {
     suspend fun shows(): Either<Exception, List<PartialShowData>>
     suspend fun show(id: String): Either<Exception, Show>
     suspend fun search(query: String): Either<Exception, List<PartialShowData>>
-    suspend fun search(
-        query: String,
-        vararg setTypeId: Int,
-    ): Either<Exception, List<PartialShowData>>
 
     suspend fun search(
         query: String,
-        setTypeIds: Set<Int>,
+        showTagIds: Set<UInt>,
     ): Either<Exception, List<PartialShowData>>
 
     suspend fun heroPhotos(): Either<Exception, List<HeroPhoto>>
@@ -52,7 +48,7 @@ interface GizzTapesApiClient {
     suspend fun stats(): Either<Exception, Stats>
     suspend fun countries(): Either<Exception, List<Country>>
     suspend fun venues(): Either<Exception, List<Venue>>
-    suspend fun setTypes(): Either<Exception, List<SetType>>
+    suspend fun showTags(): Either<Exception, List<ShowTag>>
 }
 
 private class RealGizzTapesApiClient(
@@ -89,16 +85,11 @@ private class RealGizzTapesApiClient(
 
     override suspend fun search(
         query: String,
-        vararg setTypeId: Int
-    ): Either<Exception, List<PartialShowData>> = search(query, setTypeId.toSet())
-
-    override suspend fun search(
-        query: String,
-        setTypeIds: Set<Int>
+        showTagIds: Set<UInt>
     ): Either<Exception, List<PartialShowData>> = Either.catchOrThrow {
         client.get("${api.url}/api/v1/search") {
             parameter("q", query)
-            setTypeIds.forEach { id ->
+            showTagIds.forEach { id ->
                 parameter("set_type_id", id)
             }
         }.body()
@@ -124,7 +115,7 @@ private class RealGizzTapesApiClient(
         client.get("${api.url}/api/v1/venues.json").body()
     }
 
-    override suspend fun setTypes(): Either<Exception, List<SetType>> = Either.catchOrThrow {
-        client.get("${api.url}/api/v1/set_types.json").body()
+    override suspend fun showTags(): Either<Exception, List<ShowTag>> = Either.catchOrThrow {
+        client.get("${api.url}/api/v1/show_tags.json").body()
     }
 }
