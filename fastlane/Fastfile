@@ -23,23 +23,34 @@ private_lane :perform_android_upload do
   ).strip
   UI.user_error!("No successful CI run found for commit #{current_sha}") if run_id.empty?
 
+  # Download APKs and FOSS AAB from ci.yml (full AAB comes from publish.yml below)
   download_dir = File.expand_path('../ci-artifacts')
   sh("rm -rf \"#{download_dir}\"")
-  sh("gh run download #{run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release -n android-foss-release -n android-full-release-aab -n android-foss-release-aab --dir \"#{download_dir}\"")
+  sh("gh run download #{run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release -n android-foss-release -n android-foss-release-aab --dir \"#{download_dir}\"")
 
-  full_release_aab = Dir.glob("#{download_dir}/android-full-release-aab/*.aab").first
-  UI.user_error!("Could not find full release AAB in downloaded artifacts") unless full_release_aab
+  # Download the full release AAB from the publish.yml run (same binary uploaded to Play Store)
+  version_bump_sha = sh("git log --follow -1 --format='%H' -- gradle.properties", log: false).strip
+  publish_run_id = sh(
+    "gh run list --repo Ghost-Applications/gizz-tapes --workflow publish.yml --commit #{version_bump_sha} --status success --limit 1 --json databaseId --jq '.[0].databaseId'",
+    log: false
+  ).strip
+  UI.user_error!("No successful publish run found for version bump commit #{version_bump_sha}") if publish_run_id.empty?
+
+  publish_dir = File.expand_path('../publish-artifacts')
+  sh("rm -rf \"#{publish_dir}\"")
+  sh("gh run download #{publish_run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release-aab --dir \"#{publish_dir}\"")
 
   upload_to_play_store(
-    track: 'production',
+    track: 'beta',
+    track_promote_to: 'production',
     skip_upload_apk: true,
-    skip_upload_changelogs: true,
-    aab: full_release_aab
+    skip_upload_aab: true,
+    skip_upload_changelogs: true
   )
 
   apk_files = Dir.glob("#{download_dir}/**/*.apk")
-  aab_files = Dir.glob("#{download_dir}/**/*.aab")
-  asc_files = Dir.glob("#{download_dir}/**/*.asc")
+  aab_files = Dir.glob("#{download_dir}/**/*.aab") + Dir.glob("#{publish_dir}/**/*.aab")
+  asc_files = Dir.glob("#{download_dir}/**/*.asc") + Dir.glob("#{publish_dir}/**/*.asc")
   upload_assets = apk_files + aab_files + asc_files
 
   if upload_assets.empty?

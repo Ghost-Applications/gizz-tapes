@@ -50,7 +50,7 @@ Publish a new build to open testing on Play Store
 [bundle exec] fastlane android release
 ```
 
-Release app to production and create github release
+Release Android and iOS to their respective stores, then bump version
 
 ----
 

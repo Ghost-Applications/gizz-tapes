@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'gradle.properties'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,5 +39,19 @@ jobs:
           GIZZ_TAPES_KEY_ALIAS: ${{ secrets.GIZZ_TAPES_KEY_ALIAS }}
           GIZZ_TAPES_KEY_PASSWORD: ${{ secrets.GIZZ_TAPES_KEY_PASSWORD }}
           GIZZ_TAPES_KEYSTORE_LOCATION: ./keys/release.jks
-          GIZZ_TAPES_BUILD_NUMBER: ${{ github.run_number }}
         run: bundle exe fastlane beta
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.PGP_KEY }}" > private.key
+          gpg --batch --passphrase "${{ secrets.PGP_PASSWORD }}" --import private.key
+      - name: Sign AAB with GPG
+        run: |
+          find androidApp/build/outputs/bundle/fullRelease -name "*.aab" | while read -r file; do
+            gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
+          done
+      - name: Upload full release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-full-release-aab
+          path: androidApp/build/outputs/bundle/fullRelease/
+          if-no-files-found: error
