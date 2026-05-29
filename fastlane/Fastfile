@@ -1,52 +1,173 @@
 default_platform(:android)
 
+private_lane :perform_android_upload do
+  properties = read_gradle_properties
+  version_name = properties['gizz.tapes.versionName']
+
+  keys_properties = {}
+  File.foreach('../keys/keys.properties') do |line|
+    next if line.strip.start_with?("#") || line.strip.empty?
+
+    key, value = line.strip.split("=", 2)
+    keys_properties[key] = value.strip if key && value
+  end
+
+  content = File.read('../CHANGELOG.adoc')
+  sections = content.split(/^== .*/)
+  description = sections[1].strip
+
+  current_sha = sh("git rev-parse HEAD", log: false).strip
+  run_id = sh(
+    "gh run list --repo Ghost-Applications/gizz-tapes --workflow ci.yml --commit #{current_sha} --status success --limit 1 --json databaseId --jq '.[0].databaseId'",
+    log: false
+  ).strip
+  UI.user_error!("No successful CI run found for commit #{current_sha}") if run_id.empty?
+
+  download_dir = File.expand_path('../ci-artifacts')
+  sh("rm -rf \"#{download_dir}\"")
+  sh("gh run download #{run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release -n android-foss-release -n android-full-release-aab -n android-foss-release-aab --dir \"#{download_dir}\"")
+
+  full_release_aab = Dir.glob("#{download_dir}/android-full-release-aab/*.aab").first
+  UI.user_error!("Could not find full release AAB in downloaded artifacts") unless full_release_aab
+
+  upload_to_play_store(
+    track: 'production',
+    skip_upload_apk: true,
+    skip_upload_changelogs: true,
+    aab: full_release_aab
+  )
+
+  apk_files = Dir.glob("#{download_dir}/**/*.apk")
+  aab_files = Dir.glob("#{download_dir}/**/*.aab")
+  asc_files = Dir.glob("#{download_dir}/**/*.asc")
+  upload_assets = apk_files + aab_files + asc_files
+
+  if upload_assets.empty?
+    UI.error("No files found to upload!")
+  else
+    UI.success("Found the following files to upload: #{upload_assets.join(', ')}")
+  end
+
+  set_github_release(
+    repository_name: 'Ghost-Applications/gizz-tapes',
+    api_token: keys_properties['github_token'],
+    upload_assets: upload_assets,
+    name: version_name,
+    tag_name: version_name,
+    description: description
+  )
+end
+
+private_lane :perform_ios_upload do
+  setup_ci
+  api_key = app_store_connect_api_key(
+    key_id: ENV['ASC_KEY_ID'],
+    issuer_id: ENV['ASC_ISSUER_ID'],
+    key_content: ENV['ASC_KEY_CONTENT'],
+    is_key_content_base64: true
+  )
+  match(
+    type: 'appstore',
+    readonly: true,
+    api_key: api_key
+  )
+  current_build = latest_testflight_build_number(
+    api_key: api_key,
+    app_identifier: 'gizz.tapes.GizzTapes'
+  )
+  increment_version_number(
+    version_number: read_gradle_properties['gizz.tapes.iosVersion'],
+    xcodeproj: 'iosApp/iosApp.xcodeproj'
+  )
+  increment_build_number(
+    build_number: current_build + 1,
+    xcodeproj: 'iosApp/iosApp.xcodeproj'
+  )
+  update_code_signing_settings(
+    use_automatic_signing: false,
+    path: 'iosApp/iosApp.xcodeproj',
+    team_id: 'QHJAD8Z2WL',
+    bundle_identifier: 'gizz.tapes.GizzTapes',
+    code_sign_identity: 'Apple Distribution',
+    profile_name: 'match AppStore gizz.tapes.GizzTapes'
+  )
+  build_app(
+    project: 'iosApp/iosApp.xcodeproj',
+    scheme: 'iosApp',
+    configuration: 'Release',
+    export_method: 'app-store'
+  )
+  upload_to_app_store(
+    api_key: api_key,
+    submit_for_review: true,
+    automatic_release: false
+  )
+end
+
+private_lane :perform_version_bump do
+  properties = read_gradle_properties
+  current_version = properties['gizz.tapes.defaultBuildNumber'].to_i
+
+  content = File.read('../CHANGELOG.adoc')
+
+  next_release_name = prompt(
+    text: "Enter the name of the next release:"
+  )
+
+  updated_content = content.sub(/^== .*/) do |match|
+    "#{match} #{Date.today.iso8601}"
+  end
+  updated_content = updated_content.sub(/^= .*/) do |match|
+    "#{match}\n\n== #{next_release_name}"
+  end
+
+  File.write('../CHANGELOG.adoc', updated_content)
+
+  properties['gizz.tapes.versionName'] = next_release_name.split.join("")
+  properties['gizz.tapes.defaultBuildNumber'] = current_version + 1
+  update_gradle_properties(properties)
+
+  git_commit(
+    path: [File.expand_path('../gradle.properties'), File.expand_path('../CHANGELOG.adoc')],
+    message: 'Version Bump'
+  )
+  push_to_git_remote()
+end
+
+def read_gradle_properties
+  properties = {}
+  File.readlines('../gradle.properties').each do |line|
+    next if line.strip.empty? || line.strip.start_with?('#')
+    key, value = line.strip.split('=', 2)
+    properties[key] = value.strip if key && value
+  end
+  properties
+end
+
+def update_gradle_properties(properties)
+  gradle_properties_lines = File.readlines('../gradle.properties')
+
+  gradle_properties_lines = gradle_properties_lines.map do |line|
+    if line.strip.start_with?("#") || line.strip.empty?
+      line
+    else
+      key, value = line.strip.split("=", 2)
+      if properties.key?(key)
+        "#{key}=#{properties[key]}\n"
+      else
+        line
+      end
+    end
+  end
+
+  File.write('../gradle.properties', gradle_properties_lines.join)
+end
+
 platform :ios do
   desc 'Build and submit to App Store for review'
   lane :release do
     ensure_git_branch(branch: 'main')
-    setup_ci
-    api_key = app_store_connect_api_key(
-      key_id: ENV['ASC_KEY_ID'],
-      issuer_id: ENV['ASC_ISSUER_ID'],
-      key_content: ENV['ASC_KEY_CONTENT'],
-      is_key_content_base64: true
-    )
-    match(
-      type: 'appstore',
-      readonly: true,
-      api_key: api_key
-    )
-    current_build = latest_testflight_build_number(
-      api_key: api_key,
-      app_identifier: 'gizz.tapes.GizzTapes'
-    )
-    increment_version_number(
-      version_number: read_gradle_properties['gizz.tapes.iosVersion'],
-      xcodeproj: 'iosApp/iosApp.xcodeproj'
-    )
-    increment_build_number(
-      build_number: current_build + 1,
-      xcodeproj: 'iosApp/iosApp.xcodeproj'
-    )
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: 'iosApp/iosApp.xcodeproj',
-      team_id: 'QHJAD8Z2WL',
-      bundle_identifier: 'gizz.tapes.GizzTapes',
-      code_sign_identity: 'Apple Distribution',
-      profile_name: 'match AppStore gizz.tapes.GizzTapes'
-    )
-    build_app(
-      project: 'iosApp/iosApp.xcodeproj',
-      scheme: 'iosApp',
-      configuration: 'Release',
-      export_method: 'app-store'
-    )
-    upload_to_app_store(
-      api_key: api_key,
-      submit_for_review: true,
-      automatic_release: false
-    )
+    perform_ios_upload()
   end
 
   desc 'Build and upload to TestFlight'
@@ -99,37 +220,7 @@ platform :ios do
   end
 end
 
-def read_gradle_properties
-  properties = {}
-  File.readlines('../gradle.properties').each do |line|
-    next if line.strip.empty? || line.strip.start_with?('#')
-    key, value = line.strip.split('=', 2)
-    properties[key] = value.strip if key && value
-  end
-  properties
-end
-
-def update_gradle_properties(properties)
-  gradle_properties_lines = File.readlines('../gradle.properties')
-
-  gradle_properties_lines = gradle_properties_lines.map do |line|
-    if line.strip.start_with?("#") || line.strip.empty?
-      line
-    else
-      key, value = line.strip.split("=", 2)
-      if properties.key?(key)
-        "#{key}=#{properties[key]}\n"
-      else
-        line
-      end
-    end
-  end
-
-  File.write('../gradle.properties', gradle_properties_lines.join)
-end
-
 platform :android do
-
   desc 'Publish a new build to open testing on Play Store'
   lane :beta do
     gradle(
@@ -144,103 +235,11 @@ platform :android do
     )
   end
 
-  desc 'Release app to production and create github release'
+  desc 'Release Android and iOS to their respective stores, then bump version'
   lane :release do
-    # make sure we only publish on main
     ensure_git_branch(branch: 'main')
-
-    # Read properties from gradle.properties
-    properties = {}
-    gradle_properties_lines = File.readlines('../gradle.properties')
-    gradle_properties_lines.each do |line|
-      # Skip empty lines and comments
-      next if line.strip.empty? || line.strip.start_with?("#")
-
-      # Split into key and value
-      key, value = line.strip.split("=", 2)
-      properties[key] = value.strip if key && value
-    end
-
-    current_version = properties['gizz.tapes.defaultBuildNumber'].to_i
-    version_name = properties['gizz.tapes.versionName']
-
-    keys_properties = {}
-    File.foreach('../keys/keys.properties') do |line|
-      next if line.strip.start_with?("#") || line.strip.empty?
-
-      key, value = line.strip.split("=", 2)
-      keys_properties[key] = value.strip if key && value
-    end
-
-    content = File.read('../CHANGELOG.adoc')
-    sections = content.split(/^== .*/)
-    description = sections[1].strip
-
-    current_sha = sh("git rev-parse HEAD", log: false).strip
-    run_id = sh(
-      "gh run list --repo Ghost-Applications/gizz-tapes --workflow ci.yml --commit #{current_sha} --status success --limit 1 --json databaseId --jq '.[0].databaseId'",
-      log: false
-    ).strip
-    UI.user_error!("No successful CI run found for commit #{current_sha}") if run_id.empty?
-
-    download_dir = File.expand_path('../ci-artifacts')
-    sh("rm -rf \"#{download_dir}\"")
-    sh("gh run download #{run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release -n android-foss-release -n android-full-release-aab -n android-foss-release-aab --dir \"#{download_dir}\"")
-
-    full_release_aab = Dir.glob("#{download_dir}/android-full-release-aab/*.aab").first
-    UI.user_error!("Could not find full release AAB in downloaded artifacts") unless full_release_aab
-
-    upload_to_play_store(
-      track: 'production',
-      skip_upload_apk: true,
-      skip_upload_changelogs: true,
-      aab: full_release_aab
-    )
-
-    apk_files = Dir.glob("#{download_dir}/**/*.apk")
-    aab_files = Dir.glob("#{download_dir}/**/*.aab")
-    asc_files = Dir.glob("#{download_dir}/**/*.asc")
-    upload_assets = apk_files + aab_files + asc_files
-
-    if upload_assets.empty?
-      UI.error("No files found to upload!")
-    else
-      UI.success("Found the following files to upload: #{upload_assets.join(', ')}")
-    end
-
-    set_github_release(
-      repository_name: 'Ghost-Applications/gizz-tapes',
-      api_token: keys_properties['github_token'],
-      upload_assets: upload_assets,
-      name: version_name,
-      tag_name: version_name,
-      description: description
-    )
-
-    next_release_name = prompt(
-      text: "Enter the name of the next release:"
-    )
-
-    # Find the first occurrence of `==` and insert text after it
-    updated_content = content.sub(/^== .*/) do |match|
-      "#{match} #{Date.today.iso8601}"
-    end
-
-    # Insert the new header after the title (the first line starting with `=`)
-    updated_content = updated_content.sub(/^= .*/) do |match|
-      "#{match}\n\n== #{next_release_name}"
-    end
-
-    # Write the updated content back to the file
-    File.write('../CHANGELOG.adoc', updated_content)
-
-    properties['gizz.tapes.versionName'] = next_release_name.split.join("")
-    properties['gizz.tapes.defaultBuildNumber'] = current_version + 1
-    update_gradle_properties(properties)
-    git_commit(
-      path: [File.expand_path('../gradle.properties'), File.expand_path('../CHANGELOG.adoc')],
-      message: 'Version Bump'
-    )
-    push_to_git_remote()
+    perform_android_upload()
+    perform_ios_upload()
+    perform_version_bump()
   end
 end

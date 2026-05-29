@@ -36,7 +36,4 @@ run = "./gradlew :networking-integration:jvmRun"
 
 [tasks.release]
 description = "Release Android and iOS via Fastlane"
-run = [
-    "bundle exec fastlane android release",
-    "bundle exec fastlane ios release",
-]
+run = "bundle exec fastlane release"

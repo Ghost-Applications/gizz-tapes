@@ -1,8 +1,6 @@
 = Release
 
 1. Ensure CHANGELOG.adoc is up to date
-1. Run `bundle exe fastlane release` on main branch
+1. Run `mise run release` on main branch
 1. Provide a name for the next release to fastlane
-1. Ensure CHANGELOG.adoc and gradle.properties are updated properly
-1. Commit the changes to main and push to the remote
 1. Done!
