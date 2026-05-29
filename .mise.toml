@@ -1,0 +1,42 @@
+[tools]
+java = "temurin-21"
+ruby = "3.3.6"
+
+[tasks.test]
+description = "Run unit tests and static analysis"
+run = "./gradlew test allTests detekt"
+
+[tasks.full-test]
+description = "Run all tests including integration tests"
+run = "./gradlew test allTests runIntegrationTests detekt"
+
+[tasks.detekt]
+description = "Run Detekt static analysis"
+run = "./gradlew detekt"
+
+[tasks.build]
+description = "Build release artifacts"
+run = "./gradlew build bundle"
+
+[tasks.build-debug]
+description = "Assemble a full debug APK"
+run = "./gradlew assembleFullDebug"
+
+[tasks.install-debug]
+description = "Install a full debug APK on a connected device"
+run = "./gradlew installFullDebug"
+
+[tasks.build-ios]
+description = "Archive the iOS app for release"
+run = "xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -destination 'generic/platform=iOS' -configuration Release archive -archivePath build/iosApp.xcarchive"
+
+[tasks.run-integration-test]
+description = "Run networking integration tests on JVM"
+run = "./gradlew :networking-integration:jvmRun"
+
+[tasks.release]
+description = "Release Android and iOS via Fastlane"
+run = [
+    "bundle exec fastlane android release",
+    "bundle exec fastlane ios release",
+]
