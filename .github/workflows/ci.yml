@@ -31,7 +31,7 @@ jobs:
           GIZZ_TAPES_ENCODED_KEY: ${{ secrets.GIZZ_TAPES_ENCODED_KEY }}
       - name: Build and test
         run: >
-          ./gradlew :androidApp:test :androidApp:assemble :androidApp:bundleRelease
+          ./gradlew test allTests :androidApp:assemble :androidApp:bundleRelease
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
         env:
           GIZZ_TAPES_KEYSTORE_PASSWORD: ${{ secrets.GIZZ_TAPES_KEYSTORE_PASSWORD }}

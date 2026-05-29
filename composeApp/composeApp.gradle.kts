@@ -76,6 +76,8 @@ kotlin {
             implementation(libs.arrow.resilience)
             implementation(libs.arrow.fx)
 
+            implementation(libs.html.text)
+
             api(libs.metro.viewmodel)
         }
 
