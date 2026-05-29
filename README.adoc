@@ -23,10 +23,29 @@ Steps:
 
 == Building
 
-Standard gradle commands. 
+=== Setup
 
-`./gradlew installFullDebug` to install the test build
-`./gradlew build` will build release and debug builds as well as run all checks.
+This project uses https://mise.jdx.dev/[mise] to manage Java 21 and Ruby (for Fastlane).
+
+Install mise, then run:
+
+[source,bash]
+----
+mise install
+----
+
+This will install the correct Java and Ruby versions automatically.
+
+=== Tasks
+
+[source,bash]
+----
+mise run test            # Run tests and static analysis
+mise run build           # Build release and debug artifacts
+mise run build-debug     # Assemble a debug APK
+mise run install-debug   # Install a debug APK on a connected device
+mise run release         # Release via Fastlane
+----
 
 === Build Scans
 
