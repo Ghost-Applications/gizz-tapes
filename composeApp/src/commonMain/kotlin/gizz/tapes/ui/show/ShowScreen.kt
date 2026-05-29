@@ -55,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
+import de.charlex.compose.htmltext.material3.HtmlText
 import dev.zacsweers.metrox.viewmodel.assistedMetroViewModel
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import gizz.tapes.GizzTapesTheme
@@ -367,7 +368,10 @@ private fun ShowMetadata(recordingData: RecordingData) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         recordingData.notes?.let {
-            Text(it, style = MaterialTheme.typography.bodySmall)
+            HtmlText(
+                text = it,
+                style = MaterialTheme.typography.bodySmall
+            )
             Spacer(Modifier.height(4.dp))
         }
         recordingData.taper?.let {
