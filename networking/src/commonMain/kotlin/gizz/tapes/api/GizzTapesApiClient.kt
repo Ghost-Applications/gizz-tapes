@@ -90,7 +90,7 @@ private class RealGizzTapesApiClient(
         client.get("${api.url}/api/v1/search") {
             parameter("q", query)
             showTagIds.forEach { id ->
-                parameter("set_type_id", id)
+                parameter("show_tag_id", id)
             }
         }.body()
     }
