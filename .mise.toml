@@ -37,22 +37,3 @@ run = "./gradlew :networking-integration:jvmRun"
 [tasks.release]
 description = "Tag the current version, trigger CI to publish to both stores, then bump version"
 run = "bundle exec fastlane release"
-
-[tasks.revert-release]
-description = "Delete the last release tag and revert the version bump commit (use if release failed)"
-run = """
-#!/usr/bin/env bash
-set -e
-LAST_TAG=$(git describe --tags --abbrev=0)
-echo "This will delete tag '$LAST_TAG' remotely and locally, and revert the version bump commit."
-read -p "Continue? (y/N) " confirm
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-  echo "Aborted."
-  exit 1
-fi
-git push origin --delete "$LAST_TAG"
-git tag -d "$LAST_TAG"
-git revert HEAD --no-edit
-git push
-echo "Done. Tag '$LAST_TAG' deleted and version bump reverted."
-"""

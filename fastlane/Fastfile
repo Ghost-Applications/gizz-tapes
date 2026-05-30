@@ -42,12 +42,7 @@ private_lane :perform_ios_upload do
   upload_to_app_store(
     api_key: api_key,
     submit_for_review: true,
-    automatic_release: false,
-    force: true,
-    submission_information: {
-      export_compliance_uses_encryption: false,
-      add_id_info_uses_idfa: false
-    }
+    automatic_release: false
   )
 end
 
@@ -189,7 +184,7 @@ platform :android do
     content = File.read('../CHANGELOG.adoc')
     description = content.split(/^== .*/)[1].strip
 
-    full_aab = Dir.glob('../androidApp/build/outputs/bundle/fullRelease/*.aab').map { |f| File.expand_path(f) }.first
+    full_aab = Dir.glob('../androidApp/build/outputs/bundle/fullRelease/*.aab').first
     UI.user_error!('Could not find full release AAB') unless full_aab
 
     upload_to_play_store(
@@ -199,9 +194,9 @@ platform :android do
       skip_upload_changelogs: true
     )
 
-    apk_files = Dir.glob('../androidApp/build/outputs/apk/**/*release*.apk').map { |f| File.expand_path(f) }
-    aab_files = Dir.glob('../androidApp/build/outputs/bundle/**/*release*.aab').map { |f| File.expand_path(f) }
-    asc_files = Dir.glob('../androidApp/build/outputs/**/*.asc').map { |f| File.expand_path(f) }
+    apk_files = Dir.glob('../androidApp/build/outputs/apk/**/*release*.apk')
+    aab_files = Dir.glob('../androidApp/build/outputs/bundle/**/*release*.aab')
+    asc_files = Dir.glob('../androidApp/build/outputs/**/*.asc')
     upload_assets = apk_files + aab_files + asc_files
 
     if upload_assets.empty?
