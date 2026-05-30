@@ -42,7 +42,7 @@ jobs:
           GIZZ_TAPES_KEY_ALIAS: ${{ secrets.GIZZ_TAPES_KEY_ALIAS }}
           GIZZ_TAPES_KEY_PASSWORD: ${{ secrets.GIZZ_TAPES_KEY_PASSWORD }}
           GIZZ_TAPES_KEYSTORE_LOCATION: keys/release.jks
-          GIZZ_TAPES_BUILD_NUMBER: ${{ github.run_number + 200 }}
+          GIZZ_TAPES_BUILD_NUMBER: ${{ github.run_number }}
         run: >
           ./gradlew :androidApp:assembleRelease :androidApp:bundleRelease
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
