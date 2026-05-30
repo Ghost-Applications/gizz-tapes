@@ -45,6 +45,7 @@ private_lane :perform_ios_upload do
     automatic_release: false,
     force: true,
     skip_metadata: true,
+    precheck_include_in_app_purchases: false,
     submission_information: {
       export_compliance_uses_encryption: false,
       add_id_info_uses_idfa: false
