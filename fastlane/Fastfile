@@ -44,6 +44,11 @@ private_lane :perform_ios_upload do
   notes = notes.lines.reject { |l| l.downcase.include?('android') }.join.strip
   File.write('metadata/en-US/release_notes.txt', notes)
 
+  File.write('metadata/review_information/first_name.txt', ENV['ASC_REVIEW_FIRST_NAME'])
+  File.write('metadata/review_information/last_name.txt', ENV['ASC_REVIEW_LAST_NAME'])
+  File.write('metadata/review_information/email_address.txt', ENV['ASC_REVIEW_EMAIL'])
+  File.write('metadata/review_information/phone_number.txt', ENV['ASC_REVIEW_PHONE'])
+
   upload_to_app_store(
     api_key: api_key,
     submit_for_review: true,

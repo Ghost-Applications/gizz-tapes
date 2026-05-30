@@ -50,4 +50,8 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+          ASC_REVIEW_FIRST_NAME: ${{ secrets.ASC_REVIEW_FIRST_NAME }}
+          ASC_REVIEW_LAST_NAME: ${{ secrets.ASC_REVIEW_LAST_NAME }}
+          ASC_REVIEW_EMAIL: ${{ secrets.ASC_REVIEW_EMAIL }}
+          ASC_REVIEW_PHONE: ${{ secrets.ASC_REVIEW_PHONE }}
         run: bundle exec fastlane ios release
