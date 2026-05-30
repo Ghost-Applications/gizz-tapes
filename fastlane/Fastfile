@@ -1,74 +1,5 @@
 default_platform(:android)
 
-private_lane :perform_android_upload do
-  properties = read_gradle_properties
-  version_name = properties['gizz.tapes.versionName']
-
-  keys_properties = {}
-  File.foreach('../keys/keys.properties') do |line|
-    next if line.strip.start_with?("#") || line.strip.empty?
-
-    key, value = line.strip.split("=", 2)
-    keys_properties[key] = value.strip if key && value
-  end
-
-  content = File.read('../CHANGELOG.adoc')
-  sections = content.split(/^== .*/)
-  description = sections[1].strip
-
-  current_sha = sh("git rev-parse HEAD", log: false).strip
-  run_id = sh(
-    "gh run list --repo Ghost-Applications/gizz-tapes --workflow ci.yml --commit #{current_sha} --status success --limit 1 --json databaseId --jq '.[0].databaseId'",
-    log: false
-  ).strip
-  UI.user_error!("No successful CI run found for commit #{current_sha}") if run_id.empty?
-
-  # Download APKs and FOSS AAB from ci.yml (full AAB comes from publish.yml below)
-  download_dir = File.expand_path('../ci-artifacts')
-  sh("rm -rf \"#{download_dir}\"")
-  sh("gh run download #{run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release -n android-foss-release -n android-foss-release-aab --dir \"#{download_dir}\"")
-
-  # Download the full release AAB from the publish.yml run (same binary uploaded to Play Store)
-  version_bump_sha = sh("git log --follow -1 --format='%H' -- gradle.properties", log: false).strip
-  publish_run_id = sh(
-    "gh run list --repo Ghost-Applications/gizz-tapes --workflow publish.yml --commit #{version_bump_sha} --status success --limit 1 --json databaseId --jq '.[0].databaseId'",
-    log: false
-  ).strip
-  UI.user_error!("No successful publish run found for version bump commit #{version_bump_sha}") if publish_run_id.empty?
-
-  publish_dir = File.expand_path('../publish-artifacts')
-  sh("rm -rf \"#{publish_dir}\"")
-  sh("gh run download #{publish_run_id} --repo Ghost-Applications/gizz-tapes -n android-full-release-aab --dir \"#{publish_dir}\"")
-
-  upload_to_play_store(
-    track: 'beta',
-    track_promote_to: 'production',
-    skip_upload_apk: true,
-    skip_upload_aab: true,
-    skip_upload_changelogs: true
-  )
-
-  apk_files = Dir.glob("#{download_dir}/**/*.apk")
-  aab_files = Dir.glob("#{download_dir}/**/*.aab") + Dir.glob("#{publish_dir}/**/*.aab")
-  asc_files = Dir.glob("#{download_dir}/**/*.asc") + Dir.glob("#{publish_dir}/**/*.asc")
-  upload_assets = apk_files + aab_files + asc_files
-
-  if upload_assets.empty?
-    UI.error("No files found to upload!")
-  else
-    UI.success("Found the following files to upload: #{upload_assets.join(', ')}")
-  end
-
-  set_github_release(
-    repository_name: 'Ghost-Applications/gizz-tapes',
-    api_token: keys_properties['github_token'],
-    upload_assets: upload_assets,
-    name: version_name,
-    tag_name: version_name,
-    description: description
-  )
-end
-
 private_lane :perform_ios_upload do
   setup_ci
   api_key = app_store_connect_api_key(
@@ -117,7 +48,7 @@ end
 
 private_lane :perform_version_bump do
   properties = read_gradle_properties
-  current_version = properties['gizz.tapes.defaultBuildNumber'].to_i
+  ios_major, ios_minor = properties['gizz.tapes.iosVersion'].split('.').map(&:to_i)
 
   content = File.read('../CHANGELOG.adoc')
 
@@ -135,7 +66,7 @@ private_lane :perform_version_bump do
   File.write('../CHANGELOG.adoc', updated_content)
 
   properties['gizz.tapes.versionName'] = next_release_name.split.join("")
-  properties['gizz.tapes.defaultBuildNumber'] = current_version + 1
+  properties['gizz.tapes.iosVersion'] = "#{ios_major}.#{ios_minor + 1}"
   update_gradle_properties(properties)
 
   git_commit(
@@ -177,7 +108,6 @@ end
 platform :ios do
   desc 'Build and submit to App Store for review'
   lane :release do
-    ensure_git_branch(branch: 'main')
     perform_ios_upload()
   end
 
@@ -232,7 +162,7 @@ platform :ios do
 end
 
 platform :android do
-  desc 'Publish a new build to open testing on Play Store'
+  desc 'Publish a new build to Play Store beta'
   lane :beta do
     gradle(
       task: 'bundle',
@@ -246,11 +176,53 @@ platform :android do
     )
   end
 
-  desc 'Release Android and iOS to their respective stores, then bump version'
+  desc 'Upload release artifacts to Play Store production and create GitHub release (CI only)'
+  lane :ci_release do
+    properties = read_gradle_properties
+    version_name = properties['gizz.tapes.versionName']
+
+    content = File.read('../CHANGELOG.adoc')
+    description = content.split(/^== .*/)[1].strip
+
+    full_aab = Dir.glob('../androidApp/build/outputs/bundle/fullRelease/*.aab').first
+    UI.user_error!('Could not find full release AAB') unless full_aab
+
+    upload_to_play_store(
+      track: 'production',
+      aab: full_aab,
+      skip_upload_apk: true,
+      skip_upload_changelogs: true
+    )
+
+    apk_files = Dir.glob('../androidApp/build/outputs/apk/**/*release*.apk')
+    aab_files = Dir.glob('../androidApp/build/outputs/bundle/**/*release*.aab')
+    asc_files = Dir.glob('../androidApp/build/outputs/**/*.asc')
+    upload_assets = apk_files + aab_files + asc_files
+
+    if upload_assets.empty?
+      UI.error('No files found to upload to GitHub release!')
+    else
+      UI.success("Uploading: #{upload_assets.join(', ')}")
+    end
+
+    set_github_release(
+      repository_name: 'Ghost-Applications/gizz-tapes',
+      api_token: ENV['GITHUB_TOKEN'],
+      name: version_name,
+      tag_name: version_name,
+      description: description,
+      upload_assets: upload_assets
+    )
+  end
+
+  desc 'Tag the current version and trigger CI release, then bump version'
   lane :release do
     ensure_git_branch(branch: 'main')
-    perform_android_upload()
-    perform_ios_upload()
-    perform_version_bump()
+    ensure_git_status_clean
+    version_name = read_gradle_properties['gizz.tapes.versionName']
+    add_git_tag(tag: version_name)
+    push_git_tags
+    UI.success("Tag '#{version_name}' pushed — CI will publish to both stores.")
+    perform_version_bump
   end
 end

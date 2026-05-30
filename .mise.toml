@@ -35,5 +35,5 @@ description = "Run networking integration tests on JVM"
 run = "./gradlew :networking-integration:jvmRun"
 
 [tasks.release]
-description = "Release Android and iOS via Fastlane"
+description = "Tag the current version, trigger CI to publish to both stores, then bump version"
 run = "bundle exec fastlane release"

@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'iosApp/**'
+      - 'composeApp/**'
+      - 'networking/**'
+      - 'gradle/**'
+      - 'fastlane/**'
 jobs:
   build:
     runs-on: macos-latest
