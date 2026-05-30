@@ -1,8 +1,6 @@
 = Changelog
 
-== LeRisque
-
-== KGLW 2026-05-30
+== KGLW
 
 - Fix App Icon Not Loading
 - Updated UI to new layout. Includes today is gizztory, venues, and search
