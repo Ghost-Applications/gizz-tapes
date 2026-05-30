@@ -38,6 +38,10 @@ run = "./gradlew :networking-integration:jvmRun"
 description = "Tag the current version, trigger CI to publish to both stores, then bump version"
 run = "bundle exec fastlane release"
 
+[tasks.create-github-release]
+description = "Create GitHub release from CI-built artifacts (use if the release workflow's GitHub step failed)"
+run = "GITHUB_TOKEN=$(gh auth token) bundle exec fastlane android create_github_release"
+
 [tasks.revert-release]
 description = "Delete the last release tag and revert the version bump commit (use if release failed)"
 run = """

@@ -1,20 +1,23 @@
-name: Release
+name: Create GitHub Release
 
 on:
-  push:
-    tags:
-      - '*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to create release for'
+        required: true
 
 permissions:
   contents: write
 
 jobs:
-  android:
-    name: Android Release
+  create-release:
+    name: Build and create GitHub release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag }}
           lfs: true
       - name: Checkout LFS objects
         run: git lfs checkout
@@ -30,15 +33,6 @@ jobs:
         env:
           GIZZ_TAPES_ENCODED_KEY: ${{ secrets.GIZZ_TAPES_ENCODED_KEY }}
         run: echo -n $GIZZ_TAPES_ENCODED_KEY | base64 --decode > keys/release.jks
-      - name: Provide Play Store key
-        env:
-          GIZZ_TAPES_PUBLISH_KEY: ${{ secrets.GIZZ_TAPES_SUPPLY_KEY }}
-        run: echo $GIZZ_TAPES_PUBLISH_KEY > ./keys/gizz-tapes-supply-key.json
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3.6'
-          bundler-cache: true
       - name: Compute version code
         id: version_code
         run: echo "code=$(( $(date +%s) / 60 ))" >> $GITHUB_OUTPUT
@@ -66,42 +60,25 @@ jobs:
           find androidApp/build/outputs/bundle -name "*release*.aab" | while read -r file; do
             gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
           done
-      - name: Publish to Play Store and create GitHub release
+      - name: Extract changelog
+        id: changelog
+        run: |
+          NOTES=$(awk '/^== /{found++} found==1{if(/^== /){next} print}' CHANGELOG.adoc | sed '/^$/d' | head -50)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Create GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bundle exec fastlane android ci_release
-
-  ios:
-    name: iOS Release
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
-      - name: Checkout LFS objects
-        run: git lfs checkout
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          distribution: zulu
-          cache: gradle
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-      - name: Select Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: 'latest'
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3.6'
-          bundler-cache: true
-      - name: Submit to App Store
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
-        run: bundle exec fastlane ios release
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ inputs.tag }}" \
+            --title "${{ inputs.tag }}" \
+            --notes "${{ steps.changelog.outputs.notes }}" \
+            androidApp/build/outputs/apk/foss/release/*.apk \
+            androidApp/build/outputs/apk/full/release/*.apk \
+            androidApp/build/outputs/bundle/fossRelease/*.aab \
+            androidApp/build/outputs/bundle/fullRelease/*.aab \
+            androidApp/build/outputs/apk/foss/release/*.asc \
+            androidApp/build/outputs/apk/full/release/*.asc \
+            androidApp/build/outputs/bundle/fossRelease/*.asc \
+            androidApp/build/outputs/bundle/fullRelease/*.asc
