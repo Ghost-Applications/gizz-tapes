@@ -260,7 +260,7 @@ private fun ShowContent(
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box {
+                Box(modifier = Modifier.weight(1f)) {
                     TextButton(onClick = { showRecordingMenu = true }) {
                         Text(state.recordingData.selectedRecording)
                         Icon(Icons.Default.ExpandMore, null)
@@ -280,8 +280,6 @@ private fun ShowContent(
                         }
                     }
                 }
-
-                Spacer(Modifier.weight(1f))
 
                 TextButton(onClick = onPlayAll) {
                     Icon(Icons.Default.PlayArrow, null)

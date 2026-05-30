@@ -58,13 +58,13 @@ class SearchViewModel(
     private val searchShowTagIds = MutableStateFlow(emptySet<UInt>())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val searchResultsLce = combine(searchQueryStateFlow, searchShowTagIds) { searchQuery, setIds ->
-        searchQuery to setIds
-    }.flatMapLatest { (searchQuery, setIds) ->
+    private val searchResultsLce = combine(searchQueryStateFlow, searchShowTagIds) { searchQuery, showTagIds ->
+        searchQuery to showTagIds
+    }.flatMapLatest { (searchQuery, showTagIds) ->
         flow {
             val searchResultsLce = retryUntilSuccessful(
                 action = {
-                    apiClient.search(searchQuery, setIds)
+                    apiClient.search(searchQuery, showTagIds)
                 },
                 onErrorAfter3SecondsAction = { error ->
                     logger.e(error) { "Error getting search results" }
