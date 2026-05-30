@@ -160,7 +160,7 @@ platform :ios do
       api_key: api_key,
       distribute_external: true,
       groups: ["external testers"],
-      notify_external_testers: true,
+      notify_external_testers: false,
       changelog: ENV["CHANGELOG"]
     )
   end

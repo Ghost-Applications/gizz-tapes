@@ -38,11 +38,14 @@ jobs:
         env:
           GIZZ_TAPES_PUBLISH_KEY: ${{ secrets.GIZZ_TAPES_SUPPLY_KEY }}
         run: echo $GIZZ_TAPES_PUBLISH_KEY > ./keys/gizz-tapes-supply-key.json
+      - name: Compute version code
+        id: version_code
+        run: echo "code=$(( $(date +%s) / 60 ))" >> $GITHUB_OUTPUT
       - name: Build and upload to Play Store beta
         env:
           GIZZ_TAPES_KEYSTORE_PASSWORD: ${{ secrets.GIZZ_TAPES_KEYSTORE_PASSWORD }}
           GIZZ_TAPES_KEY_ALIAS: ${{ secrets.GIZZ_TAPES_KEY_ALIAS }}
           GIZZ_TAPES_KEY_PASSWORD: ${{ secrets.GIZZ_TAPES_KEY_PASSWORD }}
           GIZZ_TAPES_KEYSTORE_LOCATION: ./keys/release.jks
-          GIZZ_TAPES_BUILD_NUMBER: ${{ github.run_number }}
+          GIZZ_TAPES_BUILD_NUMBER: ${{ steps.version_code.outputs.code }}
         run: bundle exec fastlane android beta
