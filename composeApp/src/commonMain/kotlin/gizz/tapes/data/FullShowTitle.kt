@@ -5,6 +5,8 @@ import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
 import gizz.tapes.util.toAlbumFormat
+import io.ktor.http.decodeURLQueryComponent
+import io.ktor.http.encodeURLPath
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -20,12 +22,15 @@ data class FullShowTitle(
         val navType = object : NavType<FullShowTitle>(isNullableAllowed = false) {
             override fun get(bundle: SavedState, key: String): FullShowTitle =
                 Json.decodeFromString(checkNotNull(bundle.read { getString(key) }))
+
             override fun put(bundle: SavedState, key: String, value: FullShowTitle) =
                 bundle.write { putString(key, Json.encodeToString(value)) }
+
             override fun parseValue(value: String): FullShowTitle =
-                Json.decodeFromString(value)
+                Json.decodeFromString(value.decodeURLQueryComponent())
+
             override fun serializeAsValue(value: FullShowTitle): String =
-                Json.encodeToString(value)
+                Json.encodeToString(value).encodeURLPath()
         }
     }
 }

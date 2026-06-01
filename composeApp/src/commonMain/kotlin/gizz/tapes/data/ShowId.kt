@@ -4,14 +4,14 @@ import androidx.navigation.NavType
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
+import io.ktor.http.decodeURLQueryComponent
+import io.ktor.http.encodeURLPath
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
 @Serializable
 @JvmInline
 value class ShowId(val value: String) {
-    override fun toString(): String = value
-
     companion object {
         val navType = object : NavType<ShowId>(
             isNullableAllowed = false
@@ -23,7 +23,11 @@ value class ShowId(val value: String) {
                 bundle.write { putString(key, value.value) }
 
             override fun parseValue(value: String): ShowId {
-                return ShowId(value)
+                return ShowId(value.decodeURLQueryComponent())
+            }
+
+            override fun serializeAsValue(value: ShowId): String {
+                return value.value.encodeURLPath()
             }
         }
     }
