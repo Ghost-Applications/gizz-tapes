@@ -222,12 +222,20 @@ platform :android do
 
   desc 'Tag the current version and trigger CI release, then bump version'
   lane :release do
-    ensure_git_branch(branch: 'main')
+    ensure_git_branch(branch: /(main|release\/.+)/)
     ensure_git_status_clean
-    version_name = read_gradle_properties['gizz.tapes.versionName']
-    add_git_tag(tag: version_name)
-    push_git_tags
-    UI.success("Tag '#{version_name}' pushed — CI will publish to both stores.")
-    perform_version_bump
+
+    if git_branch == 'main'
+      version_name = read_gradle_properties['gizz.tapes.versionName']
+      add_git_tag(tag: version_name)
+      push_git_tags
+      UI.success("Tag '#{version_name}' pushed — CI will publish to both stores.")
+      perform_version_bump
+    else
+      patch_tag = prompt(text: "Enter patch tag name:")
+      add_git_tag(tag: patch_tag)
+      push_git_tags
+      UI.success("Patch tag '#{patch_tag}' pushed — CI will publish to both stores.")
+    end
   end
 end
