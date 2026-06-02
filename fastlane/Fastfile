@@ -55,6 +55,7 @@ private_lane :perform_ios_upload do
     automatic_release: false,
     force: true,
     run_precheck_before_submit: false,
+    skip_screenshots: true,
     submission_information: {
       export_compliance_uses_encryption: false,
       add_id_info_uses_idfa: false
@@ -263,7 +264,7 @@ platform :android do
     else
       patch_tag = prompt(text: "Enter patch tag name:")
       add_git_tag(tag: patch_tag)
-      push_git_tags
+      push_git_tags(tag: patch_tag)
       UI.success("Patch tag '#{patch_tag}' pushed — CI will publish to both stores.")
     end
   end
