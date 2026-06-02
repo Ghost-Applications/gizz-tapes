@@ -44,6 +44,7 @@ private_lane :perform_ios_upload do
     submit_for_review: true,
     automatic_release: false,
     force: true,
+    skip_screenshots: true,
     submission_information: {
       export_compliance_uses_encryption: false,
       add_id_info_uses_idfa: false

@@ -1,6 +1,10 @@
 = Changelog
 
-== KGLW
+== KGLW Patch 1
+
+- Fix issue with navigating to shows that have special characters in their names
+
+== KGLW 2026-05-30
 
 - Fix App Icon Not Loading
 - Updated UI to new layout. Includes today is gizztory, venues, and search
