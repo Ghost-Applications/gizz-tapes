@@ -222,7 +222,7 @@ platform :android do
 
   desc 'Tag the current version and trigger CI release, then bump version'
   lane :release do
-    ensure_git_branch(branch: /(main|release\/.+)/)
+    ensure_git_branch(branch: '(main|release\/.+)')
     ensure_git_status_clean
 
     if git_branch == 'main'
