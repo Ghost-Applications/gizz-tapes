@@ -5,6 +5,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import gizz.tapes.data.BAND_NAME
+import gizz.tapes.data.FullShowTitle
+import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 import gizz.tapes.nav.Destination
 import gizz.tapes.playback.MediaId
 import gizz.tapes.playback.PlaybackItem
@@ -13,6 +16,20 @@ import kotlinx.datetime.number
 
 val MediaItem?.title: String get() = this?.mediaMetadata?.title?.toString() ?: "--"
 val MediaItem.showExtras: Destination.Show? get() = mediaMetadata.extras?.toShowInfo()
+
+// CastPlayer strips Bundle extras, so fall back to standard fields that survive Cast.
+fun MediaItem.resolveShowDestination(): Destination.Show? {
+    showExtras?.let { return it }
+    val showIdStr = realMediaId.showId ?: return null
+    val albumTitle = mediaMetadata.albumTitle?.toString() ?: return null
+    val year = mediaMetadata.recordingYear ?: return null
+    val month = mediaMetadata.recordingMonth ?: return null
+    val day = mediaMetadata.recordingDay ?: return null
+    return Destination.Show(
+        id = ShowId(showIdStr),
+        title = FullShowTitle(title = Title(albumTitle), date = LocalDate(year, month, day))
+    )
+}
 fun MediaItem.Builder.setMediaId(mediaId: MediaId): MediaItem.Builder {
     return setMediaId(mediaId.id)
 }
@@ -73,7 +90,16 @@ fun Collection<PlaybackItem>.toMediaItems(): List<MediaItem> = map { it.toMediaI
 
 fun MediaItem.toPlaybackItem(): PlaybackItem {
     val metadata = mediaMetadata
-    val show = checkNotNull(showExtras) { "MediaItem missing show extras: $mediaId" }
+    val date = LocalDate(
+        year = checkNotNull(metadata.recordingYear) { "MediaItem missing recordingYear: $mediaId" },
+        month = checkNotNull(metadata.recordingMonth) { "MediaItem missing recordingMonth: $mediaId" },
+        day = checkNotNull(metadata.recordingDay) { "MediaItem missing recordingDay: $mediaId" },
+    )
+    // CastPlayer strips Bundle extras from MediaMetadata, so fall back to fields that survive Cast.
+    val show = showExtras ?: Destination.Show(
+        id = ShowId(checkNotNull(realMediaId.showId) { "MediaItem mediaId missing showId: $mediaId" }),
+        title = FullShowTitle(title = Title(metadata.albumTitle?.toString() ?: "--"), date = date)
+    )
     return PlaybackItem(
         id = mediaId,
         url = checkNotNull(localConfiguration?.uri?.toString()) { "MediaItem missing URI: $mediaId" },
@@ -83,11 +109,7 @@ fun MediaItem.toPlaybackItem(): PlaybackItem {
         showId = show.id,
         showTitle = show.title,
         durationMs = metadata.durationMs ?: 0L,
-        showDate = LocalDate(
-            year = checkNotNull(metadata.recordingYear) { "MediaItem missing recordingYear: $mediaId" },
-            month = checkNotNull(metadata.recordingMonth) { "MediaItem missing recordingMonth: $mediaId" },
-            day = checkNotNull(metadata.recordingDay) { "MediaItem missing recordingDay: $mediaId" },
-        )
+        showDate = date
     )
 }
 

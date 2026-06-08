@@ -2,6 +2,8 @@
 
 == LeRisque
 
+- Fix chromecast playback
+
 == KGLW 2026-05-30
 
 - Fix App Icon Not Loading

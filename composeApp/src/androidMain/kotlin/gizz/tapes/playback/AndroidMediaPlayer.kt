@@ -17,7 +17,7 @@ import dev.zacsweers.metro.SingleIn
 import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.ui.player.PlayerState
-import gizz.tapes.util.showExtras
+import gizz.tapes.util.resolveShowDestination
 import gizz.tapes.util.toMediaItems
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,7 +106,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
             _state.value = PlayerState.NoMedia
             return
         }
-        val show = cmi.showExtras ?: run {
+        val show = cmi.resolveShowDestination() ?: run {
             _state.value = PlayerState.NoMedia
             return
         }
@@ -136,7 +136,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
     private fun updateStateWithError(message: String) {
         val controller = mediaController ?: return
         val cmi = controller.currentMediaItem ?: return
-        val show = cmi.showExtras ?: return
+        val show = cmi.resolveShowDestination() ?: return
         val metadata = cmi.mediaMetadata
         _state.value = PlayerState.MediaLoaded.Error(
             playerError = PlayerError(message),
