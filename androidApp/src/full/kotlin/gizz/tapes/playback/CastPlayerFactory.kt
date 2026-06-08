@@ -2,6 +2,7 @@ package gizz.tapes.playback
 
 import android.content.Context
 import androidx.media3.cast.CastPlayer
+import androidx.media3.cast.RemoteCastPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -18,8 +19,12 @@ class CastPlayerFactory(
 ) : PlayerFactory {
     override fun create(exoPlayer: ExoPlayer): Player {
         return runCatching {
+            val remotePlayer = RemoteCastPlayer.Builder(context)
+                .setMediaItemConverter(GizzMediaItemConverter())
+                .build()
             CastPlayer.Builder(context)
                 .setLocalPlayer(exoPlayer)
+                .setRemotePlayer(remotePlayer)
                 .build()
         }.getOrElse {
             Logger.e("Error creating CastPlayer, falling back to ExoPlayer", it)

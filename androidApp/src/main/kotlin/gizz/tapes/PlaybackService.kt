@@ -38,7 +38,7 @@ import gizz.tapes.util.MediaItemWrapper
 import gizz.tapes.util.MediaItemsWrapper
 import gizz.tapes.util.realMediaId
 import gizz.tapes.util.toMediaItems
-import gizz.tapes.util.toPlaybackItems
+import gizz.tapes.util.toPlaybackItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -283,7 +283,7 @@ class PlaybackService(
             )
         }
         currentlyPlayingSaver.save(
-            items = items.toPlaybackItems(),
+            items = items.mapNotNull { runCatching { it.toPlaybackItem() }.getOrNull() },
             currentTrackIndex = trackIndex,
             currentPosition = position
         )
