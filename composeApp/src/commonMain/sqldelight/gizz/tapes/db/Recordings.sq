@@ -1,0 +1,17 @@
+import kotlin.time.Instant;
+import gizz.tapes.api.data.Recording.Type;
+
+CREATE TABLE recordings (
+  id TEXT NOT NULL PRIMARY KEY,
+  showId TEXT NOT NULL,
+  uploadedAt INTEGER AS Instant NOT NULL,
+  type TEXT AS Type NOT NULL,
+  source TEXT,
+  lineage TEXT,
+  taper TEXT,
+
+  FOREIGN KEY(showId) REFERENCES shows(id)
+);
+
+insertRecording:
+INSERT INTO recordings VALUES ?;

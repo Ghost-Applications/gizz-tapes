@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
     alias(libs.plugins.metro)
+    alias(libs.plugins.sqldelight)
 
     id("signing-config")
     id("build-number")
@@ -73,6 +74,8 @@ kotlin {
             implementation(libs.arrow.resilience)
             implementation(libs.arrow.fx)
 
+            implementation(libs.sqldelight.primitive.adapters)
+
             implementation(libs.html.text)
 
             api(libs.metro.viewmodel)
@@ -90,10 +93,12 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.javacv)
             implementation(libs.ffmpeg.platform)
+            implementation(libs.sqldelight.sqlite.driver)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
         }
 
         androidMain.dependencies {
@@ -120,6 +125,14 @@ compose.desktop {
             macOS { iconFile.set(project.file("src/desktopMain/resources/icon.icns")) }
             windows { iconFile.set(project.file("src/desktopMain/resources/icon.ico")) }
             linux { iconFile.set(project.file("src/desktopMain/resources/icon.png")) }
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        register("Database") {
+            packageName.set("gizz.tapes.db")
         }
     }
 }

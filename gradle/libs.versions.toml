@@ -18,6 +18,7 @@ media3 = "1.10.1"
 firebase-bom = "34.15.0"
 lifecycle-runtime-ktx = "2.11.0"
 compose-bom = "2026.06.00"
+sqldelight = "2.3.2"
 
 [libraries]
 kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0"
@@ -71,6 +72,11 @@ javacv = { module = "org.bytedeco:javacv", version = "1.5.13" }
 ffmpeg-platform = { module = "org.bytedeco:ffmpeg-platform", version = "8.0.1-1.5.13" }
 kermit = { module = "co.touchlab:kermit", version = "2.1.0" }
 
+sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
+sqldelight-android-driver= { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
 truth = "com.google.truth:truth:1.4.5"
@@ -113,3 +119,5 @@ metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 google-services = "com.google.gms.google-services:4.5.0"
 firebase-crashlytics = "com.google.firebase.crashlytics:3.0.7"
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+

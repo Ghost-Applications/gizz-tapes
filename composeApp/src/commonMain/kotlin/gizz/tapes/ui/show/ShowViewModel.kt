@@ -26,11 +26,14 @@ import gizz.tapes.data.Settings
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.TrackDuration
 import gizz.tapes.data.TrackTitle
+import gizz.tapes.db.Shows
 import gizz.tapes.nav.Destination
 import gizz.tapes.playback.GizzMediaPlayer
 import gizz.tapes.playback.PlaybackItem
+import gizz.tapes.storage.ShowSaver
 import gizz.tapes.util.ForViewModel
 import gizz.tapes.util.LCE
+import gizz.tapes.util.contentOrNull
 import gizz.tapes.util.map
 import gizz.tapes.util.retryUntilSuccessful
 import gizz.tapes.util.tryAndGetPreferredRecordingType
@@ -38,9 +41,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 @AssistedInject
@@ -48,6 +54,7 @@ class ShowViewModel(
     private val apiClient: GizzTapesApiClient,
     private val mediaPlayer: GizzMediaPlayer,
     private val datastore: DataStore<Settings>,
+    private val showSaver: ShowSaver,
     @Assisted savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -72,6 +79,21 @@ class ShowViewModel(
 
     fun changeSelectedRecording(recordingId: RecordingId) {
         selectedRecording.value = recordingId
+    }
+
+    fun saveShow() {
+        viewModelScope.launch {
+            cachedShowData.takeWhile { value -> value.contentOrNull() != null }
+                .mapNotNull { it.contentOrNull() }
+                .collectLatest {
+                    showSaver.saveShow(
+                        title = title,
+                        show = it,
+                        recordingId = selectedRecording.value
+                            ?: error("Trying to save a show without a recording selected")
+                    )
+                }
+        }
     }
 
     private suspend fun fetchAndCacheShow() {
@@ -110,7 +132,7 @@ class ShowViewModel(
                         url = recording.filesPathPrefix + track.filename,
                         title = track.title,
                         albumTitle = title.title.value,
-                        artworkUrl = PosterUrl.Companion(show.posterUrl).value,
+                        artworkUrl = PosterUrl(show.posterUrl).value,
                         showId = ShowId(show.id),
                         showTitle = title,
                         durationMs = track.length.inWholeMilliseconds,
@@ -119,7 +141,7 @@ class ShowViewModel(
                 }
 
                 ShowScreenState(
-                    showPosterUrl = PosterUrl.Companion(show.posterUrl),
+                    showPosterUrl = PosterUrl(show.posterUrl),
                     removeOldMediaItemsAndAddNew = { startIndex ->
                         viewModelScope.launch {
                             mediaPlayer.setPlaylist(playbackItems, startIndex)

@@ -135,6 +135,8 @@ dependencies {
     implementation(libs.metro.android)
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.arrow.fx)
+    implementation(libs.sqldelight.android.driver)
+
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

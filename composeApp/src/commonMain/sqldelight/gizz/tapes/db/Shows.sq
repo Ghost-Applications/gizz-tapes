@@ -1,0 +1,15 @@
+import kotlin.UShort;
+import kotlinx.datetime.LocalDate;
+
+CREATE TABLE shows(
+  id TEXT NOT NULL PRIMARY KEY,
+  sortOrder INTEGER AS UShort NOT NULL,
+  date TEXT AS LocalDate NOT NULL,
+  posterUrl TEXT,
+  notes TEXT,
+  title TEXT,
+  permalink TEXT NOT NULL
+);
+
+insertShow:
+INSERT INTO shows VALUES ?;

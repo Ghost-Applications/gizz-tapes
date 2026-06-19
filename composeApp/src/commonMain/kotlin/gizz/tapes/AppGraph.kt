@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.core.okio.OkioStorage
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.db.SqlDriver
 import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Provides
@@ -12,9 +14,17 @@ import dev.zacsweers.metrox.viewmodel.ViewModelGraph
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.data.Settings
 import gizz.tapes.data.SettingsSerializer
+import gizz.tapes.db.Database
+import gizz.tapes.db.Files
+import gizz.tapes.db.Recordings
+import gizz.tapes.db.Shows
 import gizz.tapes.playback.CurrentlyPlayingSaver
 import gizz.tapes.playback.StoredMediaSession
 import gizz.tapes.playback.StoredMediaSessionSerializer
+import gizz.tapes.storage.durationAdapter
+import gizz.tapes.storage.instantAdapter
+import gizz.tapes.storage.localDateAdapter
+import gizz.tapes.storage.uShortAdapter
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.cache.HttpCache
@@ -69,6 +79,25 @@ interface AppGraph : ViewModelGraph {
                 }
                 install(HttpCache)
             }
+        )
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideDatabase(sqlDriver: SqlDriver): Database {
+        return Database(
+            driver = sqlDriver,
+            showsAdapter = Shows.Adapter(
+                sortOrderAdapter = uShortAdapter,
+                dateAdapter = localDateAdapter
+            ),
+            recordingsAdapter = Recordings.Adapter(
+                uploadedAtAdapter = instantAdapter,
+                typeAdapter = EnumColumnAdapter()
+            ),
+            filesAdapter = Files.Adapter(
+                lengthAdapter = durationAdapter
+            )
         )
     }
 }

@@ -99,6 +99,7 @@ fun ShowScreen(
         onRecordingChange = viewModel::changeSelectedRecording,
         onPauseAction = playerViewModel::pause,
         onPlayAction = playerViewModel::play,
+        saveShow = viewModel::saveShow,
     )
 }
 
@@ -114,6 +115,7 @@ fun ShowScreen(
     onRecordingChange: (RecordingId) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
+    saveShow: () -> Unit,
 ) {
     val platformActions = LocalPlatformActions.current
     val lazyListState = rememberLazyListState()
@@ -178,7 +180,8 @@ fun ShowScreen(
                         onTrackClick = { index ->
                             showState.value.removeOldMediaItemsAndAddNew(index)
                             onPlayerClick(title)
-                        }
+                        },
+                        saveShow = saveShow
                     )
                 }
             }
@@ -205,6 +208,7 @@ private fun ShowContent(
     onRecordingChange: (RecordingId) -> Unit,
     onPlayAll: () -> Unit,
     onTrackClick: (Int) -> Unit,
+    saveShow: () -> Unit,
 ) {
     var showRecordingMenu by remember { mutableStateOf(false) }
     var showMetadata by remember { mutableStateOf(false) }
@@ -292,6 +296,12 @@ private fun ShowContent(
         }
 
         item {
+            TextButton(onClick = saveShow) {
+                Text("Download Show For Offline Playback")
+            }
+        }
+
+        item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -299,7 +309,7 @@ private fun ShowContent(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Recording Info", style = MaterialTheme.typography.labelLarge)
+                Text("Show Info", style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.weight(1f))
                 Icon(
                     if (showMetadata) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
