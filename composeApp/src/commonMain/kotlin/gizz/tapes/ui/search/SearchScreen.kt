@@ -52,6 +52,7 @@ fun SearchScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = metroViewModel(),
     onShowClicked: ShowClick,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val setTypes by viewModel.state.collectAsState()
     SearchScreen(
@@ -59,7 +60,8 @@ fun SearchScreen(
         state = setTypes,
         onSetTypeSelection = { viewModel.toggleSetTypeId(it) },
         onSearch = { viewModel.updateSearchQuery(it) },
-        onShowClicked = onShowClicked
+        onShowClicked = onShowClicked,
+        onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }
 
@@ -71,6 +73,7 @@ fun SearchScreen(
     onSetTypeSelection: (UInt) -> Unit,
     onSearch: (String) -> Unit,
     onShowClicked: ShowClick,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     var localQuery by rememberSaveable { mutableStateOf("") }
     Column(
@@ -155,7 +158,9 @@ fun SearchScreen(
                     }
                 }
 
-                is LCE.Error<Exception> -> item { ErrorScreen(searchResults.error) }
+                is LCE.Error<Exception> -> item {
+                    ErrorScreen(searchResults.error, onViewDownloadsClicked = onViewDownloadsClicked)
+                }
                 LCE.Loading -> loadingRows()
             }
         }

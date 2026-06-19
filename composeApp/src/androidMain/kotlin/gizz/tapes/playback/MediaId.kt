@@ -9,12 +9,17 @@ import gizz.tapes.api.data.Show as ApiShow
 sealed interface MediaId {
     companion object {
         private const val ROOT_ID = "root"
+        private const val DOWNLOADED_SHOWS_SEGMENT = "downloaded"
 
         fun fromString(id: String): MediaId {
             val idParts = id.split("/")
 
             if (idParts.isEmpty() || idParts.first() != ROOT_ID) {
                 error("id $id is not in a known format")
+            }
+
+            if (idParts.size == 2 && idParts[1] == DOWNLOADED_SHOWS_SEGMENT) {
+                return DownloadedShowsId
             }
 
             // id's might need to be html escaped...
@@ -48,6 +53,13 @@ sealed interface MediaId {
         override val year = null
         override val showId = null
         override val id = ROOT_ID
+    }
+
+    data object DownloadedShowsId : MediaId {
+        override val parent = RootId
+        override val year = null
+        override val showId = null
+        override val id = "$ROOT_ID/$DOWNLOADED_SHOWS_SEGMENT"
     }
 
     data class YearId(

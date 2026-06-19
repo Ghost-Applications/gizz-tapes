@@ -9,7 +9,9 @@ import gizz.tapes.GizzTapesTheme
 @Composable
 private fun SearchScreenPreview() {
     GizzTapesTheme {
-        SearchScreen { _, _ ->
-        }
+        SearchScreen(
+            onShowClicked = { _, _ -> },
+            onViewDownloadsClicked = { }
+        )
     }
 }

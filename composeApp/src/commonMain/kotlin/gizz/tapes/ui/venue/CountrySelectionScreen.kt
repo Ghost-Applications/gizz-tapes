@@ -33,13 +33,15 @@ fun CountrySelectionScreen(
     modifier: Modifier = Modifier,
     viewModel: CountrySelectionViewModel = assistedMetroViewModel(),
     onCountryClick: CountryClick,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val state by viewModel.countriesState.collectAsState()
 
     CountrySelectionScreen(
         modifier = modifier,
         state = state,
-        onCountryClick = onCountryClick
+        onCountryClick = onCountryClick,
+        onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }
 
@@ -48,6 +50,7 @@ fun CountrySelectionScreen(
     modifier: Modifier = Modifier,
     state: LCE<List<CountrySelectionData>, Exception>,
     onCountryClick: CountryClick,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     LazyVerticalGrid(
         state = rememberLazyGridState(),
@@ -60,7 +63,7 @@ fun CountrySelectionScreen(
         when (state) {
             is LCE.Content<List<CountrySelectionData>> -> content(state.value, onCountryClick)
             is LCE.Error<Exception> -> item(span = { GridItemSpan(maxLineSpan) }) {
-                ErrorScreen(state.error)
+                ErrorScreen(state.error, onViewDownloadsClicked = onViewDownloadsClicked)
             }
 
             LCE.Loading -> loadingCards()

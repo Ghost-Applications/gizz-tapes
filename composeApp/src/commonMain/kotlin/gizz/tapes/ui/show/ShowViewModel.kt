@@ -29,18 +29,29 @@ import gizz.tapes.data.TrackTitle
 import gizz.tapes.nav.Destination
 import gizz.tapes.playback.GizzMediaPlayer
 import gizz.tapes.playback.PlaybackItem
+import gizz.tapes.storage.DownloadsExporter
+import gizz.tapes.storage.RecordingDownloadStatus
+import gizz.tapes.storage.ShowSaver
 import gizz.tapes.util.ForViewModel
 import gizz.tapes.util.LCE
+import gizz.tapes.util.contentOrNull
 import gizz.tapes.util.map
 import gizz.tapes.util.retryUntilSuccessful
+import gizz.tapes.util.sanitizeFileName
 import gizz.tapes.util.tryAndGetPreferredRecordingType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @AssistedInject
@@ -48,6 +59,8 @@ class ShowViewModel(
     private val apiClient: GizzTapesApiClient,
     private val mediaPlayer: GizzMediaPlayer,
     private val datastore: DataStore<Settings>,
+    private val showSaver: ShowSaver,
+    private val downloadsExporter: DownloadsExporter,
     @Assisted savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -60,11 +73,34 @@ class ShowViewModel(
     private val errorFlow = MutableStateFlow<LCE.Error<Throwable>?>(null)
     private val selectedRecording = MutableStateFlow<RecordingId?>(null)
 
+    // bumped after deleteDownloadedShow() so recordingDownloadStatus re-checks disk state -
+    // unlike a completed download, a deletion has no WorkManager state change to react to.
+    private val downloadRefreshTrigger = MutableStateFlow(0)
+
     val show: StateFlow<LCE<ShowScreenState, Throwable>> = loadShow().stateIn(
         scope = viewModelScope,
         started = SharingStarted.ForViewModel,
         initialValue = LCE.Loading
     )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val recordingDownloadStatus: StateFlow<RecordingDownloadStatus> = combine(
+        selectedRecording,
+        cachedShowData,
+        downloadRefreshTrigger
+    ) { selRec, showData, _ -> selRec to showData.contentOrNull() }
+        .flatMapLatest { (selRec, show) ->
+            if (selRec == null || show == null) {
+                flowOf(RecordingDownloadStatus.NOT_DOWNLOADED)
+            } else {
+                showSaver.observeRecordingDownloadStatus(show, selRec)
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.ForViewModel,
+            initialValue = RecordingDownloadStatus.NOT_DOWNLOADED
+        )
 
     init {
         viewModelScope.launch { fetchAndCacheShow() }
@@ -74,7 +110,53 @@ class ShowViewModel(
         selectedRecording.value = recordingId
     }
 
+    fun saveShow() {
+        // the download button only renders once `show` is LCE.Content, so cachedShowData
+        // and selectedRecording are guaranteed to be populated here - see loadShow().
+        val show = cachedShowData.value.contentOrNull()
+            ?: error("Trying to save a show before it has loaded")
+        val recordingId = selectedRecording.value
+            ?: error("Trying to save a show without a recording selected")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            showSaver.saveShow(title = title, show = show, recordingId = recordingId)
+        }
+    }
+
+    fun deleteDownloadedShow() {
+        // only shown once the recording is fully downloaded, so these are guaranteed present.
+        val show = cachedShowData.value.contentOrNull()
+            ?: error("Trying to delete a download before it has loaded")
+        val recordingId = selectedRecording.value
+            ?: error("Trying to delete a download without a recording selected")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            showSaver.deleteDownloadedRecording(show, recordingId)
+            downloadRefreshTrigger.update { it + 1 }
+        }
+    }
+
+    fun exportToDownloads() {
+        // only shown once the recording is fully downloaded, so these are guaranteed present.
+        val show = cachedShowData.value.contentOrNull()
+            ?: error("Trying to export a show before it has loaded")
+        val recordingId = selectedRecording.value
+            ?: error("Trying to export a show without a recording selected")
+        val recording = show.recordings.first { it.id == recordingId.id }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            downloadsExporter.export(recording, sanitizeFileName(title.fullShowTitle.value))
+                .onFailure { logger.e(it) { "Failed to export $recordingId to downloads" } }
+        }
+    }
+
     private suspend fun fetchAndCacheShow() {
+        val cachedShow = showSaver.loadCachedShow(showId)
+        if (cachedShow != null) {
+            cachedShowData.emit(LCE.Content(cachedShow))
+            return
+        }
+
         val data = retryUntilSuccessful(
             action = { apiClient.show(showId.value) },
             onErrorAfter3SecondsAction = { error ->
@@ -104,13 +186,16 @@ class ShowViewModel(
                 val recording = show.recordings.firstOrNull { it.id == selRec?.id }
                     ?: show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
 
+                selectedRecording.value = RecordingId(recording.id)
+
                 val playbackItems = recording.files.map { track ->
                     PlaybackItem(
                         id = "${recording.id}/${track.filename}",
-                        url = recording.filesPathPrefix + track.filename,
+                        url = showSaver.localFileIfDownloaded(recording, track.filename)
+                            ?: (recording.filesPathPrefix + track.filename),
                         title = track.title,
                         albumTitle = title.title.value,
-                        artworkUrl = PosterUrl.Companion(show.posterUrl).value,
+                        artworkUrl = PosterUrl(show.posterUrl).value,
                         showId = ShowId(show.id),
                         showTitle = title,
                         durationMs = track.length.inWholeMilliseconds,
@@ -119,7 +204,7 @@ class ShowViewModel(
                 }
 
                 ShowScreenState(
-                    showPosterUrl = PosterUrl.Companion(show.posterUrl),
+                    showPosterUrl = PosterUrl(show.posterUrl),
                     removeOldMediaItemsAndAddNew = { startIndex ->
                         viewModelScope.launch {
                             mediaPlayer.setPlaylist(playbackItems, startIndex)

@@ -47,7 +47,8 @@ import gizz.tapes.util.toSimpleFormat
 fun HomeScreen(
     gridState: LazyGridState,
     viewModel: HomeViewModel = assistedMetroViewModel(),
-    onShowClicked: ShowClick
+    onShowClicked: ShowClick,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val state: HomeScreenData by viewModel.state.collectAsState()
 
@@ -57,7 +58,8 @@ fun HomeScreen(
         reloadRandomShows = {
             viewModel.reloadRandomShows()
         },
-        onShowClicked = onShowClicked
+        onShowClicked = onShowClicked,
+        onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }
 
@@ -66,7 +68,8 @@ fun HomeScreen(
     gridState: LazyGridState,
     state: HomeScreenData,
     reloadRandomShows: ReloadRandomShows,
-    onShowClicked: ShowClick
+    onShowClicked: ShowClick,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     BoxWithConstraints {
         val columnWidth = GizzTapesTheme.size.gridCellMinSize
@@ -113,7 +116,7 @@ fun HomeScreen(
                 )
 
                 is LCE.Error<Exception> -> item(span = { GridItemSpan(maxLineSpan) }) {
-                    ErrorScreen(content.error)
+                    ErrorScreen(content.error, onViewDownloadsClicked = onViewDownloadsClicked)
                 }
 
                 LCE.Loading -> loading(columnCount)

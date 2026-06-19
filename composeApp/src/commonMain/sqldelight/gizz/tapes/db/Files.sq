@@ -1,0 +1,18 @@
+import kotlin.time.Duration;
+
+CREATE TABLE files (
+  recordingId TEXT NOT NULL,
+  remoteUrl TEXT NOT NULL,
+  localPath TEXT NOT NULL,
+  length INTEGER AS Duration NOT NULL,
+  title TEXT NOT NULL,
+
+  PRIMARY KEY(recordingId, localPath),
+  FOREIGN KEY(recordingId) REFERENCES recordings(id)
+);
+
+insertFile:
+INSERT OR IGNORE INTO files VALUES ?;
+
+deleteFilesForRecording:
+DELETE FROM files WHERE recordingId = ?;

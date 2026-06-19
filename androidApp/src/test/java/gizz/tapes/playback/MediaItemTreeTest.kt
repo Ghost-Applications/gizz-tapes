@@ -21,6 +21,8 @@ import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
 import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
+import gizz.tapes.data.ShowId
+import gizz.tapes.storage.DownloadedShowsSource
 import gizz.tapes.stub
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
@@ -31,6 +33,13 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 class MediaItemTreeTest {
+
+    // no downloaded shows in these tests - they only exercise the live-network path.
+    private val noDownloads = object : DownloadedShowsSource {
+        override fun loadDownloadedShows(): List<Show> = emptyList()
+        override fun loadCachedShow(showId: ShowId): Show? = null
+        override fun localFileIfDownloaded(recording: Recording, filename: String): String? = null
+    }
 
     @Test
     fun `getChildren returns year media when parentId is root`() = runTest {
@@ -89,7 +98,7 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient).getChildren(MediaId.RootId).map {
+        val result = MediaItemTree(apiClient, noDownloads).getChildren(MediaId.RootId).map {
             ShowTestData(
                 it.mediaId,
                 it.mediaMetadata.title.toString(),
@@ -101,6 +110,14 @@ class MediaItemTreeTest {
         }
 
         assertThat(result).containsExactly(
+            ShowTestData(
+                "root/downloaded",
+                "Downloaded Shows",
+                null,
+                false,
+                true,
+                MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
+            ),
             ShowTestData(
                 "root/2019",
                 "2019",
@@ -186,7 +203,7 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient).getChildren(MediaId.YearId("2021")).map {
+        val result = MediaItemTree(apiClient, noDownloads).getChildren(MediaId.YearId("2021")).map {
             ShowTestData(
                 it.mediaId,
                 it.mediaMetadata.title.toString(),
@@ -337,7 +354,7 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient)
+        val result = MediaItemTree(apiClient, noDownloads)
             .getChildren(MediaId.ShowId(parent = MediaId.YearId("2021"), showId = "1"))
             .map {
                 TestData(
@@ -486,7 +503,7 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient)
+        val result = MediaItemTree(apiClient, noDownloads)
             .getChildren(
                 MediaId.RecordingId(
                     parent = MediaId.ShowId(parent = MediaId.YearId("2021"), showId = "1"),

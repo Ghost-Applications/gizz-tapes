@@ -24,6 +24,7 @@ import arrow.core.toOption
 import arrow.fx.coroutines.parMap
 import co.touchlab.kermit.Logger
 import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -150,7 +151,7 @@ class PlaybackService(
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
-        Logger.d { "onGetSession controllerInfo=$controllerInfo" }
+        logger.d { "onGetSession controllerInfo=$controllerInfo" }
         return mediaSession
     }
 
@@ -173,9 +174,9 @@ class PlaybackService(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo
     ): ListenableFuture<MediaItemsWithStartPosition> {
-        Logger.d { "onPlaybackResumption() mediaSession=$mediaSession, controller=$controller" }
+        logger.d { "onPlaybackResumption() mediaSession=$mediaSession, controller=$controller" }
         return serviceScope.future(Dispatchers.Main) {
-            Logger.d("onPlaybackResumption() future")
+            logger.d("onPlaybackResumption() future")
             initJob.join()
             MediaItemsWithStartPosition(
                 (0 until player.mediaItemCount).map { player.getMediaItemAt(it) },
@@ -189,7 +190,7 @@ class PlaybackService(
         session: MediaSession,
         controller: MediaSession.ControllerInfo
     ): MediaSession.ConnectionResult {
-        Logger.d { "onConnect() session=$session, controller=$controller" }
+        logger.d { "onConnect() session=$session, controller=$controller" }
         val sessionCommands = MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS
         if (
             session.isMediaNotificationController(controller) ||
@@ -210,14 +211,13 @@ class PlaybackService(
         browser: MediaSession.ControllerInfo,
         params: LibraryParams?
     ): ListenableFuture<LibraryResult<MediaItem>> {
-        Logger.d {
+        logger.d {
             "onGetLibraryRoot() session=$session, browser=$browser, params=$params"
         }
-        return serviceScope.future {
-            val item = mediaItemTree.getRoot()
-            Logger.d { "onGetLibraryRoot() future result item=${MediaItemWrapper(item)}" }
-            LibraryResult.ofItem(item, params)
-        }
+
+        val item = mediaItemTree.getRoot()
+        logger.d { "onGetLibraryRoot() future result item=${MediaItemWrapper(item)}" }
+        return Futures.immediateFuture(LibraryResult.ofItem(item, params))
     }
 
     override fun onGetChildren(
@@ -228,10 +228,10 @@ class PlaybackService(
         pageSize: Int,
         params: LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Logger.d { "onGetChildren() parentId=$parentId" }
+        logger.d { "onGetChildren() parentId=$parentId" }
         return serviceScope.future {
             val items = mediaItemTree.getChildren(MediaId.fromString(parentId))
-            Logger.d { "onGetChildren() future result items=${MediaItemsWrapper(items)}" }
+            logger.d { "onGetChildren() future result items=${MediaItemsWrapper(items)}" }
             LibraryResult.ofItemList(items, params)
         }
     }
@@ -241,9 +241,9 @@ class PlaybackService(
         browser: MediaSession.ControllerInfo,
         mediaId: String
     ): ListenableFuture<LibraryResult<MediaItem>> {
-        Logger.d { "onGetItem() mediaId=$mediaId" }
+        logger.d { "onGetItem() mediaId=$mediaId" }
         return serviceScope.future {
-            Logger.d { "onGetItem() future" }
+            logger.d { "onGetItem() future" }
             mediaItemTree.getItem(MediaId.fromString(mediaId)).toOption()
                 .map { LibraryResult.ofItem(it, null) }
                 .getOrElse { LibraryResult.ofError(SessionError.ERROR_INVALID_STATE) }
@@ -255,11 +255,11 @@ class PlaybackService(
         controller: MediaSession.ControllerInfo,
         mediaItems: List<MediaItem>
     ): ListenableFuture<List<MediaItem>> {
-        Logger.d { "onAddMediaItems() mediaItems=${MediaItemsWrapper(mediaItems)}" }
+        logger.d { "onAddMediaItems() mediaItems=${MediaItemsWrapper(mediaItems)}" }
         return serviceScope.future {
             if (mediaItems.size == 1 && mediaItems.first().localConfiguration == null) {
                 mediaItemTree.getChildren(MediaId.fromString(mediaItems.first().mediaId)).let { playlist ->
-                    Logger.d { "onAddMediaItems() future result playlist=${MediaItemsWrapper(playlist)}" }
+                    logger.d { "onAddMediaItems() future result playlist=${MediaItemsWrapper(playlist)}" }
                     return@future playlist
                 }
             }

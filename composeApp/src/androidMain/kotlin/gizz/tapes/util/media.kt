@@ -1,9 +1,9 @@
 package gizz.tapes.util
 
+import android.net.Uri
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MimeTypes
 import gizz.tapes.data.BAND_NAME
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
@@ -13,6 +13,7 @@ import gizz.tapes.playback.MediaId
 import gizz.tapes.playback.PlaybackItem
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
+import java.io.File
 
 val MediaItem?.title: String get() = this?.mediaMetadata?.title?.toString() ?: "--"
 val MediaItem.showExtras: Destination.Show? get() = mediaMetadata.extras?.toShowInfo()
@@ -61,11 +62,15 @@ value class MediaMetaDataWrapper(private val mediaMetadata: MediaMetadata) {
     }
 }
 
+// local downloads are stored as plain filesystem paths (no scheme), which media3's
+// DefaultDataSource would otherwise try to fetch over the network - build a proper
+// file:// Uri so it routes to FileDataSource instead.
+fun String.toLocalOrRemoteUri(): Uri = if (startsWith("/")) File(this).toUri() else toUri()
+
 fun PlaybackItem.toMediaItem(): MediaItem {
     return MediaItem.Builder()
-        .setUri(url)
+        .setUri(url.toLocalOrRemoteUri())
         .setMediaId(id)
-        .setMimeType(MimeTypes.AUDIO_MPEG)
         .setMediaMetadata(
             MediaMetadata.Builder()
                 .setArtist(BAND_NAME)

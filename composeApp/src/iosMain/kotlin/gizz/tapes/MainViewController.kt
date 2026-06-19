@@ -18,5 +18,5 @@ fun MainViewController(): UIViewController {
         CompositionLocalProvider(LocalMetroViewModelFactory provides appGraph.metroViewModelFactory) {
             GizzTapesApp()
         }
-    }
+    }.also { RootViewControllerHolder.current = it }
 }
