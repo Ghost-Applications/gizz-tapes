@@ -33,7 +33,6 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -47,8 +46,6 @@ kotlin {
     jvm("desktop")
 
     sourceSets {
-        val desktopMain by getting
-
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -87,7 +84,7 @@ kotlin {
             implementation(libs.compose.ui.test)
         }
 
-        desktopMain.dependencies {
+        getByName("desktopMain").dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)

@@ -7,7 +7,6 @@ kotlin {
     // jvm and iOS targets will be priority for apps
     // with plans / abilities to support the others in the future.
     jvm()
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     macosArm64()
