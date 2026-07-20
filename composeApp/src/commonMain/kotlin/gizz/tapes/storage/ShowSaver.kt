@@ -37,8 +37,6 @@ class ShowSaver(
         )
 
         db.recordingsQueries.insertRecording(r)
-
-
     }
 
     private fun Show.toDbShow(title: FullShowTitle) = Shows(

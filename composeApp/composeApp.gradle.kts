@@ -31,6 +31,9 @@ kotlin {
         androidResources {
             enable = true
         }
+
+        compileSdk = libs.versions.android.sdk.get().toInt()
+        minSdk = libs.versions.android.min.sdk.get().toInt()
     }
 
     listOf(
@@ -108,6 +111,8 @@ kotlin {
 
             implementation(libs.media3.exoplayer)
             implementation(libs.media3.session)
+
+            implementation(libs.workmanager)
         }
     }
 }

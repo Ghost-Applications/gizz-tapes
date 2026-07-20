@@ -26,7 +26,6 @@ import gizz.tapes.data.Settings
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.TrackDuration
 import gizz.tapes.data.TrackTitle
-import gizz.tapes.db.Shows
 import gizz.tapes.nav.Destination
 import gizz.tapes.playback.GizzMediaPlayer
 import gizz.tapes.playback.PlaybackItem

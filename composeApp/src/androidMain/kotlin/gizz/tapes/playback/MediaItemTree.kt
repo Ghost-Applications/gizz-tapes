@@ -241,7 +241,6 @@ class MediaItemTree(
         return MediaItem.Builder()
             .setUri(recording.filesPathPrefix + track.filename)
             .setMediaId(MediaId.TrackId(show = showData, file = track, recording = recording))
-            .setMimeType(MimeTypes.AUDIO_MPEG)
             .setMediaMetadata(
                 // I think there's a reason for using `show.item.title` but I don't remember now
                 // figure out when testing on a real device and leave a good comment...

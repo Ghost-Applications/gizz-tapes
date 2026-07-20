@@ -7,6 +7,7 @@ import okio.Path.Companion.toOkioPath
 actual class AppContext(
     val context: Context
 ) {
+    actual val platform: Platform = Platform.Android
     actual val settingsPath: Path by lazy {
         context.filesDir.resolve("gizz_tapes_settings.json").toOkioPath()
     }

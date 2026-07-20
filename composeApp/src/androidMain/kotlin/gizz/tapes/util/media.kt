@@ -65,7 +65,6 @@ fun PlaybackItem.toMediaItem(): MediaItem {
     return MediaItem.Builder()
         .setUri(url)
         .setMediaId(id)
-        .setMimeType(MimeTypes.AUDIO_MPEG)
         .setMediaMetadata(
             MediaMetadata.Builder()
                 .setArtist(BAND_NAME)

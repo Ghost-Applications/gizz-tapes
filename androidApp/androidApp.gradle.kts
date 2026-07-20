@@ -131,6 +131,8 @@ dependencies {
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.session)
 
+    implementation(libs.workmanager)
+
     implementation(libs.kermit)
     implementation(libs.metro.android)
     implementation(libs.kotlinx.coroutines.guava)

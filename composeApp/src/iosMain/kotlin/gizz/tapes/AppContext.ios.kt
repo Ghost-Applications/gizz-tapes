@@ -8,6 +8,7 @@ import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 
 actual class AppContext {
+    actual val platform: Platform = Platform.iOS
     actual val settingsPath: Path = documentsDir() / "gizz_tapes_settings.json"
     actual val sessionPath: Path = documentsDir() / "gizz_tapes_session.json"
 }
