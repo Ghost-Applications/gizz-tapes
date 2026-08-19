@@ -36,6 +36,8 @@ import gizz.tapes.data.PosterUrl
 import gizz.tapes.ui.components.PlaybackError
 import gizz.tapes.ui.components.PosterImage
 
+private val logger = Logger.withTag("MiniPlayer")
+
 @Composable
 fun MiniPlayer(
     modifier: Modifier = Modifier,
@@ -44,7 +46,7 @@ fun MiniPlayer(
     playerError: PlaybackError,
     onClick: (FullShowTitle) -> Unit,
 ) {
-    Logger.d { "MiniPlayer: playerState=$playerState" }
+    logger.d { "playerState=$playerState" }
 
     AnimatedVisibility(
         modifier = modifier,

@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -85,6 +86,7 @@ class ShowViewModel(
             cachedShowData.takeWhile { value -> value.contentOrNull() != null }
                 .mapNotNull { it.contentOrNull() }
                 .collectLatest {
+                    logger.d { "saveShow collectLatest $it"}
                     showSaver.saveShow(
                         title = title,
                         show = it,
@@ -124,6 +126,8 @@ class ShowViewModel(
             showData.map { show ->
                 val recording = show.recordings.firstOrNull { it.id == selRec?.id }
                     ?: show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
+
+                selectedRecording.value = RecordingId(recording.id)
 
                 val playbackItems = recording.files.map { track ->
                     PlaybackItem(

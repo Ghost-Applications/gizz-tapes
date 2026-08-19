@@ -30,7 +30,7 @@ import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import gizz.tapes.GizzTapesTheme
 
-val logger = Logger.withTag("HeroHeader")
+private val logger = Logger.withTag("HeroHeader")
 
 @Composable
 fun HeroHeader(
