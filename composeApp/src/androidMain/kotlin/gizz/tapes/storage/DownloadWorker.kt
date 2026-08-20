@@ -40,7 +40,7 @@ class DownloadWorker(
         val url = inputData.getString(INPUT_URL_KEY) as String
         logger.d { "doWork() url=$url" }
 
-        val destination = File(appContext.filesDir, url.htmlEncode())
+        val destination = File(appContext.filesDir, url)
         destination.parentFile?.mkdirs()
 
         return httpClient.prepareGet(url).execute { response ->

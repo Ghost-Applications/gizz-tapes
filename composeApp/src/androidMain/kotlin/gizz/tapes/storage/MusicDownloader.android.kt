@@ -6,6 +6,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import co.touchlab.kermit.Logger
@@ -37,12 +38,10 @@ actual class MusicDownloader(val applicationContext: Context) {
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, WorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
             .build()
 
-        val operation = WorkManager.getInstance(applicationContext).enqueueUniqueWork(
+        WorkManager.getInstance(applicationContext).enqueueUniqueWork(
             "download_${uri}",
             ExistingWorkPolicy.KEEP,
             downloadRequest
         )
-
-        operation.result
     }
 }

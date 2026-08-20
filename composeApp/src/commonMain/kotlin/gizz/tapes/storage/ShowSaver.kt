@@ -9,6 +9,7 @@ import gizz.tapes.api.data.Show
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.RecordingId
 import gizz.tapes.db.Database
+import gizz.tapes.db.Files
 import gizz.tapes.db.Recordings
 import gizz.tapes.db.Shows
 
@@ -28,26 +29,33 @@ class ShowSaver(
     ) {
         val recording: Recording = show.recordings.first { it.id == recordingId.id }
 
-        // download and save recordings
+        db.showsQueries.insertShow(show.toDbShow(title))
 
-//        db.showsQueries.insertShow(show.toDbShow(title))
-//
-//        val r = Recordings(
-//            id = recording.id,
-//            showId = show.id,
-//            uploadedAt = recording.uploadedAt,
-//            type = recording.type,
-//            source = recording.source,
-//            lineage = recording.lineage,
-//            taper = recording.taper
-//        )
-//
-//        db.recordingsQueries.insertRecording(r)
+        val r = Recordings(
+            id = recording.id,
+            showId = show.id,
+            uploadedAt = recording.uploadedAt,
+            type = recording.type,
+            source = recording.source,
+            lineage = recording.lineage,
+            taper = recording.taper
+        )
+
+        db.recordingsQueries.insertRecording(r)
 
         logger.d { "recoding $recording" }
         recording.files.forEach {
             logger.d { "Downloading ${it.title}" }
-            musicDownloader.download(recording.filesPathPrefix + it.filename)
+            val filepath = (recording.filesPathPrefix + it.filename)
+
+            db.filesQueries.insertFile(
+                Files(
+                    recordingId = recording.id,
+                    filepath = filepath,
+                )
+            )
+
+            musicDownloader.download(filepath)
         }
     }
 

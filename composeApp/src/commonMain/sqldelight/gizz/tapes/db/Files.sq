@@ -2,7 +2,7 @@ import kotlin.time.Duration;
 
 CREATE TABLE files (
   recordingId TEXT NOT NULL,
-  fileName TEXT NOT NULL,
+  filePath TEXT NOT NULL,
   length INTEGER AS Duration NOT NULL,
   title TEXT NOT NULL,
 
