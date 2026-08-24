@@ -184,7 +184,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_26.1.app
+        run: sudo xcode-select -s /Applications/Xcode_26.6.app
       - name: Compile KMP iOS framework
         run: >
           ./gradlew :composeApp:compileKotlinIosSimulatorArm64
