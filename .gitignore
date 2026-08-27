@@ -233,3 +233,6 @@ xcuserdata/
 *.xcuserstate
 
 ci-artifacts/
+
+# Ignore all idea files
+.idea
