@@ -24,6 +24,7 @@ import gizz.tapes.data.Title
 import gizz.tapes.data.Year
 import gizz.tapes.nav.Destination
 import gizz.tapes.storage.DownloadedShowsSource
+import gizz.tapes.util.putRemoteUrl
 import gizz.tapes.util.realMediaId
 import gizz.tapes.util.retry
 import gizz.tapes.util.setMediaId
@@ -303,7 +304,7 @@ class MediaItemTree(
                                 title = Title(show.item.title),
                                 date = showData.date
                             )
-                        ).toExtrasBundle()
+                        ).toExtrasBundle().putRemoteUrl(remoteUrl)
                     )
                     .setArtist("$dateString ${show.item.title}")
                     .setAlbumArtist(BAND_NAME)

@@ -95,7 +95,7 @@ class PlaybackService(
                 true
             )
             .setHandleAudioBecomingNoisy(true)
-            .setSkipSilenceEnabled(true)
+            .setWakeMode(C.WAKE_MODE_LOCAL)
             .build()
 
         player = playerFactory.create(exoPlayer)
@@ -198,12 +198,12 @@ class PlaybackService(
             session.isAutoCompanionController(controller)
         ) {
             // Available session commands to accept incoming custom commands from Auto.
-            return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
+            return MediaSession.ConnectionResult.AcceptedResultBuilder(session, controller)
                 .setAvailableSessionCommands(sessionCommands)
                 .build()
         }
         // Default commands with default custom layout for all other controllers.
-        return MediaSession.ConnectionResult.AcceptedResultBuilder(session).build()
+        return MediaSession.ConnectionResult.AcceptedResultBuilder(session, controller).build()
     }
 
     override fun onGetLibraryRoot(

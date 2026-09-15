@@ -85,7 +85,7 @@ fun PlaybackItem.toMediaItem(): MediaItem {
                 .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
                 .setIsPlayable(true)
                 .setIsBrowsable(false)
-                .setExtras(Destination.Show(showId, showTitle).toExtrasBundle())
+                .setExtras(Destination.Show(showId, showTitle).toExtrasBundle().putRemoteUrl(remoteUrl))
                 .build()
         )
         .build()
@@ -105,9 +105,11 @@ fun MediaItem.toPlaybackItem(): PlaybackItem {
         id = ShowId(checkNotNull(realMediaId.showId) { "MediaItem mediaId missing showId: $mediaId" }),
         title = FullShowTitle(title = Title(metadata.albumTitle?.toString() ?: "--"), date = date)
     )
+    val url = checkNotNull(localConfiguration?.uri?.toString()) { "MediaItem missing URI: $mediaId" }
     return PlaybackItem(
         id = mediaId,
-        url = checkNotNull(localConfiguration?.uri?.toString()) { "MediaItem missing URI: $mediaId" },
+        url = url,
+        remoteUrl = metadata.extras?.getRemoteUrl() ?: url,
         title = metadata.title?.toString() ?: "--",
         albumTitle = metadata.albumTitle?.toString() ?: "--",
         artworkUrl = metadata.artworkUri?.toString(),

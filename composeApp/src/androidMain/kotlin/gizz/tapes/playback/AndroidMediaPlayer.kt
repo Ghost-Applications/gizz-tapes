@@ -29,8 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-private const val POLLING_INTERVAL_MS = 500L
+import kotlin.time.Duration.Companion.milliseconds
 
 @Inject
 @ContributesBinding(AppScope::class)
@@ -86,7 +85,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
         pollingJob?.cancel()
         pollingJob = scope.launch {
             while (true) {
-                delay(POLLING_INTERVAL_MS)
+                delay(700.milliseconds)
                 if (mediaController?.isPlaying == true) {
                     updateState()
                 }

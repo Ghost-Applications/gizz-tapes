@@ -1,5 +1,6 @@
 package gizz.tapes.playback
 
+import android.os.Bundle
 import androidx.media3.cast.DefaultMediaItemConverter
 import androidx.media3.cast.MediaItemConverter
 import androidx.media3.common.MediaItem
@@ -8,6 +9,8 @@ import androidx.media3.common.util.UnstableApi
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.MediaQueueItem
+import gizz.tapes.util.getRemoteUrl
+import gizz.tapes.util.putRemoteUrl
 import org.json.JSONObject
 
 /**
@@ -23,7 +26,13 @@ internal class GizzMediaItemConverter : MediaItemConverter {
     override fun toMediaQueueItem(mediaItem: MediaItem): MediaQueueItem {
         val defaultItem = default.toMediaQueueItem(mediaItem)
         val mediaInfo = defaultItem.media ?: return defaultItem
-        val contentUrl = mediaInfo.contentUrl ?: return defaultItem
+        val localContentUrl = mediaInfo.contentUrl ?: return defaultItem
+
+        // Downloaded tracks point at an app-private file:// path the Cast receiver can't fetch -
+        // swap in the streamable URL we stashed on the MediaItem's extras when casting.
+        val isLocalFile = mediaItem.localConfiguration?.uri?.scheme == "file"
+        val remoteUrl = mediaItem.mediaMetadata.extras?.getRemoteUrl()
+        val contentUrl = if (isLocalFile && remoteUrl != null) remoteUrl else localContentUrl
 
         val customData = (mediaInfo.customData ?: JSONObject())
         mediaItem.mediaMetadata.recordingYear?.let { customData.put(KEY_RECORDING_YEAR, it) }
@@ -48,7 +57,7 @@ internal class GizzMediaItemConverter : MediaItemConverter {
             return buildFallbackMediaItem(mediaInfo)
         }
 
-        val mediaItem = default.toMediaItem(mediaQueueItem)
+        val mediaItem = reconcileWithActiveContentUrl(default.toMediaItem(mediaQueueItem), mediaInfo)
         val customData = mediaInfo.customData
         val year = customData?.optInt(KEY_RECORDING_YEAR, -1).takeIf { it != -1 } ?: return mediaItem
         val month = customData?.optInt(KEY_RECORDING_MONTH, -1).takeIf { it != -1 } ?: return mediaItem
@@ -60,6 +69,24 @@ internal class GizzMediaItemConverter : MediaItemConverter {
                     .setRecordingYear(year)
                     .setRecordingMonth(month)
                     .setRecordingDay(day)
+                    .build()
+            )
+            .build()
+    }
+
+    // On reconnect to an already-active Cast session (e.g. the app process was restarted while
+    // casting continued in the background), the default converter rebuilds the MediaItem from the
+    // customData JSON embedded when the item was originally queued - which still holds a
+    // downloaded track's local file:// path. The receiver is actually playing mediaInfo.contentUrl
+    // (already the remote URL, since toMediaQueueItem() rewrites it), so trust that instead.
+    private fun reconcileWithActiveContentUrl(mediaItem: MediaItem, mediaInfo: MediaInfo): MediaItem {
+        val contentUrl = mediaInfo.contentUrl ?: return mediaItem
+        if (mediaItem.localConfiguration?.uri?.scheme != "file") return mediaItem
+        return mediaItem.buildUpon()
+            .setUri(contentUrl)
+            .setMediaMetadata(
+                mediaItem.mediaMetadata.buildUpon()
+                    .setExtras(Bundle().putRemoteUrl(contentUrl))
                     .build()
             )
             .build()
