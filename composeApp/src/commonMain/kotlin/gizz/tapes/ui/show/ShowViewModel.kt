@@ -219,14 +219,14 @@ class ShowViewModel(
                     }.toNonEmptyListOrNull()!!,
                     recordingData = RecordingData(
                         notes = show.notes,
-                        selectedRecording = recording.id,
                         recordings = show.recordings.map { RecordingId(it.id) },
                         taper = recording.taper,
                         source = recording.source,
                         lineage = recording.lineage,
-                        identifier = recording.id,
+                        id = RecordingId(recording.id),
                         uploadDate = recording.uploadedAt.toString(),
-                        kglwNetShowLink = show.kglwNet.fullLink
+                        kglwNetShowLink = show.kglwNet.fullLink,
+                        type = recording.type
                     )
                 )
             }

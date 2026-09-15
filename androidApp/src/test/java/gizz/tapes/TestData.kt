@@ -26,8 +26,6 @@ import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerState
 import gizz.tapes.ui.show.ShowScreenState
 import gizz.tapes.util.LCE.Content
-import gizz.tapes.util.map
-import gizz.tapes.util.showTitle
 import kotlinx.datetime.LocalDate
 import kotlin.collections.emptyList
 import kotlin.time.Duration.Companion.minutes
@@ -302,14 +300,14 @@ val showContent = Content(
         },
         recordingData = RecordingData(
             notes = null,
-            selectedRecording = "SMB: gizz-sb",
             recordings = nonEmptyListOf(RecordingId("test-recording")),
             taper = null,
             source = null,
             lineage = null,
-            identifier = "gizz-sb",
+            id = RecordingId("gizz-sb"),
             uploadDate = "2025-01-01",
-            kglwNetShowLink = "https://kglw.net/setlists/king-gizzard-the-lizard-wizard-november-21-2024-factory-town-miami-fl-usa.html"
+            kglwNetShowLink = "https://kglw.net/setlists/king-gizzard-the-lizard-wizard-november-21-2024-factory-town-miami-fl-usa.html",
+            type = Recording.Type.SBD
         )
     )
 )

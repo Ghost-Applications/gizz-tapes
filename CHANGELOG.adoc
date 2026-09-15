@@ -5,6 +5,7 @@
 - Fix chromecast playback
 - Allow offline playback. Shows can be downloaded and played locally, and be saved to play with
 other apps.
+- Make show source selection more apparent
 
 == KGLW 2026-05-30
 

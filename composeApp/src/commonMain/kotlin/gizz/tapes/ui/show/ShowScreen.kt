@@ -34,6 +34,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,6 +62,7 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import de.charlex.compose.htmltext.material3.HtmlText
@@ -330,8 +332,19 @@ private fun ShowContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    TextButton(onClick = { showRecordingMenu = true }) {
-                        Text(state.recordingData.selectedRecording)
+                    FilledTonalButton(
+                        onClick = { showRecordingMenu = true },
+                    ) {
+                        val recordingText = with(state.recordingData) {
+                            "${type.name}${taper?.let { " by $it" }.orEmpty()}: $id"
+                        }
+                        Text(
+                            text = recordingText,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
                         Icon(Icons.Default.ExpandMore, null)
                     }
                     DropdownMenu(
@@ -471,7 +484,7 @@ private fun ShowMetadata(recordingData: RecordingData) {
         recordingData.lineage?.let {
             Text("Lineage: $it", style = MaterialTheme.typography.bodySmall)
         }
-        Text("Identifier: ${recordingData.identifier}", style = MaterialTheme.typography.bodySmall)
+        Text("Identifier: ${recordingData.id}", style = MaterialTheme.typography.bodySmall)
         Text("Uploaded: ${recordingData.uploadDate}", style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(4.dp))
         Text(
