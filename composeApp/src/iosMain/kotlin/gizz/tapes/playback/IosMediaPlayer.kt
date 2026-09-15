@@ -76,6 +76,12 @@ class IosMediaPlayer(
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
+    // local downloads are stored as plain filesystem paths - URLWithString requires a
+    // percent-encoded URL string, which a raw path with spaces/colons is not, so route
+    // local paths through fileURLWithPath instead.
+    private fun PlaybackItem.toNSURL(): NSURL? =
+        if (url.startsWith("/")) NSURL.fileURLWithPath(url) else NSURL.URLWithString(url)
+
     private var lastArtworkUrl: String? = null
     private var cachedArtwork: MPMediaItemArtwork? = null
     private var savingJob: Job? = null
@@ -97,7 +103,7 @@ class IosMediaPlayer(
                 playlist = stored.items
                 currentIndex = stored.currentTrack.coerceIn(0, (stored.items.size - 1).coerceAtLeast(0))
                 stored.items.drop(currentIndex).forEach { item ->
-                    NSURL.URLWithString(item.url)?.let { url ->
+                    item.toNSURL()?.let { url ->
                         player.insertItem(AVPlayerItem(url), afterItem = null)
                     }
                 }
@@ -264,7 +270,7 @@ class IosMediaPlayer(
         currentIndex = startIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0))
         player.removeAllItems()
         items.drop(currentIndex).forEach { item ->
-            NSURL.URLWithString(item.url)?.let { url ->
+            item.toNSURL()?.let { url ->
                 player.insertItem(AVPlayerItem(url), afterItem = null)
             }
         }
@@ -297,7 +303,7 @@ class IosMediaPlayer(
             // so we rebuild it starting from the new index
             player.removeAllItems()
             playlist.drop(currentIndex).forEach { item ->
-                NSURL.URLWithString(item.url)?.let { url ->
+                item.toNSURL()?.let { url ->
                     player.insertItem(AVPlayerItem(url), afterItem = null)
                 }
             }

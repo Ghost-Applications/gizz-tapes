@@ -31,6 +31,7 @@ internal fun ShowSelectionScreen(
     navigateUp: NavigateUp,
     onShowClicked: (ShowId, FullShowTitle) -> Unit,
     onMiniPlayerClick: (FullShowTitle) -> Unit,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val playerState by playerViewModel.playerState.collectAsState()
     val state by viewModel.shows.collectAsState()
@@ -50,7 +51,8 @@ internal fun ShowSelectionScreen(
             IconButton(onClick = { viewModel.toggleSortOrder() }) {
                 Icon(Icons.Default.SortByAlpha, contentDescription = "Sort by date")
             }
-        }
+        },
+        onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }
 
@@ -64,6 +66,7 @@ fun ShowSelectionScreen(
     onMiniPlayerClick: (FullShowTitle) -> Unit,
     playerActions: PlayerActions,
     actions: @Composable RowScope.() -> Unit,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val selectionData = remember(state) {
         state.mapCollection {
@@ -82,6 +85,7 @@ fun ShowSelectionScreen(
         onMiniPlayerClick = onMiniPlayerClick,
         playerState = playerState,
         playerActions = playerActions,
-        actions = actions
+        actions = actions,
+        onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }

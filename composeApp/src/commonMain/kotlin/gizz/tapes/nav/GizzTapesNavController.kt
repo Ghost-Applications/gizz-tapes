@@ -14,6 +14,7 @@ import gizz.tapes.nav.Destination.ShowSelection.SelectionType.ByYear
 import gizz.tapes.ui.MainScreen
 import gizz.tapes.ui.MainScreenNavigation
 import gizz.tapes.ui.about.AboutScreen
+import gizz.tapes.ui.downloads.DownloadedShowsScreen
 import gizz.tapes.ui.player.FullPlayerScreen
 import gizz.tapes.ui.selection.ShowSelectionScreen
 import gizz.tapes.ui.settings.SettingsScreen
@@ -31,6 +32,9 @@ fun GizzTapesNavController(navController: NavHostController) {
                 navigation = MainScreenNavigation(
                     navigateToSettingsScreen = { navController.navigate(Destination.Settings) },
                     navigateToAboutScreen = { navController.navigate(Destination.About) },
+                    navigateToDownloadedShowsScreen = {
+                        navController.navigate(Destination.DownloadedShows)
+                    },
                     navigateToShow = { id, title ->
                         navController.navigate(
                             Destination.Show(
@@ -70,6 +74,7 @@ fun GizzTapesNavController(navController: NavHostController) {
                 onMiniPlayerClick = { title ->
                     navController.navigate(Destination.Player(title))
                 },
+                onViewDownloadsClicked = { navController.navigate(Destination.DownloadedShows) },
             )
         }
 
@@ -84,6 +89,7 @@ fun GizzTapesNavController(navController: NavHostController) {
                 onPlayerClick = { title ->
                     navController.navigate(Destination.Player(title))
                 },
+                onViewDownloadsClicked = { navController.navigate(Destination.DownloadedShows) },
             )
         }
 
@@ -102,7 +108,30 @@ fun GizzTapesNavController(navController: NavHostController) {
                 navigateUp = { navController.navigateUp() },
                 onVenueClicked = {
                     navController.navigate(Destination.ShowSelection(SelectionType.ByVenue(it)))
-                }
+                },
+                onViewDownloadsClicked = { navController.navigate(Destination.DownloadedShows) },
+            )
+        }
+
+        composable<Destination.DownloadedShows> {
+            DownloadedShowsScreen(
+                navigateUp = {
+                    // when the app opened offline, this is the start destination with no
+                    // back stack - fall through to the normal tabbed UI instead of a dead button.
+                    if (navController.previousBackStackEntry != null) {
+                        navController.navigateUp()
+                    } else {
+                        navController.navigate(Destination.Main) {
+                            popUpTo(Destination.DownloadedShows) { inclusive = true }
+                        }
+                    }
+                },
+                onShowClicked = { id, title ->
+                    navController.navigate(Destination.Show(id, title))
+                },
+                onMiniPlayerClick = { title ->
+                    navController.navigate(Destination.Player(title))
+                },
             )
         }
     }

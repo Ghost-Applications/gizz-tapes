@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,7 +47,8 @@ fun LazyListScope.loadingRows() {
 fun ErrorScreen(
     error: Throwable,
     modifier: Modifier = Modifier,
-    message: String = stringResource(Res.string.api_error_message)
+    message: String = stringResource(Res.string.api_error_message),
+    onViewDownloadsClicked: () -> Unit,
 ) {
     var clickCount by remember { mutableStateOf(0) }
 
@@ -65,8 +67,14 @@ fun ErrorScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             CircularProgressIndicator()
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(onClick = onViewDownloadsClicked) {
+                Text("View Downloaded Shows")
+            }
+            Spacer(modifier = Modifier.height(24.dp))
 
             if (clickCount > 5) {
                 Text(
@@ -86,5 +94,5 @@ private fun LoadingScreenPreview() {
 @Preview
 @Composable
 private fun ErrorScreenPreview() {
-    ErrorScreen(error = Exception("Test"))
+    ErrorScreen(error = Exception("Test")) { }
 }

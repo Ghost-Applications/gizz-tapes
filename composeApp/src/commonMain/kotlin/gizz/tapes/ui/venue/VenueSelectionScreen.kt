@@ -41,7 +41,8 @@ fun interface VenueClicked {
 fun VenueSelectionScreen(
     navigateUp: NavigateUp,
     onVenueClicked: VenueClicked,
-    viewModel: VenueSelectionViewModel = assistedMetroViewModel()
+    viewModel: VenueSelectionViewModel = assistedMetroViewModel(),
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val state by viewModel.venuesState.collectAsState()
 
@@ -49,7 +50,8 @@ fun VenueSelectionScreen(
         countryName = viewModel.countryName,
         navigateUp = navigateUp,
         onVenueClicked = onVenueClicked,
-        state = state
+        state = state,
+        onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }
 
@@ -59,7 +61,8 @@ fun VenueSelectionScreen(
     countryName: String,
     navigateUp: NavigateUp,
     onVenueClicked: VenueClicked,
-    state: LCE<List<VenueSelectionData>, Exception>
+    state: LCE<List<VenueSelectionData>, Exception>,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val gridState = rememberLazyGridState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -94,7 +97,7 @@ fun VenueSelectionScreen(
             when (state) {
                 is LCE.Content<List<VenueSelectionData>> -> content(state.value, onVenueClicked)
                 is LCE.Error<Exception> -> item(span = { GridItemSpan(maxLineSpan) }) {
-                    ErrorScreen(state.error)
+                    ErrorScreen(state.error, onViewDownloadsClicked = onViewDownloadsClicked)
                 }
 
                 LCE.Loading -> loadingCards()

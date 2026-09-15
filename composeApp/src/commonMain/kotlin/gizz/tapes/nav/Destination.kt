@@ -99,4 +99,7 @@ sealed interface Destination {
 
     @Serializable
     data object Search : Destination
+
+    @Serializable
+    data object DownloadedShows : Destination
 }

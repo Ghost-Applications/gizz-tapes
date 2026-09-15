@@ -24,7 +24,8 @@ import gizz.tapes.util.LCE
 fun YearSelectionScreen(
     state: LCE<List<YearSelectionData>, Exception>,
     onYearClicked: YearClicked,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     LazyVerticalGrid(
         state = rememberLazyGridState(),
@@ -39,7 +40,7 @@ fun YearSelectionScreen(
         when (state) {
             is LCE.Content<List<YearSelectionData>> -> content(state.value, onYearClicked)
             is LCE.Error<Exception> -> item(span = { GridItemSpan(maxLineSpan) }) {
-                ErrorScreen(state.error)
+                ErrorScreen(state.error, onViewDownloadsClicked = onViewDownloadsClicked)
             }
 
             LCE.Loading -> loadingCards()

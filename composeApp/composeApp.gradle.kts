@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
     alias(libs.plugins.metro)
+    alias(libs.plugins.sqldelight)
 
     id("signing-config")
     id("build-number")
@@ -30,6 +31,9 @@ kotlin {
         androidResources {
             enable = true
         }
+
+        compileSdk = libs.versions.android.sdk.get().toInt()
+        minSdk = libs.versions.android.min.sdk.get().toInt()
     }
 
     listOf(
@@ -73,6 +77,8 @@ kotlin {
             implementation(libs.arrow.resilience)
             implementation(libs.arrow.fx)
 
+            implementation(libs.sqldelight.primitive.adapters)
+
             implementation(libs.html.text)
 
             api(libs.metro.viewmodel)
@@ -90,10 +96,16 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.javacv)
             implementation(libs.ffmpeg.platform)
+            implementation(libs.sqldelight.sqlite.driver)
+        }
+
+        getByName("desktopTest").dependencies {
+            implementation(libs.ktor.client.mock)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
         }
 
         androidMain.dependencies {
@@ -103,6 +115,8 @@ kotlin {
 
             implementation(libs.media3.exoplayer)
             implementation(libs.media3.session)
+
+            implementation(libs.workmanager)
         }
     }
 }
@@ -120,6 +134,14 @@ compose.desktop {
             macOS { iconFile.set(project.file("src/desktopMain/resources/icon.icns")) }
             windows { iconFile.set(project.file("src/desktopMain/resources/icon.ico")) }
             linux { iconFile.set(project.file("src/desktopMain/resources/icon.png")) }
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        register("Database") {
+            packageName.set("gizz.tapes.db")
         }
     }
 }

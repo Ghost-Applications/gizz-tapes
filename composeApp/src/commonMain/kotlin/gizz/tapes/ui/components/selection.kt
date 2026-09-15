@@ -62,6 +62,7 @@ fun SelectionScreen(
     navigateUp: NavigateUp?,
     onMiniPlayerClick: (FullShowTitle) -> Unit,
     actions: @Composable RowScope.() -> Unit,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     GizzScaffold(
         title = title,
@@ -90,7 +91,8 @@ fun SelectionScreen(
                     is LCE.Error<Exception> -> item {
                         ErrorScreen(
                             error = state.error,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            onViewDownloadsClicked = onViewDownloadsClicked,
                         )
                     }
                     LCE.Loading -> loadingRows()

@@ -3,6 +3,8 @@
 == LeRisque
 
 - Fix chromecast playback
+- Allow offline playback. Shows can be downloaded and played locally, and be saved to play with
+other apps.
 
 == KGLW 2026-05-30
 

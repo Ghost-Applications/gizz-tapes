@@ -136,6 +136,13 @@ fun MainScreen(
                                 navigation.navigateToSettingsScreen()
                             }
                         )
+                        DropdownMenuItem(
+                            text = { Text("Downloaded Shows") },
+                            onClick = {
+                                showMenu = false
+                                navigation.navigateToDownloadedShowsScreen()
+                            }
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -181,7 +188,8 @@ fun MainScreen(
                     composable<Destination.Home> {
                         HomeScreen(
                             gridState = gridState,
-                            onShowClicked = { id, title -> navigation.navigateToShow(id, title) }
+                            onShowClicked = { id, title -> navigation.navigateToShow(id, title) },
+                            onViewDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
                         )
                     }
                     composable<Destination.YearSelection> {
@@ -189,7 +197,8 @@ fun MainScreen(
                         YearSelectionScreen(
                             state = yearsState,
                             modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
-                            onYearClicked = { navigation.navigateToShowsInYear(it) }
+                            onYearClicked = { navigation.navigateToShowsInYear(it) },
+                            onViewDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
                         )
                     }
                     composable<Destination.Venues> {
@@ -197,13 +206,15 @@ fun MainScreen(
                             modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
                             onCountryClick = { id, name ->
                                 navigation.navigateToCountryVenues(id.toInt(), name)
-                            }
+                            },
+                            onViewDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
                         )
                     }
                     composable<Destination.Search> {
                         SearchScreen(
                             modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
-                            onShowClicked = { id, title -> navigation.navigateToShow(id, title) }
+                            onShowClicked = { id, title -> navigation.navigateToShow(id, title) },
+                            onViewDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
                         )
                     }
                 }

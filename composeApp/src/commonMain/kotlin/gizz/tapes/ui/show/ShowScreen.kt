@@ -14,21 +14,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -64,6 +72,7 @@ import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.RecordingData
 import gizz.tapes.data.RecordingId
 import gizz.tapes.nav.NavigateUp
+import gizz.tapes.storage.RecordingDownloadStatus
 import gizz.tapes.ui.components.ErrorScreen
 import gizz.tapes.ui.components.GizzScaffold
 import gizz.tapes.ui.components.LoadingScreen
@@ -85,9 +94,11 @@ fun ShowScreen(
     navigateUp: NavigateUp,
     onMiniPlayerClick: (FullShowTitle) -> Unit,
     onPlayerClick: (FullShowTitle) -> Unit,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val showState by viewModel.show.collectAsState()
     val playerState by playerViewModel.playerState.collectAsState()
+    val downloadStatus by viewModel.recordingDownloadStatus.collectAsState()
 
     ShowScreen(
         title = viewModel.title,
@@ -99,6 +110,11 @@ fun ShowScreen(
         onRecordingChange = viewModel::changeSelectedRecording,
         onPauseAction = playerViewModel::pause,
         onPlayAction = playerViewModel::play,
+        saveShow = viewModel::saveShow,
+        downloadStatus = downloadStatus,
+        exportToDownloads = viewModel::exportToDownloads,
+        deleteDownloadedShow = viewModel::deleteDownloadedShow,
+        onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }
 
@@ -114,9 +130,15 @@ fun ShowScreen(
     onRecordingChange: (RecordingId) -> Unit,
     onPauseAction: () -> Unit,
     onPlayAction: () -> Unit,
+    saveShow: () -> Unit,
+    downloadStatus: RecordingDownloadStatus,
+    exportToDownloads: () -> Unit,
+    deleteDownloadedShow: () -> Unit,
+    onViewDownloadsClicked: () -> Unit,
 ) {
     val platformActions = LocalPlatformActions.current
     val lazyListState = rememberLazyListState()
+    var showOverflowMenu by remember { mutableStateOf(false) }
 
     val isScrolled by remember {
         derivedStateOf {
@@ -146,7 +168,48 @@ fun ShowScreen(
                     )
                 },
                 navigationIcon = navigationUpIcon(navigateUp),
-                actions = { platformActions() },
+                actions = {
+                    platformActions()
+
+                    IconButton(onClick = { showOverflowMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More")
+                    }
+                    DropdownMenu(
+                        expanded = showOverflowMenu,
+                        onDismissRequest = { showOverflowMenu = false }
+                    ) {
+                        if (downloadStatus == RecordingDownloadStatus.NOT_DOWNLOADED) {
+                            DropdownMenuItem(
+                                text = { Text("Download this show for offline playback") },
+                                leadingIcon = { Icon(Icons.Default.Download, null) },
+                                onClick = {
+                                    showOverflowMenu = false
+                                    saveShow()
+                                }
+                            )
+                        }
+                        if (downloadStatus == RecordingDownloadStatus.DOWNLOADED) {
+                            DropdownMenuItem(
+                                text = { Text("Export show to Downloads folder") },
+                                leadingIcon = { Icon(Icons.Default.SaveAlt, null) },
+                                onClick = {
+                                    showOverflowMenu = false
+                                    exportToDownloads()
+                                }
+                            )
+                        }
+                        if (downloadStatus == RecordingDownloadStatus.DOWNLOADED) {
+                            DropdownMenuItem(
+                                text = { Text("Delete downloaded show") },
+                                leadingIcon = { Icon(Icons.Default.Delete, null) },
+                                onClick = {
+                                    showOverflowMenu = false
+                                    deleteDownloadedShow()
+                                }
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = topBarColor,
                     navigationIconContentColor = topBarContentColor,
@@ -164,7 +227,10 @@ fun ShowScreen(
             Box(modifier = Modifier.weight(1f)) {
                 when (showState) {
                     LCE.Loading -> LoadingScreen()
-                    is LCE.Error -> ErrorScreen(error = showState.error)
+                    is LCE.Error -> ErrorScreen(
+                        error = showState.error,
+                        onViewDownloadsClicked = onViewDownloadsClicked
+                    )
                     is LCE.Content -> ShowContent(
                         title = title,
                         state = showState.value,
@@ -178,7 +244,8 @@ fun ShowScreen(
                         onTrackClick = { index ->
                             showState.value.removeOldMediaItemsAndAddNew(index)
                             onPlayerClick(title)
-                        }
+                        },
+                        downloadStatus = downloadStatus,
                     )
                 }
             }
@@ -196,6 +263,7 @@ fun ShowScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowContent(
     title: FullShowTitle,
@@ -205,6 +273,7 @@ private fun ShowContent(
     onRecordingChange: (RecordingId) -> Unit,
     onPlayAll: () -> Unit,
     onTrackClick: (Int) -> Unit,
+    downloadStatus: RecordingDownloadStatus,
 ) {
     var showRecordingMenu by remember { mutableStateOf(false) }
     var showMetadata by remember { mutableStateOf(false) }
@@ -281,6 +350,27 @@ private fun ShowContent(
                     }
                 }
 
+                when (downloadStatus) {
+                    RecordingDownloadStatus.NOT_DOWNLOADED -> Unit
+                    RecordingDownloadStatus.DOWNLOADING -> {
+                        Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                    }
+                    RecordingDownloadStatus.DOWNLOADED -> {
+                        Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                            Icon(
+                                Icons.Default.DownloadDone,
+                                contentDescription = "Downloaded",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
                 TextButton(onClick = onPlayAll) {
                     Icon(Icons.Default.PlayArrow, null)
                     Text(
@@ -299,7 +389,7 @@ private fun ShowContent(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Recording Info", style = MaterialTheme.typography.labelLarge)
+                Text("Show Info", style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.weight(1f))
                 Icon(
                     if (showMetadata) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
