@@ -102,6 +102,22 @@ android {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
     testOptions.unitTests.isReturnDefaultValues = true
+    testOptions.unitTests.isIncludeAndroidResources = true
+    testOptions.unitTests.all {
+        // Robolectric instruments internal java.*/jdk.* classes, which JPMS blocks by default
+        // on JDK 17+ (project targets JDK 21 via jvmToolchain).
+        it.jvmArgs(
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--add-opens=java.base/java.util=ALL-UNNAMED",
+            "--add-opens=java.base/java.io=ALL-UNNAMED",
+            "--add-opens=java.base/java.net=ALL-UNNAMED",
+            "--add-opens=java.base/java.security=ALL-UNNAMED",
+            "--add-opens=java.base/java.text=ALL-UNNAMED",
+            "--add-opens=java.base/jdk.internal.access=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.font=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+        )
+    }
     buildFeatures {
         compose = true
         shaders = false
@@ -153,6 +169,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.kotlinx.datetime)
     testImplementation(libs.truth)
+    testImplementation(libs.robolectric)
 }
 
 tasks.withType<GoogleServicesTask> {

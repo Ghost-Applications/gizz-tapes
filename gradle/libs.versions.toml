@@ -82,6 +82,7 @@ workmanager = "androidx.work:work-runtime-ktx:2.11.2"
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
 truth = "com.google.truth:truth:1.4.5"
+robolectric = "org.robolectric:robolectric:4.17"
 
 html-text = "de.charlex.compose:html-text-material3:3.0.0-beta02"
 

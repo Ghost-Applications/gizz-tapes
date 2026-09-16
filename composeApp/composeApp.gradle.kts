@@ -34,6 +34,8 @@ kotlin {
 
         compileSdk = libs.versions.android.sdk.get().toInt()
         minSdk = libs.versions.android.min.sdk.get().toInt()
+
+        withHostTest { }
     }
 
     listOf(

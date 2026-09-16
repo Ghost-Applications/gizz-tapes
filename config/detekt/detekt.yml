@@ -54,7 +54,8 @@ naming:
     # Detekt's default excludes list covers commonTest/jvmTest/androidTest/iosTest but not
     # desktopTest, since this project's JVM target is named "desktop" (jvm("desktop")) rather
     # than the conventional "jvm" - add it so backtick test names are allowed there too.
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/desktopTest/**']
+    # testFull/testFoss are AGP's per-flavor unit test source sets (e.g. androidApp/src/testFull).
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/desktopTest/**', '**/testFull/**', '**/testFoss/**']
   # FullShowTitle.fullShowTitle property name matching class name is intentional
   MemberNameEqualsClassName:
     active: false

@@ -193,6 +193,7 @@ class ShowViewModel(
                         id = "${recording.id}/${track.filename}",
                         url = showSaver.localFileIfDownloaded(recording, track.filename)
                             ?: (recording.filesPathPrefix + track.filename),
+                        remoteUrl = recording.filesPathPrefix + track.filename,
                         title = track.title,
                         albumTitle = title.title.value,
                         artworkUrl = PosterUrl(show.posterUrl).value,
