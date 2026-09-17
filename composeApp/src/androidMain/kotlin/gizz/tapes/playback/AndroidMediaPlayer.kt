@@ -69,7 +69,12 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
                     }
                 }
 
-                override fun onPlaybackStateChanged(state: Int) = updateState()
+                override fun onPlaybackStateChanged(state: Int) {
+                    updateState()
+                    if (state == Player.STATE_ENDED) {
+                        controller.clearMediaItems()
+                    }
+                }
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) =
                     updateState()
