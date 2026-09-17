@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,6 +46,7 @@ fun SettingsScreen(
     SettingsScreen(
         state = state,
         onRecordingTypeSelected = viewModel::updatePreferredRecordingType,
+        onVolumeBoostEnabledChanged = viewModel::updateVolumeBoostEnabled,
         navigateUp = navigateUp
     )
 }
@@ -54,6 +56,7 @@ fun SettingsScreen(
 fun SettingsScreen(
     state: LC<SettingsScreenState>,
     onRecordingTypeSelected: (Recording.Type) -> Unit,
+    onVolumeBoostEnabledChanged: (Boolean) -> Unit,
     navigateUp: NavigateUp,
 ) {
     Scaffold(
@@ -70,7 +73,8 @@ fun SettingsScreen(
                 LC.Loading -> LoadingScreen()
                 is LC.Content -> SettingsContent(
                     state = state.content,
-                    onRecordingTypeSelected = onRecordingTypeSelected
+                    onRecordingTypeSelected = onRecordingTypeSelected,
+                    onVolumeBoostEnabledChanged = onVolumeBoostEnabledChanged
                 )
             }
         }
@@ -81,6 +85,7 @@ fun SettingsScreen(
 private fun SettingsContent(
     state: SettingsScreenState,
     onRecordingTypeSelected: (Recording.Type) -> Unit,
+    onVolumeBoostEnabledChanged: (Boolean) -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -115,5 +120,20 @@ private fun SettingsContent(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        if (state.isVolumeBoostSupported) {
+            Spacer(Modifier.height(24.dp))
+            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Text("Boost quiet recordings")
+                Spacer(Modifier.width(16.dp))
+                Switch(checked = state.volumeBoostEnabled, onCheckedChange = onVolumeBoostEnabledChanged)
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Increases the volume of quiet recordings. May increase distortion.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }

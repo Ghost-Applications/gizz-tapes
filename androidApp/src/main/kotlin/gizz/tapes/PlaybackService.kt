@@ -5,6 +5,8 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.Service
 import android.content.Intent
+import android.media.audiofx.LoudnessEnhancer
+import androidx.datastore.core.DataStore
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.DeviceInfo
@@ -31,6 +33,7 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.android.ServiceKey
+import gizz.tapes.data.Settings
 import gizz.tapes.playback.CurrentlyPlayingSaver
 import gizz.tapes.playback.MediaId
 import gizz.tapes.playback.MediaItemTree
@@ -46,11 +49,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
+
+private const val VOLUME_BOOST_GAIN_MILLIBEL = 1000
 
 @Inject
 @UnstableApi
@@ -59,7 +66,8 @@ import kotlin.time.Duration.Companion.seconds
 class PlaybackService(
     private val playerFactory: PlayerFactory,
     private val currentlyPlayingSaver: CurrentlyPlayingSaver,
-    private val mediaItemTree: MediaItemTree
+    private val mediaItemTree: MediaItemTree,
+    private val settingsDataStore: DataStore<Settings>,
 ) : MediaLibraryService(), MediaLibraryService.MediaLibrarySession.Callback {
 
     private val logger = Logger.withTag("PlaybackService")
@@ -69,6 +77,9 @@ class PlaybackService(
     private var mediaSession: MediaLibrarySession? = null
     private lateinit var player: Player
     private lateinit var initJob: Job
+
+    private var loudnessEnhancer: LoudnessEnhancer? = null
+    private var volumeBoostEnabled = false
 
     override fun onCreate() {
         logger.d { "onCreate()" }
@@ -97,6 +108,39 @@ class PlaybackService(
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(C.WAKE_MODE_LOCAL)
             .build()
+
+        // Attached to exoPlayer directly (not the possibly-CastPlayer-wrapped `player`): casting
+        // plays audio on the remote receiver, so there is no local audio session to boost, and
+        // CastPlayer never forwards onAudioSessionIdChanged anyway.
+        exoPlayer.addListener(object : Player.Listener {
+            override fun onAudioSessionIdChanged(audioSessionId: Int) {
+                loudnessEnhancer?.release()
+                loudnessEnhancer = if (audioSessionId == C.AUDIO_SESSION_ID_UNSET) {
+                    null
+                } else {
+                    runCatching {
+                        LoudnessEnhancer(audioSessionId).apply {
+                            setTargetGain(VOLUME_BOOST_GAIN_MILLIBEL)
+                            enabled = volumeBoostEnabled
+                        }
+                    }.onFailure {
+                        logger.e(it) { "Error creating LoudnessEnhancer" }
+                    }.getOrNull()
+                }
+            }
+        })
+
+        serviceScope.launch {
+            settingsDataStore.data
+                .map { it.volumeBoostEnabled }
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    volumeBoostEnabled = enabled
+                    withContext(Dispatchers.Main) {
+                        loudnessEnhancer?.enabled = enabled
+                    }
+                }
+        }
 
         player = playerFactory.create(exoPlayer)
 
@@ -146,6 +190,8 @@ class PlaybackService(
             release()
             mediaSession = null
         }
+        loudnessEnhancer?.release()
+        loudnessEnhancer = null
         serviceScope.cancel()
         super.onDestroy()
     }

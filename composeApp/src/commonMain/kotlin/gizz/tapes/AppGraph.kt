@@ -34,6 +34,9 @@ import kotlin.time.Duration.Companion.seconds
 
 interface AppGraph : ViewModelGraph {
     @Provides
+    fun providePlatform(appContext: AppContext): Platform = appContext.platform
+
+    @Provides
     @SingleIn(AppScope::class)
     fun provideSettingsDataStore(
         appContext: AppContext,

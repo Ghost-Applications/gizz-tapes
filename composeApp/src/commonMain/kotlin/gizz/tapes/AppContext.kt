@@ -8,6 +8,9 @@ sealed interface Platform {
     data object Desktop : Platform
 }
 
+/** Volume boosting uses Android's LoudnessEnhancer, which has no iOS/Desktop equivalent. */
+val Platform.isVolumeBoostSupported: Boolean get() = this is Platform.Android
+
 expect class AppContext {
     val platform: Platform
     val settingsPath: Path

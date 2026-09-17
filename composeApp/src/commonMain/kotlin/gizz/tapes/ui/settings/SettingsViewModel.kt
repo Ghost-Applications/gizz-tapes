@@ -7,8 +7,10 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import gizz.tapes.Platform
 import gizz.tapes.api.data.Recording
 import gizz.tapes.data.Settings
+import gizz.tapes.isVolumeBoostSupported
 import gizz.tapes.util.LC
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +25,10 @@ import kotlinx.coroutines.launch
 @ViewModelKey
 class SettingsViewModel(
     private val dataStore: DataStore<Settings>,
+    platform: Platform,
 ) : ViewModel() {
+
+    private val isVolumeBoostSupported = platform.isVolumeBoostSupported
 
     val settingsState: StateFlow<LC<SettingsScreenState>> = loadSettings().stateIn(
         scope = viewModelScope,
@@ -33,7 +38,7 @@ class SettingsViewModel(
 
     private fun loadSettings(): Flow<LC<SettingsScreenState>> = flow {
         dataStore.data
-            .map { SettingsScreenState(it.preferredRecordingType) }
+            .map { SettingsScreenState(it.preferredRecordingType, it.volumeBoostEnabled, isVolumeBoostSupported) }
             .map { LC.Content(it) }
             .collect { emit(it) }
     }
@@ -41,6 +46,12 @@ class SettingsViewModel(
     fun updatePreferredRecordingType(type: Recording.Type) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(preferredRecordingType = type) }
+        }
+    }
+
+    fun updateVolumeBoostEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(volumeBoostEnabled = enabled) }
         }
     }
 }

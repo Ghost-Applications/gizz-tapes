@@ -19,6 +19,7 @@ data class Settings(
     val preferredRecordingType: Recording.Type = SBD,
     val yearSortOrder: SortOrder = Ascending,
     val showSortOrder: SortOrder = Ascending,
+    val volumeBoostEnabled: Boolean = false,
 )
 
 @Inject
