@@ -38,6 +38,9 @@ import platform.MediaPlayer.MPMediaItemPropertyTitle
 import platform.MediaPlayer.MPNowPlayingInfoCenter
 import platform.MediaPlayer.MPNowPlayingInfoPropertyElapsedPlaybackTime
 import platform.MediaPlayer.MPNowPlayingInfoPropertyPlaybackRate
+import platform.MediaPlayer.MPNowPlayingPlaybackStatePaused
+import platform.MediaPlayer.MPNowPlayingPlaybackStatePlaying
+import platform.MediaPlayer.MPNowPlayingPlaybackStateStopped
 import platform.MediaPlayer.MPRemoteCommandCenter
 import platform.MediaPlayer.MPRemoteCommandHandlerStatusSuccess
 import platform.UIKit.UIImage
@@ -142,6 +145,14 @@ class IosMediaPlayer(
         cc.pauseCommand.addTargetWithHandler { _ -> scope.launch { pause() }; MPRemoteCommandHandlerStatusSuccess }
         cc.nextTrackCommand.addTargetWithHandler { _ -> scope.launch { skipToNext() }; MPRemoteCommandHandlerStatusSuccess }
         cc.previousTrackCommand.addTargetWithHandler { _ -> scope.launch { skipToPrevious() }; MPRemoteCommandHandlerStatusSuccess }
+        // Some headphone remotes (wired single-button controls, Bluetooth AVRCP) send a single
+        // toggle command instead of distinct play/pause - handle it explicitly rather than
+        // relying on the system to synthesize a play/pause call.
+        cc.togglePlayPauseCommand.addTargetWithHandler { _ ->
+            val isPlaying = (_state.value as? PlayerState.MediaLoaded)?.isPlaying == true
+            scope.launch { if (isPlaying) pause() else play() }
+            MPRemoteCommandHandlerStatusSuccess
+        }
         cc.changePlaybackPositionCommand.addTargetWithHandler { event ->
             val positionSeconds = (event as MPChangePlaybackPositionCommandEvent).positionTime
             val index = (_state.value as? PlayerState.MediaLoaded)?.currentTrackIndex ?: 0
@@ -167,6 +178,10 @@ class IosMediaPlayer(
         cachedArtwork?.let { info[MPMediaItemPropertyArtwork] = it }
 
         MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = info
+        // Must be kept in sync with actual playback state, otherwise iOS can lose track of
+        // which app owns remote-control focus and route the next headphone command elsewhere.
+        MPNowPlayingInfoCenter.defaultCenter().playbackState =
+            if (item.isPlaying) MPNowPlayingPlaybackStatePlaying else MPNowPlayingPlaybackStatePaused
 
         val artworkUrl = item.artworkUri
         if (artworkUrl != null && artworkUrl != lastArtworkUrl) {
@@ -205,9 +220,11 @@ class IosMediaPlayer(
         localBackend.release()
         GizzCastContext.sessionManager.removeListener(sessionListener)
         MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = null
+        MPNowPlayingInfoCenter.defaultCenter().playbackState = MPNowPlayingPlaybackStateStopped
         val cc = MPRemoteCommandCenter.sharedCommandCenter()
         cc.playCommand.enabled = false
         cc.pauseCommand.enabled = false
+        cc.togglePlayPauseCommand.enabled = false
         cc.nextTrackCommand.enabled = false
         cc.previousTrackCommand.enabled = false
         cc.changePlaybackPositionCommand.enabled = false

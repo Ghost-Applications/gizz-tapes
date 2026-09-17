@@ -6,10 +6,12 @@
 other apps.
 - Make show source selection more apparent
 - Updated Libraries to their latest versions
+- Queue is now cleared after the last track in a show has been played
 
 === iOS
 
 - Added Chromecast support for iOS devices
+- Fixed issue with headphones buttons not working with the app
 
 === Android
 

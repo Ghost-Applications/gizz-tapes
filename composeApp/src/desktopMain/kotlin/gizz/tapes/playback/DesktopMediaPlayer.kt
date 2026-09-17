@@ -154,8 +154,14 @@ class DesktopMediaPlayer : GizzMediaPlayer {
             runPlaybackLoop(newGrabber, newLine)
 
             if (isActive) {
-                if (currentIndex < playlist.size - 1) skipToNext()
-                else { isPaused = true; updateState() }
+                if (currentIndex < playlist.size - 1) {
+                    skipToNext()
+                } else {
+                    playlist = emptyList()
+                    currentIndex = -1
+                    isPaused = true
+                    updateState()
+                }
             }
         } catch (e: CancellationException) {
             throw e

@@ -140,6 +140,11 @@ class LocalPlaybackBackend(
         val remainingItems = player.items()
         if (remainingItems.isNotEmpty()) {
             currentIndex = playlist.size - remainingItems.size
+        } else if (playlist.isNotEmpty()) {
+            // AVQueuePlayer has drained the queue - playback finished.
+            playlist = emptyList()
+            currentIndex = -1
+            stopSaving()
         }
         val avItem = player.currentItem()
 
