@@ -34,15 +34,13 @@ private_lane :perform_ios_upload do
     profile_name: 'match AppStore gizz.tapes.GizzTapes'
   )
   build_app(
-    project: 'iosApp/iosApp.xcodeproj',
+    workspace: 'iosApp/iosApp.xcworkspace',
     scheme: 'iosApp',
     configuration: 'Release',
     export_method: 'app-store'
   )
 
-  notes = File.read('../CHANGELOG.adoc').split(/^== .*/)[1]&.strip || ''
-  notes = notes.lines.reject { |l| l.downcase.include?('android') }.join.strip
-  File.write('metadata/en-US/release_notes.txt', notes)
+  File.write('metadata/en-US/release_notes.txt', changelog_notes_for('iOS'))
 
   File.write('metadata/review_information/first_name.txt', ENV['ASC_REVIEW_FIRST_NAME'])
   File.write('metadata/review_information/last_name.txt', ENV['ASC_REVIEW_LAST_NAME'])
@@ -91,6 +89,46 @@ private_lane :perform_version_bump do
     message: 'Version Bump'
   )
   push_to_git_remote()
+end
+
+# The top CHANGELOG.adoc section (the one being released) looks like:
+#   == LeRisque
+#
+#   - general note that applies to every platform
+#
+#   === iOS
+#
+#   - iOS-only note
+#
+#   === Android
+#
+#   - Android-only note
+#
+# The === subsections are optional - a release with nothing platform-specific just has general
+# notes and no === headers at all. Returns the general notes plus that platform's subsection
+# (if any), joined together - i.e. what that platform's own release notes should say.
+def changelog_notes_for(platform)
+  content = File.read('../CHANGELOG.adoc')
+  top_section = content.split(/^== .*/)[1]&.strip || ''
+
+  parts = top_section.split(/^=== (.+)$/)
+  general = parts[0].strip
+  platform_sections = parts[1..].each_slice(2).to_h { |name, body| [name.strip.downcase, body.strip] }
+
+  [general, platform_sections[platform.downcase]].reject { |s| s.nil? || s.empty? }.join("\n\n")
+end
+
+# Play Store release notes work by dropping a file at
+# metadata/android/<locale>/changelogs/<version_code>.txt before calling upload_to_play_store -
+# there's no way to just pass the notes as a string. version_code must match whatever version
+# code the build being uploaded actually has (GIZZ_TAPES_BUILD_NUMBER, computed by the calling
+# workflow), or Play Store won't associate the notes with it.
+def write_play_store_changelog(version_code)
+  unless version_code
+    UI.important('GIZZ_TAPES_BUILD_NUMBER not set - skipping Play Store changelog.')
+    return
+  end
+  File.write("metadata/android/en-US/changelogs/#{version_code}.txt", changelog_notes_for('Android'))
 end
 
 def read_gradle_properties
@@ -163,7 +201,7 @@ platform :ios do
       profile_name: 'match AppStore gizz.tapes.GizzTapes'
     )
     build_app(
-      project: 'iosApp/iosApp.xcodeproj',
+      workspace: 'iosApp/iosApp.xcworkspace',
       scheme: 'iosApp',
       configuration: 'Release',
       export_method: 'app-store'
@@ -186,6 +224,7 @@ platform :android do
       flavor: 'full',
       build_type: 'Release'
     )
+    write_play_store_changelog(ENV['GIZZ_TAPES_BUILD_NUMBER'])
     upload_to_play_store(
       track: 'beta',
       skip_upload_apk: true,
@@ -197,10 +236,9 @@ platform :android do
   lane :ci_release do
     properties = read_gradle_properties
     version_name = properties['gizz.tapes.versionName']
+    description = changelog_notes_for('Android')
 
-    content = File.read('../CHANGELOG.adoc')
-    description = content.split(/^== .*/)[1].strip
-    description = description.lines.reject { |l| l.downcase.include?('ios') }.join.strip
+    write_play_store_changelog(ENV['GIZZ_TAPES_BUILD_NUMBER'])
 
     full_aab = Dir.glob('../androidApp/build/outputs/bundle/fullRelease/*.aab').map { |f| File.expand_path(f) }.first
     UI.user_error!('Could not find full release AAB') unless full_aab
@@ -209,8 +247,7 @@ platform :android do
       upload_to_play_store(
         track: 'production',
         aab: full_aab,
-        skip_upload_apk: true,
-        skip_upload_changelogs: true
+        skip_upload_apk: true
       )
     rescue => e
       raise e unless e.message.include?('Version code') && e.message.include?('already been used')
@@ -227,7 +264,7 @@ platform :android do
   lane :create_github_release do |options|
     properties = read_gradle_properties
     version_name = options[:version_name] || properties['gizz.tapes.versionName']
-    description = options[:description] || File.read('../CHANGELOG.adoc').split(/^== .*/)[1].strip
+    description = options[:description] || changelog_notes_for('Android')
 
     apk_files = Dir.glob('../androidApp/build/outputs/apk/**/*release*.apk').map { |f| File.expand_path(f) }
     aab_files = Dir.glob('../androidApp/build/outputs/bundle/**/*release*.aab').map { |f| File.expand_path(f) }

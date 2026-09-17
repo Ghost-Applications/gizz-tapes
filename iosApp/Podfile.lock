@@ -1,0 +1,23 @@
+PODS:
+  - composeApp (1.0.0):
+    - google-cast-sdk (= 4.8.4)
+  - google-cast-sdk (4.8.4)
+
+DEPENDENCIES:
+  - composeApp (from `../composeApp`)
+
+SPEC REPOS:
+  trunk:
+    - google-cast-sdk
+
+EXTERNAL SOURCES:
+  composeApp:
+    :path: "../composeApp"
+
+SPEC CHECKSUMS:
+  composeApp: c53314af8da700b265b566b697ad8726a178d552
+  google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
+
+PODFILE CHECKSUM: ad48b81fedf779c2f32cf1f8f3b774cbdc1fb7c8
+
+COCOAPODS: 1.17.0

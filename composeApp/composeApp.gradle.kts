@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.multiplatform.android.library)
+    alias(libs.plugins.kotlin.native.cocoapods)
 
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
@@ -46,6 +47,43 @@ kotlin {
             baseName = "GizzTapes"
             isStatic = true
             binaryOption("bundleId", "gizz.tapes")
+        }
+        // The Cast SDK's cinterop def only declares `-framework GoogleCast`; Xcode's app build
+        // resolves GoogleCast's own transitive framework dependencies automatically, but the
+        // standalone test binary Gradle links here does not, so they must be listed explicitly.
+        iosTarget.binaries.getTest("DEBUG").linkerOpts(
+            "-ObjC",
+            "-framework", "Network",
+            "-framework", "CoreData",
+            "-framework", "SystemConfiguration",
+            "-framework", "MediaAccessibility",
+            "-framework", "AVFoundation",
+            "-framework", "AVKit",
+            "-framework", "MediaPlayer",
+        )
+    }
+
+    // composeApp is consumed as a CocoaPods pod by iosApp/Podfile (`pod 'composeApp', :path =>
+    // '../composeApp'`) so that google-cast-sdk's framework gets embedded into the app; this
+    // replaces the old manual "Compile Kotlin Framework" build phase (see iosApp.xcodeproj).
+    cocoapods {
+        version = "1.0.0"
+        summary = "Gizz Tapes shared module"
+        homepage = "https://github.com/Ghost-Applications/gizz-tapes"
+        ios.deploymentTarget = "15.3"
+        podfile = project.file("../iosApp/Podfile")
+
+        framework {
+            baseName = "GizzTapes"
+            isStatic = true
+            binaryOption("bundleId", "gizz.tapes")
+        }
+
+        // Pinned to 4.8.4 (not the latest 4.8.6) because 4.8.6 requires iOS 16+ while this app's
+        // deployment target is 15.3; 4.8.4 is the newest release still compatible with that.
+        pod("google-cast-sdk") {
+            version = "4.8.4"
+            moduleName = "GoogleCast"
         }
     }
 

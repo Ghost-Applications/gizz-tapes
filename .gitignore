@@ -232,6 +232,10 @@ keys/
 xcuserdata/
 *.xcuserstate
 
+# CocoaPods
+iosApp/Pods/
+composeApp/composeApp.podspec
+
 ci-artifacts/
 
 # Ignore all idea files
