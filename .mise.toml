@@ -28,7 +28,13 @@ run = "./gradlew installFullDebug"
 
 [tasks.build-ios]
 description = "Archive the iOS app for release"
-run = "xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -destination 'generic/platform=iOS' -configuration Release archive -archivePath build/iosApp.xcarchive"
+run = """
+#!/usr/bin/env bash
+set -e
+./gradlew :composeApp:generateDummyFramework
+pod install --project-directory=iosApp
+xcodebuild -workspace iosApp/iosApp.xcworkspace -scheme iosApp -destination 'generic/platform=iOS' -configuration Release archive -archivePath build/iosApp.xcarchive
+"""
 
 [tasks.run-integration-test]
 description = "Run networking integration tests on JVM"

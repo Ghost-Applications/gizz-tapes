@@ -32,7 +32,7 @@ jobs:
       - name: Build and test
         run: >
           ./gradlew test allTests :androidApp:assemble :androidApp:bundleRelease
-          -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+          -Dorg.gradle.jvmargs="-Xmx6G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
         env:
           GIZZ_TAPES_KEYSTORE_PASSWORD: ${{ secrets.GIZZ_TAPES_KEYSTORE_PASSWORD }}
           GIZZ_TAPES_KEY_PASSWORD: ${{ secrets.GIZZ_TAPES_KEY_PASSWORD }}
@@ -186,23 +186,38 @@ jobs:
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_26.6.app
       - name: Compile KMP iOS framework
+        env:
+          SDK_NAME: iphonesimulator
+          PLATFORM_NAME: iphonesimulator
+          ARCHS: arm64
         run: >
           ./gradlew :composeApp:compileKotlinIosSimulatorArm64
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
       - name: Run iOS tests
+        env:
+          SDK_NAME: iphonesimulator
+          PLATFORM_NAME: iphonesimulator
+          ARCHS: arm64
         run: >
           ./gradlew :composeApp:iosSimulatorArm64Test
           -Dorg.gradle.jvmargs="-Xmx4G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+      - name: Install CocoaPods dependencies
+        env:
+          SDK_NAME: iphonesimulator
+          PLATFORM_NAME: iphonesimulator
+          ARCHS: arm64
+        run: ./gradlew :composeApp:podInstall
       - name: Build iOS simulator app
         run: |
           xcodebuild \
-            -project iosApp/iosApp.xcodeproj \
+            -workspace iosApp/iosApp.xcworkspace \
             -scheme iosApp \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
+            ARCHS=arm64 \
             SYMROOT=$(pwd)/build/ios \
             build
       - name: Upload iOS simulator app

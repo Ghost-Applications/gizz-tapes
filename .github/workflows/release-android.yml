@@ -80,4 +80,5 @@ jobs:
       - name: Publish to Play Store and create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIZZ_TAPES_BUILD_NUMBER: ${{ steps.version_code.outputs.code }}
         run: bundle exec fastlane android ci_release

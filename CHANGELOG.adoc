@@ -2,11 +2,18 @@
 
 == LeRisque
 
-- Fix chromecast playback
 - Allow offline playback. Shows can be downloaded and played locally, and be saved to play with
 other apps.
 - Make show source selection more apparent
 - Updated Libraries to their latest versions
+
+=== iOS
+
+- Added Chromecast support for iOS devices
+
+=== Android
+
+- Fix chromecast playback
 - Fixed a bug causing crashes in Android Auto
 
 == KGLW 2026-05-30

@@ -4,6 +4,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.window.ComposeUIViewController
 import dev.zacsweers.metro.createGraphFactory
 import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
+import gizz.tapes.ui.components.CastButton
 import platform.UIKit.UIViewController
 
 // Used in iOS code
@@ -15,7 +16,10 @@ fun MainViewController(): UIViewController {
             enforceStrictPlistSanityCheck = false
         }
     ) {
-        CompositionLocalProvider(LocalMetroViewModelFactory provides appGraph.metroViewModelFactory) {
+        CompositionLocalProvider(
+            LocalMetroViewModelFactory provides appGraph.metroViewModelFactory,
+            LocalPlatformActions provides { CastButton() },
+        ) {
             GizzTapesApp()
         }
     }.also { RootViewControllerHolder.current = it }
