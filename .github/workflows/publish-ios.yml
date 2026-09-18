@@ -40,7 +40,12 @@ jobs:
           SDK_NAME: iphoneos
           PLATFORM_NAME: iphoneos
           ARCHS: arm64
-        run: ./gradlew :composeApp:podInstall
+        # :podInstall only sets up the outer iosApp/Podfile; the google-cast-sdk cinterop pod
+        # dependency is resolved via a separate synthetic CocoaPods project, which otherwise only
+        # gets pod-installed for the first time during the archive's "[CP-User] Build composeApp"
+        # script phase, where it has failed (Executing of '/usr/local/bin/pod install' failed with
+        # code 1 and an empty message).
+        run: ./gradlew :composeApp:podInstall :composeApp:podInstallSyntheticIos
       - name: Build and upload to TestFlight
         env:
           CHANGELOG: ${{ github.event.head_commit.message }}
