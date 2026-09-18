@@ -236,6 +236,7 @@ internal fun PlaybackItem.toCastMediaInformation(): GCKMediaInformation {
     // The explicit `as NSString` casts look redundant (Kotlin String bridges to NSString) but
     // are required here: setObject(forKey:) takes a generic NSCopyingProtocol parameter, and the
     // compiler doesn't apply that bridging conversion through a protocol-typed parameter.
+    @Suppress("CAST_NEVER_SUCCEEDS")
     val customData = NSMutableDictionary().apply {
         setObject(NSNumber(int = showDate.year), forKey = KEY_RECORDING_YEAR as NSString)
         setObject(NSNumber(int = showDate.month.number), forKey = KEY_RECORDING_MONTH as NSString)

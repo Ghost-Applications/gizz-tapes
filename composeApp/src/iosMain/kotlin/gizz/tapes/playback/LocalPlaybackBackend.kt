@@ -35,6 +35,7 @@ import platform.AVFoundation.seekToTime
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMake
 import platform.Foundation.NSURL
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -97,7 +98,7 @@ class LocalPlaybackBackend(
 
         scope.launch {
             while (true) {
-                delay(500)
+                delay(500.milliseconds)
                 updateState()
             }
         }
