@@ -43,6 +43,14 @@ jobs:
         with:
           ruby-version: '3.3.6'
           bundler-cache: true
+      - name: Install CocoaPods dependencies
+        env:
+          SDK_NAME: iphoneos
+          PLATFORM_NAME: iphoneos
+          ARCHS: arm64
+        # See publish-ios.yml: Pods/ is gitignored, and the google-cast-sdk synthetic pod project
+        # must be installed up front rather than during the archive's composeApp script phase.
+        run: ./gradlew :composeApp:podInstall :composeApp:podInstallSyntheticIos
       - name: Submit to App Store
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

@@ -50,17 +50,30 @@ jobs:
         run: >
           ./gradlew :androidApp:assembleRelease
           -Dorg.gradle.jvmargs="-Xmx6G -Xms1G -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.PGP_KEY }}" > private.key
+          gpg --batch --passphrase "${{ secrets.PGP_PASSWORD }}" --import private.key
+      - name: Sign APKs with GPG
+        run: |
+          find androidApp/build/outputs/apk -name "*.apk" | while read -r file; do
+            gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.PGP_PASSWORD }}" --armor --detach-sign "$file"
+          done
       - name: Upload foss release APK
         uses: actions/upload-artifact@v4
         with:
           name: nightly-android-foss
-          path: androidApp/build/outputs/apk/foss/release/*.apk
+          path: |
+            androidApp/build/outputs/apk/foss/release/*.apk
+            androidApp/build/outputs/apk/foss/release/*.apk.asc
           if-no-files-found: error
       - name: Upload full release APK
         uses: actions/upload-artifact@v4
         with:
           name: nightly-android-full
-          path: androidApp/build/outputs/apk/full/release/*.apk
+          path: |
+            androidApp/build/outputs/apk/full/release/*.apk
+            androidApp/build/outputs/apk/full/release/*.apk.asc
           if-no-files-found: error
 
   desktop:
@@ -134,8 +147,8 @@ jobs:
             --notes "Automated build from commit ${{ github.sha }}. May be unstable." \
             --prerelease \
             --target "${{ github.sha }}" \
-            artifacts/nightly-android-foss/*.apk \
-            artifacts/nightly-android-full/*.apk \
+            artifacts/nightly-android-foss/* \
+            artifacts/nightly-android-full/* \
             artifacts/nightly-desktop-deb/* \
             artifacts/nightly-desktop-dmg/* \
             artifacts/nightly-desktop-msi/*
