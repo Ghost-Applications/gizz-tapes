@@ -1,6 +1,8 @@
 = Changelog
 
-== LeRisque
+== MarsForTheRich
+
+== LeRisque 2026-09-26
 
 - Allow offline playback. Shows can be downloaded and played locally, and be saved to play with
 other apps.
