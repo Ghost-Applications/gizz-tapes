@@ -88,7 +88,7 @@ private_lane :perform_version_bump do
     path: [File.expand_path('../gradle.properties'), File.expand_path('../CHANGELOG.adoc')],
     message: 'Version Bump'
   )
-  push_to_git_remote()
+  push_to_git_remote(tags: false)
 end
 
 # The top CHANGELOG.adoc section (the one being released) looks like:
@@ -295,7 +295,7 @@ platform :android do
     if git_branch == 'main'
       version_name = read_gradle_properties['gizz.tapes.versionName']
       add_git_tag(tag: version_name)
-      push_git_tags
+      push_git_tags(tag: version_name)
       UI.success("Tag '#{version_name}' pushed — CI will publish to both stores.")
       perform_version_bump
     else
