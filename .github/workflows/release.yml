@@ -71,6 +71,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bundle exec fastlane android ci_release
 
+  desktop:
+    name: Desktop Release
+    # Fastlane creates the GitHub release in the android job, the installers are attached to it.
+    needs: android
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      ref: ${{ github.ref }}
+    secrets: inherit
+
   ios:
     name: iOS Release
     runs-on: macos-latest

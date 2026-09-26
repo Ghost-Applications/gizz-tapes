@@ -2,6 +2,12 @@
 
 ## MarsForTheRich
 
+- Added artist names for non-KGWL shows
+
+### Desktop 
+
+- Added media notifications for pausing / playing for Windows, Linux, and macOS 
+
 ## LeRisque 2026-09-26
 
 - Allow offline playback. Shows can be downloaded and played locally, and be saved to play with

@@ -82,3 +82,12 @@ jobs:
             androidApp/build/outputs/apk/full/release/*.asc \
             androidApp/build/outputs/bundle/fossRelease/*.asc \
             androidApp/build/outputs/bundle/fullRelease/*.asc
+
+  desktop:
+    name: Desktop artifacts
+    needs: create-release
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      ref: ${{ inputs.tag }}
+      tag: ${{ inputs.tag }}
+    secrets: inherit

@@ -26,6 +26,15 @@ Available from Google Play, F-Droid, Obtainium, or directly from GitHub releases
 We highly recommend using [Obtainium](https://github.com/ImranR98/Obtainium)
 to install this app and to keep it up to date.
 
+## Desktop
+
+Desktop builds for macOS (`.dmg`), Windows (`.msi`), and Linux (`.deb`) are now attached to each
+GitHub release. They're mainly a way to quickly test the UI and aren't officially supported. We
+can't test every platform, so use them at your own risk.
+
+The macOS build isn't notarized, so macOS will block it the first time you open it. To allow it,
+go to System Settings → Privacy & Security and click "Open Anyway".
+
 ## Nightly Builds
 
 Want to help us test? Every push to `main` publishes a
@@ -36,7 +45,7 @@ if you find something broken.
 
 ## Verifying Releases
 
-Every GitHub release ships a detached PGP signature (`.asc`) alongside each APK/AAB.
+Every GitHub release ships a detached PGP signature (`.asc`) alongside each APK, AAB, and desktop installer.
 
 - PGP key: [`3239 DF00 5BDF 2CD2 7898  57AF 59F8 42F7 3BAF 2A8D`](https://ghostapps.rocks/pgp.asc)
 
