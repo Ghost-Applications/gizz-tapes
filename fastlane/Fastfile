@@ -61,6 +61,20 @@ private_lane :perform_ios_upload do
   )
 end
 
+# Commits the release's version code to gradle.properties so the tagged commit fully determines
+# the build (needed for F-Droid reproducible builds). Minute-based like the Play beta codes, so
+# codes keep increasing across beta and production uploads.
+private_lane :commit_release_build_number do
+  build_number = Time.now.to_i / 60
+  update_gradle_properties('gizz.tapes.defaultBuildNumber' => build_number.to_s)
+
+  git_commit(
+    path: [File.expand_path('../gradle.properties')],
+    message: "Release build number #{build_number}"
+  )
+  push_to_git_remote(tags: false)
+end
+
 private_lane :perform_version_bump do
   properties = read_gradle_properties
   ios_major, ios_minor = properties['gizz.tapes.iosVersion'].split('.').map(&:to_i)
@@ -291,6 +305,8 @@ platform :android do
   lane :release do
     ensure_git_branch(branch: '(main|release\/.+)')
     ensure_git_status_clean
+
+    commit_release_build_number
 
     if git_branch == 'main'
       version_name = read_gradle_properties['gizz.tapes.versionName']

@@ -35,7 +35,7 @@ jobs:
         run: echo -n $GIZZ_TAPES_ENCODED_KEY | base64 --decode > keys/release.jks
       - name: Compute version code
         id: version_code
-        run: echo "code=$(( $(date +%s) / 60 ))" >> $GITHUB_OUTPUT
+        run: echo "code=$(grep "^gizz.tapes.defaultBuildNumber=" gradle.properties | cut -d= -f2)" >> $GITHUB_OUTPUT
       - name: Build release artifacts
         env:
           GIZZ_TAPES_KEYSTORE_PASSWORD: ${{ secrets.GIZZ_TAPES_KEYSTORE_PASSWORD }}
