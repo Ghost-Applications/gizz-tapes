@@ -168,7 +168,8 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Gizz Tapes"
-            packageVersion = "1.0.${project.property("gizz.tapes.defaultBuildNumber")}"
+            // MSI caps the build component at 65535, so the (minute-based) version code can't be used here.
+            packageVersion = "${project.property("gizz.tapes.iosVersion")}.0"
             description = project.property("gizz.tapes.versionName") as String
 
             macOS { iconFile.set(project.file("src/desktopMain/resources/icon.icns")) }
