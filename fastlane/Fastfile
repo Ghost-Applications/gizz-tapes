@@ -126,8 +126,8 @@ def changelog_notes_for(platform)
   top_section = content.split(/^## .*/)[1]&.strip || ''
 
   parts = top_section.split(/^### (.+)$/)
-  general = parts[0].strip
-  platform_sections = parts[1..].each_slice(2).to_h { |name, body| [name.strip.downcase, body.strip] }
+  general = parts[0].to_s.strip
+  platform_sections = parts.drop(1).each_slice(2).to_h { |name, body| [name.strip.downcase, body.strip] }
 
   [general, platform_sections[platform.downcase]].reject { |s| s.nil? || s.empty? }.join("\n\n")
 end
