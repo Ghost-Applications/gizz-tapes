@@ -40,6 +40,10 @@ xcodebuild -workspace iosApp/iosApp.xcworkspace -scheme iosApp -destination 'gen
 description = "Run networking integration tests on JVM"
 run = "./gradlew :networking-integration:jvmRun"
 
+[tasks.sign-readme]
+description = "PGP sign README.md (writes README.md.asc)"
+run = "gpg --armor --detach-sign --yes -u 3239DF005BDF2CD2789857AF59F842F73BAF2A8D README.md && gpg --verify README.md.asc README.md"
+
 [tasks.release]
 description = "Tag the current version, trigger CI to publish to both stores, then bump version"
 run = "bundle exec fastlane release"

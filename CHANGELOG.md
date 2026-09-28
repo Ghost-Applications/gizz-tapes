@@ -1,8 +1,8 @@
-= Changelog
+# Changelog
 
-== MarsForTheRich
+## MarsForTheRich
 
-== LeRisque 2026-09-26
+## LeRisque 2026-09-26
 
 - Allow offline playback. Shows can be downloaded and played locally, and be saved to play with
 other apps.
@@ -10,46 +10,46 @@ other apps.
 - Updated Libraries to their latest versions
 - Queue is now cleared after the last track in a show has been played
 
-=== iOS
+### iOS
 
 - Added Chromecast support for iOS devices
 - Fixed issue with headphones buttons not working with the app
 
-=== Android
+### Android
 
 - Fix chromecast playback
 - Fixed a bug causing crashes in Android Auto
 
-== KGLW 2026-05-30
+## KGLW 2026-05-30
 
 - Fix App Icon Not Loading
 - Updated UI to new layout. Includes today is gizztory, venues, and search
 - added themed icon for Android 13+
 - Fix html rendering in show notes
 
-== JOJAM 2026-04-28
+## JOJAM 2026-04-28
 
 - Converted project to kotlin multiplatform
 - iOS App 1.0 Released
 - Desktop App Beta available
 
-== Ice V 2026-01-11
+## Ice V 2026-01-11
 
 - Updating to Android SDK 36
 - Updating libraries to latest versions
 - Migrate from kotlinx.datetime.Instant to kotlin.time.Instant
 
-== Hate Dancin' 2025-08-24
+## Hate Dancin' 2025-08-24
 
 - Fix show notes link
 
-== Gaia 2025-03-16
+## Gaia 2025-03-16
 
 - Fixed bug where the currently playing track wasn't shown as playing in the show screen
 - Highlight the background of the currently playing track on the show screen
 - Update api to handle nulls for title in Show and PartialShowData data classes
 
-== Fishing For Fishies 2025-03-02
+## Fishing For Fishies 2025-03-02
 
 - Save player state, app restarts will no longer effect where you were left off in a show.
 - Fix issue where player loses where it is in the playlist when switching between casting and
@@ -57,14 +57,14 @@ local playback.
 - added show notes and ability to change recording source
 - Fix reddit link in about page
 
-== Evil Death Roll 2024-12-17
+## Evil Death Roll 2024-12-17
 
 - Bug fixes and Performance
 - Fixed Image Caching
 - Sorting for shows and years
 - Show media loading in media player ui
 
-== Dawn of Eternal Night 2024-12-08
+## Dawn of Eternal Night 2024-12-08
 
 - Fix system ui icon being same color as app background
 - Fix issue when playing a new show would always play the first song
@@ -72,16 +72,16 @@ even when taping other songs in the show.
 - Show show title in place of band name in Android Auto
 - Add settings screen, with ability to choose default stream type
 
-== Converge-Patch1 2024-11-18
+## Converge-Patch1 2024-11-18
 
 - Removes dependenciesInfo from bundle and apk for f-droid release
 
-== Converge 2024-11-13
+## Converge 2024-11-13
 
 - Release for new play store listing
 - Updates for f-droid release
 
-== Big Fig Wasp 2024-11-07
+## Big Fig Wasp 2024-11-07
 
 - Setup Foss and Full Variants for f-droid release
 - Added media player error state and cleaned up the PlayerState
@@ -90,6 +90,6 @@ even when taping other songs in the show.
 - Update Rows Font and Spacing
 - Added About Page
 
-== Antarctica 2024-10-07
+## Antarctica 2024-10-07
 
 - Got the app up and running!

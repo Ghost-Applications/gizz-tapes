@@ -1,6 +1,6 @@
-= Release
+# Release
 
-1. Ensure CHANGELOG.adoc is up to date
+1. Ensure CHANGELOG.md is up to date
 1. Run `mise run release` on main branch
 1. Provide a name for the next release when prompted
 1. Done! CI will build and publish to both the Play Store and App Store.

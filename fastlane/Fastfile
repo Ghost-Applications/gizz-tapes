@@ -65,53 +65,53 @@ private_lane :perform_version_bump do
   properties = read_gradle_properties
   ios_major, ios_minor = properties['gizz.tapes.iosVersion'].split('.').map(&:to_i)
 
-  content = File.read('../CHANGELOG.adoc')
+  content = File.read('../CHANGELOG.md')
 
   next_release_name = prompt(
     text: "Enter the name of the next release:"
   )
 
-  updated_content = content.sub(/^== .*/) do |match|
+  updated_content = content.sub(/^## .*/) do |match|
     "#{match} #{Date.today.iso8601}"
   end
-  updated_content = updated_content.sub(/^= .*/) do |match|
-    "#{match}\n\n== #{next_release_name}"
+  updated_content = updated_content.sub(/^# .*/) do |match|
+    "#{match}\n\n## #{next_release_name}"
   end
 
-  File.write('../CHANGELOG.adoc', updated_content)
+  File.write('../CHANGELOG.md', updated_content)
 
   properties['gizz.tapes.versionName'] = next_release_name.split.join("")
   properties['gizz.tapes.iosVersion'] = "#{ios_major}.#{ios_minor + 1}"
   update_gradle_properties(properties)
 
   git_commit(
-    path: [File.expand_path('../gradle.properties'), File.expand_path('../CHANGELOG.adoc')],
+    path: [File.expand_path('../gradle.properties'), File.expand_path('../CHANGELOG.md')],
     message: 'Version Bump'
   )
   push_to_git_remote(tags: false)
 end
 
-# The top CHANGELOG.adoc section (the one being released) looks like:
-#   == LeRisque
+# The top CHANGELOG.md section (the one being released) looks like:
+#   ## LeRisque
 #
 #   - general note that applies to every platform
 #
-#   === iOS
+#   ### iOS
 #
 #   - iOS-only note
 #
-#   === Android
+#   ### Android
 #
 #   - Android-only note
 #
-# The === subsections are optional - a release with nothing platform-specific just has general
-# notes and no === headers at all. Returns the general notes plus that platform's subsection
+# The ### subsections are optional - a release with nothing platform-specific just has general
+# notes and no ### headers at all. Returns the general notes plus that platform's subsection
 # (if any), joined together - i.e. what that platform's own release notes should say.
 def changelog_notes_for(platform)
-  content = File.read('../CHANGELOG.adoc')
-  top_section = content.split(/^== .*/)[1]&.strip || ''
+  content = File.read('../CHANGELOG.md')
+  top_section = content.split(/^## .*/)[1]&.strip || ''
 
-  parts = top_section.split(/^=== (.+)$/)
+  parts = top_section.split(/^### (.+)$/)
   general = parts[0].strip
   platform_sections = parts[1..].each_slice(2).to_h { |name, body| [name.strip.downcase, body.strip] }
 

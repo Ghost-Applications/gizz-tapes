@@ -1,3 +1,3 @@
-= Firebase Hosting
+# Firebase Hosting
 
 Currently used just to publish a privacy policy required by google play.

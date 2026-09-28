@@ -63,7 +63,7 @@ jobs:
       - name: Extract changelog
         id: changelog
         run: |
-          NOTES=$(awk '/^== /{found++} found==1{if(/^== /){next} print}' CHANGELOG.adoc | sed '/^$/d' | head -50)
+          NOTES=$(awk '/^## /{found++} found==1{if(/^## /){next} print}' CHANGELOG.md | sed '/^$/d' | head -50)
           echo "notes<<EOF" >> $GITHUB_OUTPUT
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
