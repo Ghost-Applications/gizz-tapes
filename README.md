@@ -20,7 +20,7 @@ Available from Google Play, F-Droid, Obtainium, or directly from GitHub releases
 
 <a href="https://play.google.com/store/apps/details?id=gizz.tapes.full"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"></a>
 <a href="https://f-droid.org/en/packages/gizz.tapes.foss/"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/Ghost-Applications/gizz-tapes"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="54"></a>
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/Ghost-Applications/gizz-tapes"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a>
 <a href="https://github.com/Ghost-Applications/gizz-tapes/releases"><img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png?raw=true" alt="Get it on GitHub" height="80"></a>
 
 We highly recommend using [Obtainium](https://github.com/ImranR98/Obtainium)
@@ -38,8 +38,7 @@ if you find something broken.
 
 Every GitHub release ships a detached PGP signature (`.asc`) alongside each APK/AAB.
 
-- PGP key: `3239 DF00 5BDF 2CD2 7898  57AF 59F8 42F7 3BAF 2A8D`
-  ([keys.openpgp.org](https://keys.openpgp.org/search?q=3239DF005BDF2CD2789857AF59F842F73BAF2A8D) · [ghostapps.rocks/pgp.asc](https://ghostapps.rocks/pgp.asc))
+- PGP key: [`3239 DF00 5BDF 2CD2 7898  57AF 59F8 42F7 3BAF 2A8D`](https://ghostapps.rocks/pgp.asc)
 
 ```sh
 gpg --recv-keys 3239DF005BDF2CD2789857AF59F842F73BAF2A8D
