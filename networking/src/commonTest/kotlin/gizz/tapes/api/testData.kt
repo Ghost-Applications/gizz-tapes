@@ -13,6 +13,7 @@ val showsJson = """
         "average_rating": 4.5,
         "count_ratings": 6,
         "weighted_rating": 4.475755593392184,
+        "artist_name": "King Gizzard & The Lizard Wizard",
         "tags": []
     },
     {
@@ -26,6 +27,7 @@ val showsJson = """
         "average_rating": 4.7,
         "count_ratings": 43,
         "weighted_rating": 4.6782138438796474,
+        "artist_name": "King Gizzard & The Lizard Wizard",
         "tags": [3]
     },
     {
@@ -39,6 +41,7 @@ val showsJson = """
         "average_rating": 4.8,
         "count_ratings": 40,
         "weighted_rating": 4.767823558723091,
+        "artist_name": "King Gizzard & The Lizard Wizard",
         "tags": [3, 2, 1]
     },
     {
@@ -52,6 +55,7 @@ val showsJson = """
         "average_rating": 4.8,
         "count_ratings": 6,
         "weighted_rating": 4.6574150676958315,
+        "artist_name": "King Gizzard & The Lizard Wizard",
         "tags": []
     },
     {
@@ -65,6 +69,7 @@ val showsJson = """
         "average_rating": 4.4,
         "count_ratings": 8,
         "weighted_rating": 4.412649259852024,
+        "artist_name": "King Gizzard & The Lizard Wizard",
         "tags": []
     }
 ]
@@ -149,6 +154,7 @@ val showJson = """
         "average_rating": 3.7,
         "count_ratings": 3,
         "weighted_rating": 4.117837112143297,
+        "artist_id": 1,
         "tags": []
         "recordings": [
             {

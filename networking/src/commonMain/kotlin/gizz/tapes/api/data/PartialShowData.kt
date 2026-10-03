@@ -22,4 +22,6 @@ data class PartialShowData(
     @SerialName("weighted_rating")
     val weightedRating: Float?,
     val tags: List<UInt>,
+    @SerialName("artist_name")
+    val artistName: String,
 )

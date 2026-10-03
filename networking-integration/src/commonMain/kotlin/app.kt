@@ -82,6 +82,12 @@ fun main() = runBlocking {
                 throw it
             }
         }.let { add(it) }
+
+        async {
+            api.artists().onLeft {
+                throw it
+            }
+        }.let { add(it) }
     }
 
     deffered.joinAll()

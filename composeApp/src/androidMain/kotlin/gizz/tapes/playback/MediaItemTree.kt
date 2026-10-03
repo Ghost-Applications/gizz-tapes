@@ -16,7 +16,7 @@ import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.api.data.KglwFile
 import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Recording
-import gizz.tapes.data.BAND_NAME
+import gizz.tapes.data.ArtistRepository
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.ShowId
@@ -42,6 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 class MediaItemTree(
     private val apiClient: GizzTapesApiClient,
     private val downloadedShowsSource: DownloadedShowsSource,
+    private val artistRepository: ArtistRepository,
 ) {
     private val logger = Logger.withTag("MediaItemTree")
 
@@ -209,10 +210,7 @@ class MediaItemTree(
 
         if (show.children.isEmpty()) {
             val showData = loadShow(checkNotNull(show.mediaId.showId))
-
-            val showMetadata = show.item.mediaMetadata
-            val dateString =
-                "${showMetadata.releaseYear}/${showMetadata.releaseMonth}/${showMetadata.releaseDay}"
+            val artistName = artistRepository.artistName(showData.artistId)
 
             val showChildren = showData.recordings
                 .sortedBy { it.type }
@@ -225,12 +223,12 @@ class MediaItemTree(
                             MediaMetadata.Builder()
                                 .setTitle(showData.title)
                                 .setDisplayTitle("${recording.type}: ${recording.id} ${recording.taper.orEmpty()}")
-                                .setArtist("$dateString ${show.item.title}")
+                                .setArtist(artistName)
                                 .setAlbumTitle(show.item.title)
                                 .setReleaseYear(showData.date.year)
                                 .setReleaseDay(showData.date.day)
                                 .setReleaseMonth(showData.date.month.number)
-                                .setAlbumArtist(BAND_NAME)
+                                .setAlbumArtist(artistName)
                                 .setArtworkUri(PosterUrl(showData.posterUrl).toUri())
                                 .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
                                 .setIsPlayable(true)
@@ -258,13 +256,11 @@ class MediaItemTree(
         if (recording.children.isEmpty()) {
             val showData = loadShow(checkNotNull(recording.mediaId.showId))
 
-            val showMetadata = recording.item.mediaMetadata
-            val dateString = "${showMetadata.releaseYear}/${showMetadata.releaseMonth}/${showMetadata.releaseDay}"
-
             val selectedRecording = showData.recordings.first { it.id == recordingId.recordingId }
+            val artistName = artistRepository.artistName(showData.artistId)
 
             val showChildren = selectedRecording.files.map { track ->
-                createTrackMediaItem(selectedRecording, track, showData, recording, dateString)
+                createTrackMediaItem(selectedRecording, track, showData, recording, artistName)
             }.map { mi -> MediaItemNode(mi) }
 
             showChildren.forEach {
@@ -282,7 +278,7 @@ class MediaItemTree(
         track: KglwFile,
         showData: gizz.tapes.api.data.Show,
         show: MediaItemNode,
-        dateString: String
+        artistName: String
     ): MediaItem {
         logger.d { "createTrackMediaItem() recording=$recording, track=$track" }
         val remoteUrl = recording.filesPathPrefix + track.filename
@@ -306,8 +302,8 @@ class MediaItemTree(
                             )
                         ).toExtrasBundle().putRemoteUrl(remoteUrl)
                     )
-                    .setArtist("$dateString ${show.item.title}")
-                    .setAlbumArtist(BAND_NAME)
+                    .setArtist(artistName)
+                    .setAlbumArtist(artistName)
                     .setAlbumTitle(show.item.title)
                     .setTitle(track.title)
                     .setRecordingYear(showData.date.year)

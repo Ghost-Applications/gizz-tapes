@@ -18,6 +18,8 @@ import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.api.data.Show
+import gizz.tapes.data.ArtistRepository
+import gizz.tapes.data.BAND_NAME
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
 import gizz.tapes.data.RecordingData
@@ -61,6 +63,7 @@ class ShowViewModel(
     private val datastore: DataStore<Settings>,
     private val showSaver: ShowSaver,
     private val downloadsExporter: DownloadsExporter,
+    private val artistRepository: ArtistRepository,
     @Assisted savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -72,6 +75,9 @@ class ShowViewModel(
     private val cachedShowData = MutableStateFlow<LCE<Show, Nothing>>(LCE.Loading)
     private val errorFlow = MutableStateFlow<LCE.Error<Throwable>?>(null)
     private val selectedRecording = MutableStateFlow<RecordingId?>(null)
+
+    // resolved before cachedShowData emits, so loadShow() always sees the show's artist.
+    private var artistName = BAND_NAME
 
     // bumped after deleteDownloadedShow() so recordingDownloadStatus re-checks disk state -
     // unlike a completed download, a deletion has no WorkManager state change to react to.
@@ -153,6 +159,7 @@ class ShowViewModel(
     private suspend fun fetchAndCacheShow() {
         val cachedShow = showSaver.loadCachedShow(showId)
         if (cachedShow != null) {
+            artistName = artistRepository.artistName(cachedShow.artistId)
             cachedShowData.emit(LCE.Content(cachedShow))
             return
         }
@@ -166,6 +173,7 @@ class ShowViewModel(
                 )
             }
         )
+        data.contentOrNull()?.let { artistName = artistRepository.artistName(it.artistId) }
         cachedShowData.emit(data)
     }
 
@@ -200,7 +208,8 @@ class ShowViewModel(
                         showId = ShowId(show.id),
                         showTitle = title,
                         durationMs = track.length.inWholeMilliseconds,
-                        showDate = show.date
+                        showDate = show.date,
+                        artistName = artistName,
                     )
                 }
 
