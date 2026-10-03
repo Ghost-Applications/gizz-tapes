@@ -9,6 +9,7 @@ import arrow.core.nonEmptyListOf
 import arrow.core.right
 import com.google.common.truth.Truth.assertThat
 import gizz.tapes.api.GizzTapesApiClient
+import gizz.tapes.api.data.Artist
 import gizz.tapes.api.data.Country
 import gizz.tapes.api.data.HeroPhoto
 import gizz.tapes.api.data.InternetArchive
@@ -21,6 +22,7 @@ import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
 import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
+import gizz.tapes.data.ArtistRepository
 import gizz.tapes.data.ShowId
 import gizz.tapes.storage.DownloadedShowsSource
 import gizz.tapes.stub
@@ -58,6 +60,7 @@ class MediaItemTreeTest {
                         countRatings = 0f,
                         weightedRating = 0f,
                         tags = emptyList(),
+                        artistName = "King Gizzard & The Lizard Wizard",
                     ),
                     PartialShowData(
                         id = "2",
@@ -70,7 +73,8 @@ class MediaItemTreeTest {
                         averageRating = 0f,
                         countRatings = 0f,
                         weightedRating = 0f,
-                        tags = emptyList()
+                        tags = emptyList(),
+                        artistName = "King Gizzard & The Lizard Wizard",
                     ),
                     PartialShowData(
                         id = "3",
@@ -84,6 +88,7 @@ class MediaItemTreeTest {
                         countRatings = 0f,
                         weightedRating = 0f,
                         tags = emptyList(),
+                        artistName = "King Gizzard & The Lizard Wizard",
                     )
                 ).right()
             }
@@ -98,7 +103,11 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient, noDownloads).getChildren(MediaId.RootId).map {
+        val result = MediaItemTree(
+            apiClient,
+            noDownloads,
+            ArtistRepository(apiClient)
+        ).getChildren(MediaId.RootId).map {
             ShowTestData(
                 it.mediaId,
                 it.mediaMetadata.title.toString(),
@@ -162,6 +171,7 @@ class MediaItemTreeTest {
                         countRatings = 0f,
                         weightedRating = 0f,
                         tags = emptyList(),
+                        artistName = "King Gizzard & The Lizard Wizard",
                     ),
                     PartialShowData(
                         id = "2",
@@ -175,6 +185,7 @@ class MediaItemTreeTest {
                         countRatings = 0f,
                         weightedRating = 0f,
                         tags = emptyList(),
+                        artistName = "King Gizzard & The Lizard Wizard",
                     ),
                     PartialShowData(
                         id = "3",
@@ -188,6 +199,7 @@ class MediaItemTreeTest {
                         countRatings = 0f,
                         weightedRating = 0f,
                         tags = emptyList(),
+                        artistName = "King Gizzard & The Lizard Wizard",
                     )
                 ).right()
             }
@@ -203,7 +215,11 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient, noDownloads).getChildren(MediaId.YearId("2021")).map {
+        val result = MediaItemTree(
+            apiClient,
+            noDownloads,
+            ArtistRepository(apiClient)
+        ).getChildren(MediaId.YearId("2021")).map {
             ShowTestData(
                 it.mediaId,
                 it.mediaMetadata.title.toString(),
@@ -218,8 +234,8 @@ class MediaItemTreeTest {
         assertThat(result).containsExactly(
             ShowTestData(
                 mediaId = "root/2021/3",
-                title = "Venue 3 - Title 3 - Location 3",
-                displayTitle = "2021/12/10 Venue 3 - Title 3 - Location 3",
+                title = "Venue 3 • Title 3 • Location 3",
+                displayTitle = "2021/12/10 Venue 3 • Title 3 • Location 3",
                 artworkUri = Uri.parse("https://example.com/poster3.jpg"),
                 isPlayable = false,
                 isBrowsable = true,
@@ -227,8 +243,8 @@ class MediaItemTreeTest {
             ),
             ShowTestData(
                 mediaId = "root/2021/2",
-                title = "Venue 2 - Title 2 - Location 2",
-                displayTitle = "2021/8/15 Venue 2 - Title 2 - Location 2",
+                title = "Venue 2 • Title 2 • Location 2",
+                displayTitle = "2021/8/15 Venue 2 • Title 2 • Location 2",
                 artworkUri = Uri.parse("https://example.com/poster2.jpg"),
                 isPlayable = false,
                 isBrowsable = true,
@@ -236,8 +252,8 @@ class MediaItemTreeTest {
             ),
             ShowTestData(
                 mediaId = "root/2021/1",
-                title = "Venue 1 - Title 1 - Location 1",
-                displayTitle = "2021/5/20 Venue 1 - Title 1 - Location 1",
+                title = "Venue 1 • Title 1 • Location 1",
+                displayTitle = "2021/5/20 Venue 1 • Title 1 • Location 1",
                 artworkUri = Uri.parse("https://example.com/poster1.jpg"),
                 isPlayable = false,
                 isBrowsable = true,
@@ -262,6 +278,7 @@ class MediaItemTreeTest {
                     countRatings = 0f,
                     weightedRating = 0f,
                     tags = emptyList(),
+                    artistName = "King Gizzard & The Lizard Wizard",
                 )
             ).right()
 
@@ -283,6 +300,7 @@ class MediaItemTreeTest {
                 countRatings = 0f,
                 weightedRating = 0f,
                 tags = emptyList(),
+                artistId = 1.toUInt(),
                 recordings = nonEmptyListOf(
                     Recording(
                         id = "kglw2024-11-20archie",
@@ -336,6 +354,11 @@ class MediaItemTreeTest {
             override suspend fun showTags(): Either<Exception, List<ShowTag>> {
                 error("Not implemented")
             }
+
+            override suspend fun artists(): Either<Exception, List<Artist>> =
+                listOf(
+                    Artist(id = 1.toUInt(), slug = "stu-mackenzie", name = "Stu Mackenzie", showCount = 1.toUInt())
+                ).right()
         }
 
         data class TestData(
@@ -354,7 +377,7 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient, noDownloads)
+        val result = MediaItemTree(apiClient, noDownloads, ArtistRepository(apiClient))
             .getChildren(MediaId.ShowId(parent = MediaId.YearId("2021"), showId = "1"))
             .map {
                 TestData(
@@ -379,9 +402,9 @@ class MediaItemTreeTest {
                 mediaId = "root/2021/1/kglw2024-11-20archie",
                 title = "Title 1",
                 displayTitle = "SBD: kglw2024-11-20archie ",
-                artist = "2021/5/20 Venue 1 - Title 1 - Location 1",
-                albumTitle = "Venue 1 - Title 1 - Location 1",
-                albumArtist = "King Gizzard & The Lizard Wizard",
+                artist = "Stu Mackenzie",
+                albumTitle = "Venue 1 • Title 1 • Location 1",
+                albumArtist = "Stu Mackenzie",
                 releaseYear = 2021,
                 releaseMonth = 5,
                 releaseDay = 20,
@@ -411,6 +434,7 @@ class MediaItemTreeTest {
                     countRatings = 0f,
                     weightedRating = 0f,
                     tags = emptyList(),
+                    artistName = "King Gizzard & The Lizard Wizard",
                 )
             ).right()
 
@@ -432,6 +456,7 @@ class MediaItemTreeTest {
                 countRatings = 0f,
                 weightedRating = 0f,
                 tags = emptyList(),
+                artistId = 1.toUInt(),
                 recordings = nonEmptyListOf(
                     Recording(
                         id = "kglw2024-11-20archie",
@@ -485,6 +510,11 @@ class MediaItemTreeTest {
             override suspend fun showTags(): Either<Exception, List<ShowTag>> {
                 error("Not implemented")
             }
+
+            override suspend fun artists(): Either<Exception, List<Artist>> =
+                listOf(
+                    Artist(id = 1.toUInt(), slug = "stu-mackenzie", name = "Stu Mackenzie", showCount = 1.toUInt())
+                ).right()
         }
 
         data class TestData(
@@ -503,7 +533,7 @@ class MediaItemTreeTest {
             val mediaType: Int?
         )
 
-        val result = MediaItemTree(apiClient, noDownloads)
+        val result = MediaItemTree(apiClient, noDownloads, ArtistRepository(apiClient))
             .getChildren(
                 MediaId.RecordingId(
                     parent = MediaId.ShowId(parent = MediaId.YearId("2021"), showId = "1"),
@@ -532,9 +562,9 @@ class MediaItemTreeTest {
             TestData(
                 "root/2021/1/kglw2024-11-20archie/01-Intro.mp3",
                 "Intro",
-                "2021/5/20 Title 1",
+                "Stu Mackenzie",
                 "Title 1",
-                "King Gizzard & The Lizard Wizard",
+                "Stu Mackenzie",
                 10000L,
                 Uri.parse(
                     "https://example.com/poster1.jpg"
@@ -549,9 +579,9 @@ class MediaItemTreeTest {
             TestData(
                 "root/2021/1/kglw2024-11-20archie/02-Rattlesnake.mp3",
                 "Rattlesnake",
-                "2021/5/20 Title 1",
+                "Stu Mackenzie",
                 "Title 1",
-                "King Gizzard & The Lizard Wizard",
+                "Stu Mackenzie",
                 629000L,
                 Uri.parse(
                     "https://example.com/poster1.jpg"
@@ -566,9 +596,9 @@ class MediaItemTreeTest {
             TestData(
                 "root/2021/1/kglw2024-11-20archie/03-O.N.E..mp3",
                 "O.N.E.",
-                "2021/5/20 Title 1",
+                "Stu Mackenzie",
                 "Title 1",
-                "King Gizzard & The Lizard Wizard",
+                "Stu Mackenzie",
                 229000L,
                 Uri.parse(
                     "https://example.com/poster1.jpg"

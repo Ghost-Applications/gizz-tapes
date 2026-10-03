@@ -1,5 +1,6 @@
 package gizz.tapes.playback
 
+import gizz.tapes.data.BAND_NAME
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.ui.player.PlayerState
@@ -39,4 +40,5 @@ data class PlaybackItem(
     val showTitle: FullShowTitle,
     val durationMs: Long,
     val showDate: LocalDate,
+    val artistName: String = BAND_NAME,
 )

@@ -204,6 +204,7 @@ class GizzTapesApiClientTest {
                     "average_rating": 3.7,
                     "count_ratings": 3,
                     "weighted_rating": 4.117837112143297,
+                    "artist_name": "King Gizzard & The Lizard Wizard",
                     "tags": []
                 }]
                 """.trimIndent(),
@@ -235,6 +236,7 @@ class GizzTapesApiClientTest {
                     "average_rating": 3.7,
                     "count_ratings": 3,
                     "weighted_rating": 4.117837112143297,
+                    "artist_name": "King Gizzard & The Lizard Wizard",
                     "tags": []
                 }]
                 """.trimIndent(),
