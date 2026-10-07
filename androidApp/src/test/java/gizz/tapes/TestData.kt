@@ -112,7 +112,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-04",
@@ -125,7 +126,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-05",
@@ -138,7 +140,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-06",
@@ -151,7 +154,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-08",
@@ -164,7 +168,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-09early",
@@ -177,7 +182,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-09late",
@@ -190,7 +196,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-11",
@@ -203,7 +210,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-12",
@@ -216,7 +224,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         ),
         PartialShowData(
             id = "2024-09-14",
@@ -229,7 +238,8 @@ val partialShowData = Content(
             averageRating = null,
             countRatings = 0f,
             weightedRating = null,
-            tags = emptyList()
+            tags = emptyList(),
+            artistName = "King Gizzard & The Lizard Wizard",
         )
     )
 )
@@ -252,6 +262,7 @@ val show = Show(
     countRatings = 0f,
     weightedRating = null,
     tags = emptyList(),
+    artistId = 1.toUInt(),
     recordings = nonEmptyListOf(
         Recording(
             id = "kglw2024-09-11.bandcampbootlegger",

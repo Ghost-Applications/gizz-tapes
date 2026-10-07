@@ -1,6 +1,7 @@
 package gizz.tapes.api
 
 import arrow.core.Either
+import gizz.tapes.api.data.Artist
 import gizz.tapes.api.data.Country
 import gizz.tapes.api.data.HeroPhoto
 import gizz.tapes.api.data.PartialShowData
@@ -49,6 +50,7 @@ interface GizzTapesApiClient {
     suspend fun countries(): Either<Exception, List<Country>>
     suspend fun venues(): Either<Exception, List<Venue>>
     suspend fun showTags(): Either<Exception, List<ShowTag>>
+    suspend fun artists(): Either<Exception, List<Artist>>
 }
 
 private class RealGizzTapesApiClient(
@@ -117,5 +119,9 @@ private class RealGizzTapesApiClient(
 
     override suspend fun showTags(): Either<Exception, List<ShowTag>> = Either.catchOrThrow {
         client.get("${api.url}/api/v1/show_tags.json").body()
+    }
+
+    override suspend fun artists(): Either<Exception, List<Artist>> = Either.catchOrThrow {
+        client.get("${api.url}/api/v1/artists.json").body()
     }
 }

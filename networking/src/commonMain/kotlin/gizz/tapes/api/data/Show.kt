@@ -31,4 +31,7 @@ data class Show(
     @SerialName("weighted_rating")
     val weightedRating: Float?,
     val tags: List<UInt>,
+    // nullable so Show JSON cached by older app versions (downloaded shows) still decodes
+    @SerialName("artist_id")
+    val artistId: UInt? = null,
 )

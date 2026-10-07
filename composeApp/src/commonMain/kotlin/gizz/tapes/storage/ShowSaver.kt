@@ -9,7 +9,7 @@ import gizz.tapes.AppContext
 import gizz.tapes.api.data.KglwFile
 import gizz.tapes.api.data.Recording
 import gizz.tapes.api.data.Show
-import gizz.tapes.data.BAND_NAME
+import gizz.tapes.data.ArtistRepository
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.RecordingId
 import gizz.tapes.data.ShowId
@@ -57,6 +57,7 @@ class ShowSaver(
     private val musicDownloader: MusicDownloader,
     private val appContext: AppContext,
     private val httpClient: HttpClient,
+    private val artistRepository: ArtistRepository,
     private val fileSystem: FileSystem = FileSystem.SYSTEM,
 ) : DownloadedShowsSource {
 
@@ -145,7 +146,7 @@ class ShowSaver(
                 tagOnceDownloaded(localPath) {
                     Id3Tags(
                         title = file.title,
-                        artist = BAND_NAME,
+                        artist = artistRepository.artistName(show.artistId),
                         album = title.fullShowTitle.value,
                         trackNumber = index + 1,
                         trackCount = recording.files.size,

@@ -73,8 +73,8 @@ fun PlaybackItem.toMediaItem(): MediaItem {
         .setMediaId(id)
         .setMediaMetadata(
             MediaMetadata.Builder()
-                .setArtist(BAND_NAME)
-                .setAlbumArtist(BAND_NAME)
+                .setArtist(artistName)
+                .setAlbumArtist(artistName)
                 .setAlbumTitle(albumTitle)
                 .setTitle(title)
                 .setRecordingYear(showDate.year)
@@ -116,7 +116,8 @@ fun MediaItem.toPlaybackItem(): PlaybackItem {
         showId = show.id,
         showTitle = show.title,
         durationMs = metadata.durationMs ?: 0L,
-        showDate = date
+        showDate = date,
+        artistName = metadata.artist?.toString() ?: BAND_NAME,
     )
 }
 
