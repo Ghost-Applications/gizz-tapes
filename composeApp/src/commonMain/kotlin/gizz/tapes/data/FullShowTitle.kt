@@ -6,7 +6,7 @@ import androidx.savedstate.read
 import androidx.savedstate.write
 import gizz.tapes.util.toAlbumFormat
 import io.ktor.http.decodeURLQueryComponent
-import io.ktor.http.encodeURLPath
+import io.ktor.http.encodeURLParameter
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -30,7 +30,7 @@ data class FullShowTitle(
                 Json.decodeFromString(value.decodeURLQueryComponent())
 
             override fun serializeAsValue(value: FullShowTitle): String =
-                Json.encodeToString(value).encodeURLPath()
+                Json.encodeToString(value).encodeURLParameter()
         }
     }
 }

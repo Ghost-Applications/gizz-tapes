@@ -127,6 +127,14 @@ android {
         includeInApk = false
         includeInBundle = false
     }
+
+    bundle {
+        // Ship all densities in the base APK. Installs missing the density split (e.g. sideloaded
+        // base.apk) crash loading mediarouter's PNG-only cast button drawables.
+        density {
+            enableSplit = false
+        }
+    }
 }
 
 dependencies {
