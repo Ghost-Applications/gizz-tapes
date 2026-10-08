@@ -3,6 +3,7 @@
 ## MarsForTheRich
 
 - Added artist names for non-KGWL shows
+- fixed crashing when try to view shows with "/" in the name
 
 ### Desktop 
 
