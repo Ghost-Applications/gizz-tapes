@@ -136,6 +136,9 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.javacv)
             implementation(libs.ffmpeg.platform)
+            implementation(libs.jna)
+            implementation(libs.dbus.java.core)
+            implementation(libs.dbus.java.transport)
             implementation(libs.sqldelight.sqlite.driver)
         }
 
@@ -167,6 +170,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            // From suggestRuntimeModules: java.sql for SQLite, jdk.unsupported for JNA.
+            modules("java.instrument", "java.management", "java.sql", "jdk.security.auth", "jdk.unsupported")
             packageName = "Gizz Tapes"
             // MSI caps the build component at 65535, so the (minute-based) version code can't be used here.
             packageVersion = "${project.property("gizz.tapes.iosVersion")}.0"

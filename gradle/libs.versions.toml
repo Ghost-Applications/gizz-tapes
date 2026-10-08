@@ -1,4 +1,5 @@
 [versions]
+dbus-java = "5.2.2"
 # values used in build scripts
 compose-compiler = "1.5.15"
 compose = "1.12.0"
@@ -70,6 +71,9 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 
 javacv = { module = "org.bytedeco:javacv", version = "1.5.14" }
 ffmpeg-platform = { module = "org.bytedeco:ffmpeg-platform", version = "8.1.2-1.5.14" }
+jna = { module = "net.java.dev.jna:jna", version = "5.19.1" }
+dbus-java-core = { module = "com.github.hypfvieh:dbus-java-core", version.ref = "dbus-java" }
+dbus-java-transport = { module = "com.github.hypfvieh:dbus-java-transport-native-unixsocket", version.ref = "dbus-java" }
 kermit = { module = "co.touchlab:kermit", version = "2.2.0" }
 
 sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
