@@ -8,7 +8,7 @@ import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Year
 import io.ktor.http.decodeURLQueryComponent
-import io.ktor.http.encodeURLPath
+import io.ktor.http.encodeURLParameter
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.reflect.typeOf
@@ -53,7 +53,7 @@ sealed interface Destination {
                 }
 
                 override fun serializeAsValue(value: SelectionType): String {
-                    return Json.encodeToString(value).encodeURLPath()
+                    return Json.encodeToString(value).encodeURLParameter()
                 }
 
                 override fun put(bundle: SavedState, key: String, value: SelectionType) {

@@ -5,7 +5,7 @@ import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
 import io.ktor.http.decodeURLQueryComponent
-import io.ktor.http.encodeURLPath
+import io.ktor.http.encodeURLParameter
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
@@ -27,7 +27,7 @@ value class ShowId(val value: String) {
             }
 
             override fun serializeAsValue(value: ShowId): String {
-                return value.value.encodeURLPath()
+                return value.value.encodeURLParameter()
             }
         }
     }
