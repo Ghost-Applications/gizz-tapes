@@ -16,6 +16,8 @@ import gizz.tapes.ui.MainScreenNavigation
 import gizz.tapes.ui.about.AboutScreen
 import gizz.tapes.ui.downloads.DownloadedShowsScreen
 import gizz.tapes.ui.player.FullPlayerScreen
+import gizz.tapes.ui.saved.FavoriteShowsScreen
+import gizz.tapes.ui.saved.RecentShowsScreen
 import gizz.tapes.ui.selection.ShowSelectionScreen
 import gizz.tapes.ui.settings.SettingsScreen
 import gizz.tapes.ui.show.ShowScreen
@@ -34,6 +36,12 @@ fun GizzTapesNavController(navController: NavHostController) {
                     navigateToAboutScreen = { navController.navigate(Destination.About) },
                     navigateToDownloadedShowsScreen = {
                         navController.navigate(Destination.DownloadedShows)
+                    },
+                    navigateToRecentShowsScreen = {
+                        navController.navigate(Destination.RecentShows)
+                    },
+                    navigateToFavoriteShowsScreen = {
+                        navController.navigate(Destination.FavoriteShows)
                     },
                     navigateToShow = { id, title ->
                         navController.navigate(
@@ -126,6 +134,30 @@ fun GizzTapesNavController(navController: NavHostController) {
                         }
                     }
                 },
+                onShowClicked = { id, title ->
+                    navController.navigate(Destination.Show(id, title))
+                },
+                onMiniPlayerClick = { title ->
+                    navController.navigate(Destination.Player(title))
+                },
+            )
+        }
+
+        composable<Destination.FavoriteShows> {
+            FavoriteShowsScreen(
+                navigateUp = { navController.navigateUp() },
+                onShowClicked = { id, title ->
+                    navController.navigate(Destination.Show(id, title))
+                },
+                onMiniPlayerClick = { title ->
+                    navController.navigate(Destination.Player(title))
+                },
+            )
+        }
+
+        composable<Destination.RecentShows> {
+            RecentShowsScreen(
+                navigateUp = { navController.navigateUp() },
                 onShowClicked = { id, title ->
                     navController.navigate(Destination.Show(id, title))
                 },

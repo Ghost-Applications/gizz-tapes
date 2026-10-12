@@ -8,6 +8,8 @@ class MainScreenNavigation(
     val navigateToSettingsScreen: () -> Unit,
     val navigateToAboutScreen: () -> Unit,
     val navigateToDownloadedShowsScreen: () -> Unit,
+    val navigateToRecentShowsScreen: () -> Unit,
+    val navigateToFavoriteShowsScreen: () -> Unit,
     val navigateToShow: (showId: ShowId, showTitle: FullShowTitle) -> Unit,
     val navigateToShowsInYear: (year: Year) -> Unit,
     val navigateToCountryVenues: (countryId: Int, countryName: String) -> Unit,

@@ -33,6 +33,7 @@ import gizz.tapes.playback.GizzMediaPlayer
 import gizz.tapes.playback.PlaybackItem
 import gizz.tapes.storage.DownloadsExporter
 import gizz.tapes.storage.RecordingDownloadStatus
+import gizz.tapes.storage.SavedShowsRepository
 import gizz.tapes.storage.ShowSaver
 import gizz.tapes.util.ForViewModel
 import gizz.tapes.util.LCE
@@ -64,6 +65,7 @@ class ShowViewModel(
     private val showSaver: ShowSaver,
     private val downloadsExporter: DownloadsExporter,
     private val artistRepository: ArtistRepository,
+    private val savedShowsRepository: SavedShowsRepository,
     @Assisted savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -108,8 +110,20 @@ class ShowViewModel(
             initialValue = RecordingDownloadStatus.NOT_DOWNLOADED
         )
 
+    val isFavorite: StateFlow<Boolean> = savedShowsRepository.favoriteShowIds
+        .map { showId in it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.ForViewModel,
+            initialValue = false
+        )
+
     init {
         viewModelScope.launch { fetchAndCacheShow() }
+    }
+
+    fun toggleFavorite() {
+        viewModelScope.launch { savedShowsRepository.toggleFavorite(showId) }
     }
 
     fun changeSelectedRecording(recordingId: RecordingId) {
@@ -218,6 +232,9 @@ class ShowViewModel(
                     removeOldMediaItemsAndAddNew = { startIndex ->
                         viewModelScope.launch {
                             mediaPlayer.setPlaylist(playbackItems, startIndex)
+                        }
+                        viewModelScope.launch(Dispatchers.IO) {
+                            savedShowsRepository.addRecentShow(ShowId(show.id))
                         }
                     },
                     tracks = recording.files.map { track ->

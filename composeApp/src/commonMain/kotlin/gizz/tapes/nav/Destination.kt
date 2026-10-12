@@ -102,4 +102,13 @@ sealed interface Destination {
 
     @Serializable
     data object DownloadedShows : Destination
+
+    @Serializable
+    data object MyContent : Destination
+
+    @Serializable
+    data object RecentShows : Destination
+
+    @Serializable
+    data object FavoriteShows : Destination
 }

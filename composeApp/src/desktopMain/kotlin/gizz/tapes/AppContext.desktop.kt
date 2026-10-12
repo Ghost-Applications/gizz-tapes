@@ -7,5 +7,6 @@ actual class AppContext {
     actual val platform: Platform = Platform.Desktop
     actual val settingsPath: Path = "${System.getProperty("user.home")}/.gizztapes/settings.json".toPath()
     actual val sessionPath: Path = "${System.getProperty("user.home")}/.gizztapes/session.json".toPath()
+    actual val savedShowsPath: Path = "${System.getProperty("user.home")}/.gizztapes/saved_shows.json".toPath()
     actual val downloadsPath: Path = "${System.getProperty("user.home")}/.gizztapes/downloads".toPath()
 }

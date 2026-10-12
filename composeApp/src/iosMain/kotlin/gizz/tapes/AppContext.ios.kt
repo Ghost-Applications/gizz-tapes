@@ -11,6 +11,7 @@ actual class AppContext {
     actual val platform: Platform = Platform.iOS
     actual val settingsPath: Path = documentsDir() / "gizz_tapes_settings.json"
     actual val sessionPath: Path = documentsDir() / "gizz_tapes_session.json"
+    actual val savedShowsPath: Path = documentsDir() / "gizz_tapes_saved_shows.json"
     actual val downloadsPath: Path = documentsDir() / "downloads"
 }
 

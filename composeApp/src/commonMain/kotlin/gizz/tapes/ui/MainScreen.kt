@@ -48,6 +48,7 @@ import gizz.tapes.ui.components.TopAppBarText
 import gizz.tapes.ui.components.gizzIcon
 import gizz.tapes.ui.home.BottomNavBarItem
 import gizz.tapes.ui.home.HomeScreen
+import gizz.tapes.ui.mycontent.MyContentScreen
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerActions
 import gizz.tapes.ui.player.PlayerViewModel
@@ -136,13 +137,6 @@ fun MainScreen(
                                 navigation.navigateToSettingsScreen()
                             }
                         )
-                        DropdownMenuItem(
-                            text = { Text("Downloaded Shows") },
-                            onClick = {
-                                showMenu = false
-                                navigation.navigateToDownloadedShowsScreen()
-                            }
-                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -215,6 +209,14 @@ fun MainScreen(
                             modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
                             onShowClicked = { id, title -> navigation.navigateToShow(id, title) },
                             onViewDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
+                        )
+                    }
+                    composable<Destination.MyContent> {
+                        MyContentScreen(
+                            modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+                            onFavoritesClicked = navigation.navigateToFavoriteShowsScreen,
+                            onHistory = navigation.navigateToRecentShowsScreen,
+                            onDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
                         )
                     }
                 }
