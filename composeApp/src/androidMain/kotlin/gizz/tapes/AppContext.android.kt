@@ -14,6 +14,9 @@ actual class AppContext(
     actual val sessionPath: Path by lazy {
         context.filesDir.resolve("stored_media_session.json").toOkioPath()
     }
+    actual val savedShowsPath: Path by lazy {
+        context.filesDir.resolve("saved_shows.json").toOkioPath()
+    }
     actual val downloadsPath: Path by lazy {
         context.filesDir.resolve("downloads").toOkioPath()
     }

@@ -30,6 +30,8 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -101,6 +103,7 @@ fun ShowScreen(
     val showState by viewModel.show.collectAsState()
     val playerState by playerViewModel.playerState.collectAsState()
     val downloadStatus by viewModel.recordingDownloadStatus.collectAsState()
+    val isFavorite by viewModel.isFavorite.collectAsState()
 
     ShowScreen(
         title = viewModel.title,
@@ -116,6 +119,8 @@ fun ShowScreen(
         downloadStatus = downloadStatus,
         exportToDownloads = viewModel::exportToDownloads,
         deleteDownloadedShow = viewModel::deleteDownloadedShow,
+        isFavorite = isFavorite,
+        toggleFavorite = viewModel::toggleFavorite,
         onViewDownloadsClicked = onViewDownloadsClicked,
     )
 }
@@ -136,6 +141,8 @@ fun ShowScreen(
     downloadStatus: RecordingDownloadStatus,
     exportToDownloads: () -> Unit,
     deleteDownloadedShow: () -> Unit,
+    isFavorite: Boolean,
+    toggleFavorite: () -> Unit,
     onViewDownloadsClicked: () -> Unit,
 ) {
     val platformActions = LocalPlatformActions.current
@@ -173,23 +180,30 @@ fun ShowScreen(
                 actions = {
                     platformActions()
 
-                    IconButton(onClick = { showOverflowMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More")
+                    IconButton(onClick = toggleFavorite) {
+                        if (isFavorite) {
+                            Icon(Icons.Filled.Star, contentDescription = "Remove from favorites")
+                        } else {
+                            Icon(Icons.Outlined.StarBorder, contentDescription = "Add to favorites")
+                        }
+                    }
+
+                    if (downloadStatus == RecordingDownloadStatus.NOT_DOWNLOADED) {
+                        IconButton(onClick = saveShow) {
+                            Icon(Icons.Default.Download, contentDescription = "Download this show for offline playback")
+                        }
+                    }
+
+                    // the overflow only holds actions for an already-downloaded show.
+                    if (downloadStatus == RecordingDownloadStatus.DOWNLOADED) {
+                        IconButton(onClick = { showOverflowMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More")
+                        }
                     }
                     DropdownMenu(
                         expanded = showOverflowMenu,
                         onDismissRequest = { showOverflowMenu = false }
                     ) {
-                        if (downloadStatus == RecordingDownloadStatus.NOT_DOWNLOADED) {
-                            DropdownMenuItem(
-                                text = { Text("Download this show for offline playback") },
-                                leadingIcon = { Icon(Icons.Default.Download, null) },
-                                onClick = {
-                                    showOverflowMenu = false
-                                    saveShow()
-                                }
-                            )
-                        }
                         if (downloadStatus == RecordingDownloadStatus.DOWNLOADED) {
                             DropdownMenuItem(
                                 text = { Text("Export show to Downloads folder") },

@@ -15,5 +15,6 @@ expect class AppContext {
     val platform: Platform
     val settingsPath: Path
     val sessionPath: Path
+    val savedShowsPath: Path
     val downloadsPath: Path
 }

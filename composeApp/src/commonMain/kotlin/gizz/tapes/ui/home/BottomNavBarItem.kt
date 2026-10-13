@@ -3,6 +3,7 @@ package gizz.tapes.ui.home
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Festival
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -17,4 +18,5 @@ enum class BottomNavBarItem(
     Years("Years", Icons.Filled.CalendarToday, Destination.YearSelection),
     Venues("Venues", Icons.Filled.Festival, Destination.Venues),
     Search("Search", Icons.Filled.Search, Destination.Search),
+    MyContent("My Content", Icons.Filled.Folder, Destination.MyContent),
 }

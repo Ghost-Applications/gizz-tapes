@@ -21,6 +21,8 @@ import gizz.tapes.db.Shows
 import gizz.tapes.playback.CurrentlyPlayingSaver
 import gizz.tapes.playback.StoredMediaSession
 import gizz.tapes.playback.StoredMediaSessionSerializer
+import gizz.tapes.storage.SavedShows
+import gizz.tapes.storage.SavedShowsSerializer
 import gizz.tapes.storage.durationAdapter
 import gizz.tapes.storage.instantAdapter
 import gizz.tapes.storage.localDateAdapter
@@ -63,6 +65,22 @@ interface AppGraph : ViewModelGraph {
             corruptionHandler = ReplaceFileCorruptionHandler {
                 Logger.e(it) { "Corruption when reading settings" }
                 StoredMediaSession()
+            }
+        )
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideSavedShowsDataStore(
+        appContext: AppContext,
+        serializer: SavedShowsSerializer
+    ): DataStore<SavedShows> {
+        FileSystem.SYSTEM.createDirectories(appContext.savedShowsPath.parent!!)
+        return DataStoreFactory.create(
+            storage = OkioStorage(FileSystem.SYSTEM, serializer) { appContext.savedShowsPath },
+            corruptionHandler = ReplaceFileCorruptionHandler {
+                Logger.e(it) { "Corruption when reading saved shows" }
+                SavedShows()
             }
         )
     }
