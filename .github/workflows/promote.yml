@@ -1,0 +1,99 @@
+name: Promote
+
+# Moves an already-uploaded build to the next track. Builds land on Play internal testing and
+# TestFlight internal testers (publish*.yml / release*.yml); this sends them on:
+#   beta       - Play internal -> beta, TestFlight -> "external testers" group
+#   production - Play beta -> production, TestFlight build -> App Store review
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Track to promote to'
+        required: true
+        type: choice
+        options:
+          - beta
+          - production
+      platform:
+        description: 'Platform(s) to promote'
+        required: true
+        type: choice
+        default: both
+        options:
+          - both
+          - android
+          - ios
+      ref:
+        description: 'Ref the build was made from (release tag), used for changelog and iOS version'
+        required: true
+        default: main
+      build:
+        description: 'Play version code / TestFlight build number (defaults to latest)'
+        required: false
+        default: ''
+
+jobs:
+  android:
+    name: Android
+    if: inputs.platform != 'ios'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Use latest Fastfile
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: fastlane/Fastfile
+          sparse-checkout-cone-mode: false
+          path: latest
+      - name: Override Fastfile with latest fixes
+        run: cp latest/fastlane/Fastfile fastlane/Fastfile
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.6'
+          bundler-cache: true
+      - name: Provide Play Store key
+        env:
+          GIZZ_TAPES_PUBLISH_KEY: ${{ secrets.GIZZ_TAPES_SUPPLY_KEY }}
+        run: echo $GIZZ_TAPES_PUBLISH_KEY > ./keys/gizz-tapes-supply-key.json
+      - name: Promote on Play Store
+        env:
+          TRACK: ${{ inputs.track }}
+          BUILD: ${{ inputs.build }}
+        run: bundle exec fastlane android promote track:"$TRACK" ${BUILD:+version_code:"$BUILD"}
+
+  ios:
+    name: iOS
+    if: inputs.platform != 'android'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Use latest Fastfile
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: fastlane/Fastfile
+          sparse-checkout-cone-mode: false
+          path: latest
+      - name: Override Fastfile with latest fixes
+        run: cp latest/fastlane/Fastfile fastlane/Fastfile
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.6'
+          bundler-cache: true
+      - name: Promote on App Store Connect
+        env:
+          TRACK: ${{ inputs.track }}
+          BUILD: ${{ inputs.build }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+          ASC_REVIEW_FIRST_NAME: ${{ secrets.ASC_REVIEW_FIRST_NAME }}
+          ASC_REVIEW_LAST_NAME: ${{ secrets.ASC_REVIEW_LAST_NAME }}
+          ASC_REVIEW_EMAIL: ${{ secrets.ASC_REVIEW_EMAIL }}
+          ASC_REVIEW_PHONE: ${{ secrets.ASC_REVIEW_PHONE }}
+        run: bundle exec fastlane ios promote track:"$TRACK" ${BUILD:+build_number:"$BUILD"}

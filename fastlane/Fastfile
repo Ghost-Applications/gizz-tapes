@@ -1,13 +1,19 @@
 default_platform(:android)
 
-private_lane :perform_ios_upload do
-  setup_ci
-  api_key = app_store_connect_api_key(
+private_lane :ios_api_key do
+  app_store_connect_api_key(
     key_id: ENV['ASC_KEY_ID'],
     issuer_id: ENV['ASC_ISSUER_ID'],
     key_content: ENV['ASC_KEY_CONTENT'],
     is_key_content_base64: true
   )
+end
+
+# Builds the app and uploads it to TestFlight for internal testers only. Use the ios promote lane
+# to send a build on to external testers or App Store review.
+private_lane :perform_ios_upload do |options|
+  setup_ci
+  api_key = ios_api_key
   match(
     type: 'appstore',
     readonly: true,
@@ -39,25 +45,10 @@ private_lane :perform_ios_upload do
     configuration: 'Release',
     export_method: 'app-store'
   )
-
-  File.write('metadata/en-US/release_notes.txt', changelog_notes_for('iOS'))
-
-  File.write('metadata/review_information/first_name.txt', ENV['ASC_REVIEW_FIRST_NAME'])
-  File.write('metadata/review_information/last_name.txt', ENV['ASC_REVIEW_LAST_NAME'])
-  File.write('metadata/review_information/email_address.txt', ENV['ASC_REVIEW_EMAIL'])
-  File.write('metadata/review_information/phone_number.txt', ENV['ASC_REVIEW_PHONE'])
-
-  upload_to_app_store(
+  upload_to_testflight(
     api_key: api_key,
-    submit_for_review: true,
-    automatic_release: false,
-    force: true,
-    run_precheck_before_submit: false,
-    skip_screenshots: true,
-    submission_information: {
-      export_compliance_uses_encryption: false,
-      add_id_info_uses_idfa: false
-    }
+    distribute_external: false,
+    changelog: options[:changelog]
   )
 end
 
@@ -175,64 +166,66 @@ def update_gradle_properties(properties)
 end
 
 platform :ios do
-  desc 'Build and submit to App Store for review'
+  desc 'Build and upload a release to TestFlight internal testers'
   lane :release do
-    perform_ios_upload()
+    perform_ios_upload(changelog: changelog_notes_for('iOS'))
   end
 
-  desc 'Build and upload to TestFlight'
-  lane :beta do
-    setup_ci
-    api_key = app_store_connect_api_key(
-      key_id: ENV['ASC_KEY_ID'],
-      issuer_id: ENV['ASC_ISSUER_ID'],
-      key_content: ENV['ASC_KEY_CONTENT'],
-      is_key_content_base64: true
-    )
-    match(
-      type: 'appstore',
-      readonly: true,
-      api_key: api_key
-    )
-    current_build = latest_testflight_build_number(
-      api_key: api_key,
-      app_identifier: 'gizz.tapes.GizzTapes'
-    )
-    increment_version_number(
-      version_number: read_gradle_properties['gizz.tapes.iosVersion'],
-      xcodeproj: 'iosApp/iosApp.xcodeproj'
-    )
-    increment_build_number(
-      build_number: current_build + 1,
-      xcodeproj: 'iosApp/iosApp.xcodeproj'
-    )
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: 'iosApp/iosApp.xcodeproj',
-      team_id: 'QHJAD8Z2WL',
-      bundle_identifier: 'gizz.tapes.GizzTapes',
-      code_sign_identity: 'Apple Distribution',
-      profile_name: 'match AppStore gizz.tapes.GizzTapes'
-    )
-    build_app(
-      workspace: 'iosApp/iosApp.xcworkspace',
-      scheme: 'iosApp',
-      configuration: 'Release',
-      export_method: 'app-store'
-    )
-    upload_to_testflight(
-      api_key: api_key,
-      distribute_external: true,
-      groups: ["external testers"],
-      notify_external_testers: false,
-      changelog: ENV["CHANGELOG"]
-    )
+  desc 'Build and upload to TestFlight internal testers'
+  lane :internal do
+    perform_ios_upload(changelog: ENV['CHANGELOG'])
+  end
+
+  desc 'Promote a TestFlight build to external testers (track:beta) or App Store review (track:production)'
+  lane :promote do |options|
+    api_key = ios_api_key
+    app_version = read_gradle_properties['gizz.tapes.iosVersion']
+    build_number = options[:build_number]
+
+    case options[:track]
+    when 'beta'
+      upload_to_testflight(
+        api_key: api_key,
+        distribute_only: true,
+        app_version: app_version,
+        build_number: build_number,
+        distribute_external: true,
+        groups: ['external testers'],
+        notify_external_testers: false,
+        changelog: changelog_notes_for('iOS')
+      )
+    when 'production'
+      File.write('metadata/en-US/release_notes.txt', changelog_notes_for('iOS'))
+
+      File.write('metadata/review_information/first_name.txt', ENV['ASC_REVIEW_FIRST_NAME'])
+      File.write('metadata/review_information/last_name.txt', ENV['ASC_REVIEW_LAST_NAME'])
+      File.write('metadata/review_information/email_address.txt', ENV['ASC_REVIEW_EMAIL'])
+      File.write('metadata/review_information/phone_number.txt', ENV['ASC_REVIEW_PHONE'])
+
+      upload_to_app_store(
+        api_key: api_key,
+        app_version: app_version,
+        build_number: build_number,
+        skip_binary_upload: true,
+        submit_for_review: true,
+        automatic_release: false,
+        force: true,
+        run_precheck_before_submit: false,
+        skip_screenshots: true,
+        submission_information: {
+          export_compliance_uses_encryption: false,
+          add_id_info_uses_idfa: false
+        }
+      )
+    else
+      UI.user_error!("Unknown track '#{options[:track]}' - expected beta or production")
+    end
   end
 end
 
 platform :android do
-  desc 'Publish a new build to Play Store beta'
-  lane :beta do
+  desc 'Publish a new build to Play Store internal testing'
+  lane :internal do
     gradle(
       task: 'bundle',
       flavor: 'full',
@@ -240,13 +233,31 @@ platform :android do
     )
     write_play_store_changelog(ENV['GIZZ_TAPES_BUILD_NUMBER'])
     upload_to_play_store(
-      track: 'beta',
+      track: 'internal',
       skip_upload_apk: true,
       aab: lane_context[:GRADLE_AAB_OUTPUT_PATH]
     )
   end
 
-  desc 'Upload release artifacts to Play Store production and create GitHub release (CI only)'
+  desc 'Promote a build internal -> beta (track:beta) or beta -> production (track:production)'
+  lane :promote do |options|
+    from_track = { 'beta' => 'internal', 'production' => 'beta' }[options[:track]]
+    UI.user_error!("Unknown track '#{options[:track]}' - expected beta or production") unless from_track
+
+    upload_to_play_store(
+      track: from_track,
+      track_promote_to: options[:track],
+      version_code: options[:version_code],
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc 'Upload release artifacts to Play Store internal testing and create GitHub release (CI only)'
   lane :ci_release do
     properties = read_gradle_properties
     version_name = properties['gizz.tapes.versionName']
@@ -259,7 +270,7 @@ platform :android do
 
     begin
       upload_to_play_store(
-        track: 'production',
+        track: 'internal',
         aab: full_aab,
         skip_upload_apk: true
       )
@@ -312,13 +323,13 @@ platform :android do
       version_name = read_gradle_properties['gizz.tapes.versionName']
       add_git_tag(tag: version_name)
       push_git_tags(tag: version_name)
-      UI.success("Tag '#{version_name}' pushed — CI will publish to both stores.")
+      UI.success("Tag '#{version_name}' pushed — CI will publish to both stores' internal tracks.")
       perform_version_bump
     else
       patch_tag = prompt(text: "Enter patch tag name:")
       add_git_tag(tag: patch_tag)
       push_git_tags(tag: patch_tag)
-      UI.success("Patch tag '#{patch_tag}' pushed — CI will publish to both stores.")
+      UI.success("Patch tag '#{patch_tag}' pushed — CI will publish to both stores' internal tracks.")
     end
   end
 end

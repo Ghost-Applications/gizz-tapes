@@ -46,7 +46,7 @@ jobs:
         # script phase, where it has failed (Executing of '/usr/local/bin/pod install' failed with
         # code 1 and an empty message).
         run: ./gradlew :composeApp:podInstall :composeApp:podInstallSyntheticIos
-      - name: Build and upload to TestFlight
+      - name: Build and upload to TestFlight (internal testers)
         env:
           CHANGELOG: ${{ github.event.head_commit.message }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
@@ -54,4 +54,4 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
-        run: bundle exec fastlane ios beta
+        run: bundle exec fastlane ios internal

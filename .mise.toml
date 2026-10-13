@@ -45,8 +45,16 @@ description = "PGP sign README.md (writes README.md.asc)"
 run = "gpg --armor --detach-sign --yes -u 3239DF005BDF2CD2789857AF59F842F73BAF2A8D README.md && gpg --verify README.md.asc README.md"
 
 [tasks.release]
-description = "Tag the current version, trigger CI to publish to both stores, then bump version"
+description = "Tag the current version, trigger CI to publish to both stores' internal tracks, then bump version"
 run = "bundle exec fastlane release"
+
+[tasks.promote-beta]
+description = "Promote builds to Play beta + TestFlight external testers (extra args go to gh, e.g. -- -f ref=<tag> -f platform=ios)"
+run = "gh workflow run promote.yml -f track=beta"
+
+[tasks.promote-production]
+description = "Promote builds to Play production + App Store review (extra args go to gh, e.g. -- -f ref=<tag> -f platform=ios)"
+run = "gh workflow run promote.yml -f track=production"
 
 [tasks.create-github-release]
 description = "Create GitHub release from CI-built artifacts (use if the release workflow's GitHub step failed)"
