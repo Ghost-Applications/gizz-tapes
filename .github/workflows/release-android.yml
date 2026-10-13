@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: play-store
+  cancel-in-progress: false
+
 jobs:
   android:
     name: Android Release

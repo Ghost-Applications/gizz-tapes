@@ -12,6 +12,9 @@ jobs:
   android:
     name: Android Release
     runs-on: ubuntu-latest
+    concurrency:
+      group: play-store
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:

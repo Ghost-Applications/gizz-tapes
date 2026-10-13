@@ -10,6 +10,10 @@ on:
       - 'networking-integration/**'
       - 'gradle/**'
       - 'fastlane/**'
+concurrency:
+  group: play-store
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
