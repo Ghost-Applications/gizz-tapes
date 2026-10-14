@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -477,6 +478,7 @@ private fun TrackRow(
 
 @Composable
 private fun ShowMetadata(recordingData: RecordingData) {
+    val uriHandler = LocalUriHandler.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -485,7 +487,9 @@ private fun ShowMetadata(recordingData: RecordingData) {
         recordingData.notes?.let {
             HtmlText(
                 text = it,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                // Notes come from user-entered HTML; hrefs with leading whitespace fail to resolve an Activity.
+                onUriClick = { uri -> uriHandler.openUri(uri.trim()) }
             )
             Spacer(Modifier.height(4.dp))
         }
