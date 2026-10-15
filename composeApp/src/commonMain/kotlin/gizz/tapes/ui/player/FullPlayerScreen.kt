@@ -1,6 +1,7 @@
 package gizz.tapes.ui.player
 
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -136,6 +137,7 @@ fun FullPlayerScreen(
                 FullPlayerContent(
                     state = playerState,
                     modifier = Modifier.padding(padding),
+                    onPosterClick = { navigateToShow(playerState.showId, playerState.showTitle) },
                     onPlay = onPlay,
                     onPause = onPause,
                     onSeek = onSeek,
@@ -151,6 +153,7 @@ fun FullPlayerScreen(
 private fun FullPlayerContent(
     state: PlayerState.MediaLoaded,
     modifier: Modifier = Modifier,
+    onPosterClick: () -> Unit,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onSeek: (Int, Long) -> Unit,
@@ -159,9 +162,9 @@ private fun FullPlayerContent(
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         if (maxWidth > maxHeight) {
-            LandscapePlayerContent(state, onPlay, onPause, onSeek, onSkipPrevious, onSkipNext)
+            LandscapePlayerContent(state, onPosterClick, onPlay, onPause, onSeek, onSkipPrevious, onSkipNext)
         } else {
-            PortraitPlayerContent(state, onPlay, onPause, onSeek, onSkipPrevious, onSkipNext)
+            PortraitPlayerContent(state, onPosterClick, onPlay, onPause, onSeek, onSkipPrevious, onSkipNext)
         }
     }
 }
@@ -169,6 +172,7 @@ private fun FullPlayerContent(
 @Composable
 private fun PortraitPlayerContent(
     state: PlayerState.MediaLoaded,
+    onPosterClick: () -> Unit,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onSeek: (Int, Long) -> Unit,
@@ -191,6 +195,7 @@ private fun PortraitPlayerContent(
                 .fillMaxWidth(0.8f)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(4.dp))
+                .clickable(onClick = onPosterClick)
         )
 
         Spacer(Modifier.height(24.dp))
@@ -267,6 +272,7 @@ private fun PortraitPlayerContent(
 @Composable
 private fun LandscapePlayerContent(
     state: PlayerState.MediaLoaded,
+    onPosterClick: () -> Unit,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onSeek: (Int, Long) -> Unit,
@@ -287,6 +293,7 @@ private fun LandscapePlayerContent(
             modifier = Modifier
                 .fillMaxHeight()
                 .aspectRatio(1f)
+                .clickable(onClick = onPosterClick)
         )
 
         Column(
