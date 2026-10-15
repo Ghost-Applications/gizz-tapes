@@ -1,5 +1,6 @@
 package gizz.tapes.ui.player
 
+import gizz.tapes.data.BAND_NAME
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import kotlin.jvm.JvmInline
@@ -21,6 +22,7 @@ sealed interface PlayerState {
         val albumTitle: String
         val mediaId: String
         val currentTrackIndex: Int
+        val artistName: String
 
         companion object {
             operator fun invoke(
@@ -34,6 +36,7 @@ sealed interface PlayerState {
                 albumTitle: String,
                 mediaId: String,
                 currentTrackIndex: Int,
+                artistName: String = BAND_NAME,
             ): MediaLoaded = when {
                 isPlaying -> Playing(
                     showId = showId,
@@ -44,6 +47,7 @@ sealed interface PlayerState {
                     albumTitle = albumTitle,
                     mediaId = mediaId,
                     currentTrackIndex = currentTrackIndex,
+                    artistName = artistName,
                 )
 
                 isLoading -> Loading(
@@ -55,6 +59,7 @@ sealed interface PlayerState {
                     albumTitle = albumTitle,
                     mediaId = mediaId,
                     currentTrackIndex = currentTrackIndex,
+                    artistName = artistName,
                 )
 
                 else -> Paused(
@@ -66,6 +71,7 @@ sealed interface PlayerState {
                     albumTitle = albumTitle,
                     mediaId = mediaId,
                     currentTrackIndex = currentTrackIndex,
+                    artistName = artistName,
                 )
             }
         }
@@ -80,6 +86,7 @@ sealed interface PlayerState {
                 albumTitle = albumTitle,
                 mediaId = mediaId,
                 currentTrackIndex = currentTrackIndex,
+                artistName = artistName,
             )
 
             false -> Paused(
@@ -91,6 +98,7 @@ sealed interface PlayerState {
                 albumTitle = albumTitle,
                 mediaId = mediaId,
                 currentTrackIndex = currentTrackIndex,
+                artistName = artistName,
             )
         }
 
@@ -103,6 +111,7 @@ sealed interface PlayerState {
             override val albumTitle: String,
             override val mediaId: String,
             override val currentTrackIndex: Int,
+            override val artistName: String = BAND_NAME,
         ) : MediaLoaded {
             override val isPlaying = true
         }
@@ -116,6 +125,7 @@ sealed interface PlayerState {
             override val albumTitle: String,
             override val mediaId: String,
             override val currentTrackIndex: Int,
+            override val artistName: String = BAND_NAME,
         ) : MediaLoaded {
             override val isPlaying = false
         }
@@ -129,6 +139,7 @@ sealed interface PlayerState {
             override val albumTitle: String,
             override val mediaId: String,
             override val currentTrackIndex: Int,
+            override val artistName: String = BAND_NAME,
         ) : MediaLoaded {
             override val isPlaying = false
         }
@@ -143,6 +154,7 @@ sealed interface PlayerState {
             override val albumTitle: String,
             override val mediaId: String,
             override val currentTrackIndex: Int,
+            override val artistName: String = BAND_NAME,
         ) : MediaLoaded {
             override val isPlaying = false
         }

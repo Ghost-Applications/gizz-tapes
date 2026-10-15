@@ -20,4 +20,7 @@ actual class AppContext(
     actual val downloadsPath: Path by lazy {
         context.filesDir.resolve("downloads").toOkioPath()
     }
+    actual val scrobbleQueuePath: Path by lazy {
+        context.filesDir.resolve("scrobble_queue.json").toOkioPath()
+    }
 }

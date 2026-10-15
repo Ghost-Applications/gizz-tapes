@@ -36,6 +36,10 @@ fun main() = application {
     }
 
     LaunchedEffect(Unit) {
+        appGraph.scrobbler.start()
+    }
+
+    LaunchedEffect(Unit) {
         appGraph.mediaPlayer.state
             .filterIsInstance<PlayerState.MediaLoaded.Playing>()
             .distinctUntilChangedBy { it.mediaId }

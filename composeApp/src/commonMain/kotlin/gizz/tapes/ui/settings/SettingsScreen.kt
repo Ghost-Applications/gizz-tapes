@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -28,9 +30,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import gizz.tapes.api.data.Recording
+import gizz.tapes.lastfm.LastFmAuthState
 import gizz.tapes.nav.NavigateUp
 import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.navigationUpIcon
@@ -43,10 +47,14 @@ fun SettingsScreen(
     navigateUp: NavigateUp,
 ) {
     val state by viewModel.settingsState.collectAsState()
+    val uriHandler = LocalUriHandler.current
     SettingsScreen(
         state = state,
         onRecordingTypeSelected = viewModel::updatePreferredRecordingType,
         onVolumeBoostEnabledChanged = viewModel::updateVolumeBoostEnabled,
+        onConnectLastFm = { viewModel.connectLastFm(uriHandler::openUri) },
+        onCancelLastFm = viewModel::cancelLastFm,
+        onDisconnectLastFm = viewModel::disconnectLastFm,
         navigateUp = navigateUp
     )
 }
@@ -57,6 +65,9 @@ fun SettingsScreen(
     state: LC<SettingsScreenState>,
     onRecordingTypeSelected: (Recording.Type) -> Unit,
     onVolumeBoostEnabledChanged: (Boolean) -> Unit,
+    onConnectLastFm: () -> Unit,
+    onCancelLastFm: () -> Unit,
+    onDisconnectLastFm: () -> Unit,
     navigateUp: NavigateUp,
 ) {
     Scaffold(
@@ -74,7 +85,10 @@ fun SettingsScreen(
                 is LC.Content -> SettingsContent(
                     state = state.content,
                     onRecordingTypeSelected = onRecordingTypeSelected,
-                    onVolumeBoostEnabledChanged = onVolumeBoostEnabledChanged
+                    onVolumeBoostEnabledChanged = onVolumeBoostEnabledChanged,
+                    onConnectLastFm = onConnectLastFm,
+                    onCancelLastFm = onCancelLastFm,
+                    onDisconnectLastFm = onDisconnectLastFm,
                 )
             }
         }
@@ -86,6 +100,9 @@ private fun SettingsContent(
     state: SettingsScreenState,
     onRecordingTypeSelected: (Recording.Type) -> Unit,
     onVolumeBoostEnabledChanged: (Boolean) -> Unit,
+    onConnectLastFm: () -> Unit,
+    onCancelLastFm: () -> Unit,
+    onDisconnectLastFm: () -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -135,5 +152,41 @@ private fun SettingsContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+
+        Spacer(Modifier.height(24.dp))
+        LastFmSetting(
+            state = state.lastFmState,
+            onConnect = onConnectLastFm,
+            onCancel = onCancelLastFm,
+            onDisconnect = onDisconnectLastFm,
+        )
     }
+}
+
+@Composable
+private fun LastFmSetting(
+    state: LastFmAuthState,
+    onConnect: () -> Unit,
+    onCancel: () -> Unit,
+    onDisconnect: () -> Unit,
+) {
+    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        Text("Last.fm")
+        Spacer(Modifier.width(16.dp))
+        when (state) {
+            LastFmAuthState.LoggedOut -> Button(onClick = onConnect) { Text("Connect") }
+            LastFmAuthState.Authorizing -> OutlinedButton(onClick = onCancel) { Text("Cancel") }
+            is LastFmAuthState.LoggedIn -> OutlinedButton(onClick = onDisconnect) { Text("Disconnect") }
+        }
+    }
+    Spacer(Modifier.height(8.dp))
+    Text(
+        text = when (state) {
+            LastFmAuthState.LoggedOut -> "Scrobble what you listen to on Last.fm."
+            LastFmAuthState.Authorizing -> "Approve Gizz Tapes in your browser, then come back here."
+            is LastFmAuthState.LoggedIn -> "Scrobbling as ${state.name}."
+        },
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }

@@ -83,6 +83,7 @@ class DesktopMediaPlayer : GizzMediaPlayer {
             albumTitle = item.albumTitle,
             mediaId = item.id,
             currentTrackIndex = currentIndex,
+            artistName = item.artistName,
         )
     }
 

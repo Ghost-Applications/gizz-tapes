@@ -14,6 +14,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import gizz.tapes.data.BAND_NAME
 import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.ui.player.PlayerState
@@ -134,6 +135,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
             albumTitle = metadata.albumTitle?.toString() ?: "--",
             mediaId = cmi.mediaId,
             currentTrackIndex = controller.currentMediaItemIndex,
+            artistName = metadata.artist?.toString() ?: BAND_NAME,
         )
     }
 

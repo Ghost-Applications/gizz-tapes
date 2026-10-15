@@ -34,6 +34,24 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".LastFmCallbackActivity"
+            android:exported="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:ignore="Instantiatable">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="lastfm"
+                    android:scheme="gizztapes" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".PlaybackService"
             android:exported="true"

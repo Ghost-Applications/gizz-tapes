@@ -9,4 +9,5 @@ actual class AppContext {
     actual val sessionPath: Path = "${System.getProperty("user.home")}/.gizztapes/session.json".toPath()
     actual val savedShowsPath: Path = "${System.getProperty("user.home")}/.gizztapes/saved_shows.json".toPath()
     actual val downloadsPath: Path = "${System.getProperty("user.home")}/.gizztapes/downloads".toPath()
+    actual val scrobbleQueuePath: Path = "${System.getProperty("user.home")}/.gizztapes/scrobble_queue.json".toPath()
 }
