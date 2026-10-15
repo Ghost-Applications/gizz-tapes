@@ -17,4 +17,5 @@ expect class AppContext {
     val sessionPath: Path
     val savedShowsPath: Path
     val downloadsPath: Path
+    val scrobbleQueuePath: Path
 }

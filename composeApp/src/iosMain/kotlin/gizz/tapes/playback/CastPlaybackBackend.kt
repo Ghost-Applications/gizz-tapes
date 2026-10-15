@@ -20,6 +20,7 @@ import cocoapods.google_cast_sdk.GCKRemoteMediaClient
 import cocoapods.google_cast_sdk.GCKRemoteMediaClientListenerProtocol
 import cocoapods.google_cast_sdk.kGCKMetadataKeyAlbumTitle
 import cocoapods.google_cast_sdk.kGCKMetadataKeyTitle
+import gizz.tapes.data.BAND_NAME
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
@@ -181,6 +182,7 @@ class CastPlaybackBackend : PlaybackBackend {
             albumTitle = albumTitle,
             mediaId = playlistItem?.id ?: info?.contentID().orEmpty(),
             currentTrackIndex = currentItemIndex(),
+            artistName = playlistItem?.artistName ?: BAND_NAME,
         )
     }
 

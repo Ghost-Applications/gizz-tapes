@@ -34,6 +34,7 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.android.ServiceKey
 import gizz.tapes.data.Settings
+import gizz.tapes.lastfm.Scrobbler
 import gizz.tapes.playback.CurrentlyPlayingSaver
 import gizz.tapes.playback.MediaId
 import gizz.tapes.playback.MediaItemTree
@@ -68,6 +69,7 @@ class PlaybackService(
     private val currentlyPlayingSaver: CurrentlyPlayingSaver,
     private val mediaItemTree: MediaItemTree,
     private val settingsDataStore: DataStore<Settings>,
+    private val scrobbler: Scrobbler,
 ) : MediaLibraryService(), MediaLibraryService.MediaLibrarySession.Callback {
 
     private val logger = Logger.withTag("PlaybackService")
@@ -84,6 +86,7 @@ class PlaybackService(
     override fun onCreate() {
         logger.d { "onCreate()" }
         super.onCreate()
+        scrobbler.start()
 
         val exoPlayer = ExoPlayer.Builder(this)
             // only load renderers for audio files since we do not support video

@@ -194,6 +194,7 @@ class LocalPlaybackBackend(
             albumTitle = item.albumTitle,
             mediaId = item.id,
             currentTrackIndex = currentIndex,
+            artistName = item.artistName,
         )
     }
 

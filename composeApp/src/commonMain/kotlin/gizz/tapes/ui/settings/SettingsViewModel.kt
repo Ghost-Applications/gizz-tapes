@@ -11,10 +11,12 @@ import gizz.tapes.Platform
 import gizz.tapes.api.data.Recording
 import gizz.tapes.data.Settings
 import gizz.tapes.isVolumeBoostSupported
+import gizz.tapes.lastfm.LastFmAuthManager
 import gizz.tapes.util.LC
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -26,6 +28,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
     private val dataStore: DataStore<Settings>,
     platform: Platform,
+    private val lastFmAuthManager: LastFmAuthManager,
 ) : ViewModel() {
 
     private val isVolumeBoostSupported = platform.isVolumeBoostSupported
@@ -38,7 +41,14 @@ class SettingsViewModel(
 
     private fun loadSettings(): Flow<LC<SettingsScreenState>> = flow {
         dataStore.data
-            .map { SettingsScreenState(it.preferredRecordingType, it.volumeBoostEnabled, isVolumeBoostSupported) }
+            .combine(lastFmAuthManager.state) { settings, lastFmState ->
+                SettingsScreenState(
+                    selectedPreferredRecordingType = settings.preferredRecordingType,
+                    volumeBoostEnabled = settings.volumeBoostEnabled,
+                    isVolumeBoostSupported = isVolumeBoostSupported,
+                    lastFmState = lastFmState,
+                )
+            }
             .map { LC.Content(it) }
             .collect { emit(it) }
     }
@@ -54,4 +64,14 @@ class SettingsViewModel(
             dataStore.updateData { it.copy(volumeBoostEnabled = enabled) }
         }
     }
+
+    fun connectLastFm(openUrl: (String) -> Unit) {
+        viewModelScope.launch {
+            lastFmAuthManager.startAuth()?.let(openUrl)
+        }
+    }
+
+    fun cancelLastFm() = lastFmAuthManager.cancelAuth()
+
+    fun disconnectLastFm() = lastFmAuthManager.logout()
 }

@@ -27,6 +27,7 @@ kotlin {
             implementation(libs.arrow.core.serialization)
             implementation(libs.ktor.json)
             implementation(libs.ktor.content.negotiation)
+            implementation(libs.okio)
         }
 
         commonTest.dependencies {

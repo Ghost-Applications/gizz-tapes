@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import gizz.tapes.Platform
 import gizz.tapes.api.data.Recording.Type
 import gizz.tapes.data.Settings
+import gizz.tapes.lastfm.fakeLastFmAuthManager
 import gizz.tapes.util.LC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,6 +50,7 @@ class SettingsViewModelTest {
                     transform(Settings())
             },
             platform = Platform.Desktop,
+            lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
         val job = launch {
@@ -73,6 +75,7 @@ class SettingsViewModelTest {
                     transform(dataStateFlow.value)
             },
             platform = Platform.Desktop,
+            lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
         val job = launch {
@@ -100,6 +103,7 @@ class SettingsViewModelTest {
                 }
             },
             platform = Platform.Desktop,
+            lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
         val job = launch {
@@ -132,6 +136,7 @@ class SettingsViewModelTest {
                 }
             },
             platform = Platform.Desktop,
+            lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
         val job = launch {
@@ -160,6 +165,7 @@ class SettingsViewModelTest {
                     transform(Settings())
             },
             platform = Platform.Android,
+            lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
         val job = launch {

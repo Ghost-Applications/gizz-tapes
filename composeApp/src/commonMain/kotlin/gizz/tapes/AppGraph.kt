@@ -18,6 +18,14 @@ import gizz.tapes.db.Database
 import gizz.tapes.db.Files
 import gizz.tapes.db.Recordings
 import gizz.tapes.db.Shows
+import gizz.tapes.lastfm.LastFmApiClient
+import gizz.tapes.lastfm.LastFmAuthManager
+import gizz.tapes.lastfm.LastFmKeys
+import gizz.tapes.lastfm.LastFmSessionStore
+import gizz.tapes.lastfm.ScrobbleQueue
+import gizz.tapes.lastfm.ScrobbleQueueSerializer
+import gizz.tapes.lastfm.Scrobbler
+import gizz.tapes.lastfm.createLastFmSessionStore
 import gizz.tapes.playback.CurrentlyPlayingSaver
 import gizz.tapes.playback.StoredMediaSession
 import gizz.tapes.playback.StoredMediaSessionSerializer
@@ -35,6 +43,9 @@ import okio.SYSTEM
 import kotlin.time.Duration.Companion.seconds
 
 interface AppGraph : ViewModelGraph {
+    val scrobbler: Scrobbler
+    val lastFmAuthManager: LastFmAuthManager
+
     @Provides
     fun providePlatform(appContext: AppContext): Platform = appContext.platform
 
@@ -105,6 +116,41 @@ interface AppGraph : ViewModelGraph {
     @SingleIn(AppScope::class)
     fun provideGizzApi(httpClient: HttpClient): GizzTapesApiClient {
         return GizzTapesApiClient(httpClient)
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideLastFmApi(): LastFmApiClient {
+        // own client: the shared one's 1.5s timeout is too tight for Last.fm, and responses must not be cached.
+        return LastFmApiClient(
+            apiKey = LastFmKeys.API_KEY,
+            sharedSecret = LastFmKeys.SHARED_SECRET,
+            client = HttpClient {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 15.seconds.inWholeMilliseconds
+                }
+            }
+        )
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideLastFmSessionStore(appContext: AppContext): LastFmSessionStore = createLastFmSessionStore(appContext)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideScrobbleQueueDataStore(
+        appContext: AppContext,
+        serializer: ScrobbleQueueSerializer
+    ): DataStore<ScrobbleQueue> {
+        FileSystem.SYSTEM.createDirectories(appContext.scrobbleQueuePath.parent!!)
+        return DataStoreFactory.create(
+            storage = OkioStorage(FileSystem.SYSTEM, serializer) { appContext.scrobbleQueuePath },
+            corruptionHandler = ReplaceFileCorruptionHandler {
+                Logger.e(it) { "Corruption when reading scrobble queue" }
+                ScrobbleQueue()
+            }
+        )
     }
 
     @Provides

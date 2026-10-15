@@ -13,6 +13,7 @@ actual class AppContext {
     actual val sessionPath: Path = documentsDir() / "gizz_tapes_session.json"
     actual val savedShowsPath: Path = documentsDir() / "gizz_tapes_saved_shows.json"
     actual val downloadsPath: Path = documentsDir() / "downloads"
+    actual val scrobbleQueuePath: Path = documentsDir() / "gizz_tapes_scrobble_queue.json"
 }
 
 private fun documentsDir(): Path {
