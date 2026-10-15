@@ -63,7 +63,7 @@ interface AppGraph : ViewModelGraph {
         return DataStoreFactory.create(
             storage = OkioStorage(FileSystem.SYSTEM, serializer) { appContext.sessionPath },
             corruptionHandler = ReplaceFileCorruptionHandler {
-                Logger.e(it) { "Corruption when reading settings" }
+                Logger.e(it) { "Corruption when reading media session" }
                 StoredMediaSession()
             }
         )

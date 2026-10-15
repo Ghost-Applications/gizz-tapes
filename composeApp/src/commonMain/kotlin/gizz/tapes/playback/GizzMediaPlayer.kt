@@ -32,7 +32,7 @@ interface GizzMediaPlayer {
 data class PlaybackItem(
     val id: String,
     val url: String,
-    val remoteUrl: String,
+    val remoteUrl: String = url,
     val title: String,
     val albumTitle: String,
     val artworkUrl: String?,
