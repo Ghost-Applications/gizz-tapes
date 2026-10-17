@@ -254,3 +254,10 @@ val showJson = """
         ]
     }
 """.trimIndent()
+
+val tapersJson = """
+[
+  {"id": 122, "name": "Revinylize", "is_anon": false, "recordings": [{"id": "kglw2024-09-01", "show_id": 840}]},
+  {"id": 7, "name": null, "is_anon": true, "recordings": []}
+]
+""".trimIndent()

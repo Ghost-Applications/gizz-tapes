@@ -41,7 +41,7 @@ import gizz.tapes.util.contentOrNull
 import gizz.tapes.util.map
 import gizz.tapes.util.retryUntilSuccessful
 import gizz.tapes.util.sanitizeFileName
-import gizz.tapes.util.tryAndGetPreferredRecordingType
+import gizz.tapes.util.tryAndGetPreferredRecording
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
@@ -197,8 +197,8 @@ class ShowViewModel(
             datastore.data,
             cachedShowData
         ) { selRec, settings, showData ->
-            Triple(selRec, settings.preferredRecordingType, showData)
-        }.map { (selRec, preferredRecording, showData) ->
+            Triple(selRec, settings, showData)
+        }.map { (selRec, settings, showData) ->
             val error = errorFlow.value
             if (error != null && showData == LCE.Loading) {
                 return@map error
@@ -206,7 +206,10 @@ class ShowViewModel(
 
             showData.map { show ->
                 val recording = show.recordings.firstOrNull { it.id == selRec?.id }
-                    ?: show.recordings.tryAndGetPreferredRecordingType(preferredRecording)
+                    ?: show.recordings.tryAndGetPreferredRecording(
+                        rankedTypes = settings.recordingTypeRanking,
+                        favouriteTapers = settings.favouriteTapers,
+                    )
 
                 selectedRecording.value = RecordingId(recording.id)
 

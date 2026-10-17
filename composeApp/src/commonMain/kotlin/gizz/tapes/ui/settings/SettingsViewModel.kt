@@ -8,17 +8,19 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import gizz.tapes.Platform
-import gizz.tapes.api.data.Recording
+import gizz.tapes.api.GizzTapesApiClient
+import gizz.tapes.api.data.Taper
+import gizz.tapes.data.DEFAULT_RECORDING_TYPE_RANKING
 import gizz.tapes.data.Settings
 import gizz.tapes.isVolumeBoostSupported
 import gizz.tapes.lastfm.LastFmAuthManager
 import gizz.tapes.util.LC
+import gizz.tapes.util.LCE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
 @ViewModelKey
 class SettingsViewModel(
     private val dataStore: DataStore<Settings>,
+    private val apiClient: GizzTapesApiClient,
     platform: Platform,
     private val lastFmAuthManager: LastFmAuthManager,
 ) : ViewModel() {
@@ -39,23 +42,55 @@ class SettingsViewModel(
         initialValue = LC.Loading
     )
 
-    private fun loadSettings(): Flow<LC<SettingsScreenState>> = flow {
-        dataStore.data
-            .combine(lastFmAuthManager.state) { settings, lastFmState ->
+    private fun loadSettings(): Flow<LC<SettingsScreenState>> =
+        combine(dataStore.data, loadTapers(), lastFmAuthManager.state) { settings, tapers, lastFmState ->
+            LC.Content(
                 SettingsScreenState(
-                    selectedPreferredRecordingType = settings.preferredRecordingType,
+                    rankedRecordingTypes = settings.rankedRecordingTypes,
+                    favouriteTapers = settings.favouriteTapers,
+                    tapers = tapers,
                     volumeBoostEnabled = settings.volumeBoostEnabled,
                     isVolumeBoostSupported = isVolumeBoostSupported,
                     lastFmState = lastFmState,
                 )
-            }
-            .map { LC.Content(it) }
-            .collect { emit(it) }
+            )
+        }
+
+    private fun loadTapers(): Flow<LCE<List<TaperItem>, Throwable>> = flow {
+        emit(LCE.Loading)
+        emit(
+            apiClient.tapers().fold(
+                ifLeft = { LCE.Error(it) },
+                ifRight = { LCE.Content(it.toFavouriteCandidates()) }
+            )
+        )
     }
 
-    fun updatePreferredRecordingType(type: Recording.Type) {
+    fun updateRecordingTypesRanked(ranked: Boolean) {
         viewModelScope.launch {
-            dataStore.updateData { it.copy(preferredRecordingType = type) }
+            dataStore.updateData {
+                it.copy(rankedRecordingTypes = if (ranked) DEFAULT_RECORDING_TYPE_RANKING else null)
+            }
+        }
+    }
+
+    fun moveRecordingType(from: Int, to: Int) {
+        viewModelScope.launch {
+            dataStore.updateData { settings ->
+                val ranking = settings.recordingTypeRanking.toMutableList()
+                if (from !in ranking.indices || to !in ranking.indices) return@updateData settings
+                ranking.add(to, ranking.removeAt(from))
+                settings.copy(rankedRecordingTypes = ranking)
+            }
+        }
+    }
+
+    fun toggleFavouriteTaper(name: String) {
+        viewModelScope.launch {
+            dataStore.updateData {
+                val favourites = it.favouriteTapers
+                it.copy(favouriteTapers = if (name in favourites) favourites - name else favourites + name)
+            }
         }
     }
 
@@ -75,3 +110,15 @@ class SettingsViewModel(
 
     fun disconnectLastFm() = lastFmAuthManager.logout()
 }
+
+/** Mirrors the taper filtering on tapes.kglw.net/settings. */
+private fun List<Taper>.toFavouriteCandidates(): List<TaperItem> =
+    asSequence()
+        .filter { !it.isAnon && !it.name.isNullOrBlank() }
+        .filterNot { it.name.orEmpty().contains("sam joseph", ignoreCase = true) }
+        .filter { it.recordings.size > MIN_TAPER_RECORDINGS }
+        .map { TaperItem(name = it.name.orEmpty(), uploadCount = it.recordings.size) }
+        .sortedByDescending { it.uploadCount }
+        .toList()
+
+private const val MIN_TAPER_RECORDINGS = 2

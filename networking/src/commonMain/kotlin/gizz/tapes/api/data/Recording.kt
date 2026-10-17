@@ -27,6 +27,8 @@ data class Recording(
     val source: String?,
     val lineage: String?,
     val taper: String?,
+    @SerialName("taper_id")
+    val taperId: UInt? = null,
     @SerialName("files_path_prefix")
     val filesPathPrefix: String,
     @SerialName("internet_archive")
@@ -44,6 +46,9 @@ data class Recording(
 
         /** Matrix recording; are usually a combination of various AUDs or AUDs and SBD's */
         MTX,
+
+        /** Mixed recording; a mix of source types */
+        Mixed,
 
         /** Set if there is a value in the JSON, but we don't recognize it in code yet. */
         UnknownType,

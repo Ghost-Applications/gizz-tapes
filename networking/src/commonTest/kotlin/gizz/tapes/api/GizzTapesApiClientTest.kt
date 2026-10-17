@@ -5,6 +5,7 @@ import gizz.tapes.api.data.HeroPhoto
 import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.Stats
+import gizz.tapes.api.data.Taper
 import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
 import io.ktor.client.HttpClient
@@ -216,6 +217,33 @@ class GizzTapesApiClientTest {
         val client = GizzTapesApiClient(HttpClient(mockEngine))
         val result = client.shows()
         assertIs<List<PartialShowData>>(result.getOrNull())
+    }
+
+    @Test
+    fun getTapers() = runTest {
+        val mockEngine = MockEngine {
+            respond(
+                content = tapersJson,
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+
+        val client = GizzTapesApiClient(HttpClient(mockEngine))
+
+        val result = client.tapers()
+        assertEquals(
+            listOf(
+                Taper(
+                    id = 122u,
+                    name = "Revinylize",
+                    isAnon = false,
+                    recordings = listOf(Taper.TaperRecording(id = "kglw2024-09-01", showId = 840u))
+                ),
+                Taper(id = 7u, name = null, isAnon = true, recordings = emptyList()),
+            ),
+            result.getOrNull()
+        )
     }
 
     @Test

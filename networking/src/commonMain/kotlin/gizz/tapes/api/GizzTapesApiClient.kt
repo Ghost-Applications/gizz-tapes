@@ -8,6 +8,7 @@ import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
+import gizz.tapes.api.data.Taper
 import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
 import io.ktor.client.HttpClient
@@ -51,6 +52,7 @@ interface GizzTapesApiClient {
     suspend fun venues(): Either<Exception, List<Venue>>
     suspend fun showTags(): Either<Exception, List<ShowTag>>
     suspend fun artists(): Either<Exception, List<Artist>>
+    suspend fun tapers(): Either<Exception, List<Taper>>
 }
 
 private class RealGizzTapesApiClient(
@@ -123,5 +125,9 @@ private class RealGizzTapesApiClient(
 
     override suspend fun artists(): Either<Exception, List<Artist>> = Either.catchOrThrow {
         client.get("${api.url}/api/v1/artists.json").body()
+    }
+
+    override suspend fun tapers(): Either<Exception, List<Taper>> = Either.catchOrThrow {
+        client.get("${api.url}/api/v1/tapers.json").body()
     }
 }
