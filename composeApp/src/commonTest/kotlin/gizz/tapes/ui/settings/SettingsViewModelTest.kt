@@ -1,11 +1,18 @@
 package gizz.tapes.ui.settings
 
 import androidx.datastore.core.DataStore
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import gizz.tapes.Platform
+import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.api.data.Recording.Type
+import gizz.tapes.api.data.Taper
+import gizz.tapes.data.DEFAULT_RECORDING_TYPE_RANKING
 import gizz.tapes.data.Settings
 import gizz.tapes.lastfm.fakeLastFmAuthManager
 import gizz.tapes.util.LC
+import gizz.tapes.util.LCE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -13,8 +20,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -23,7 +30,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModelTest {
@@ -42,140 +48,166 @@ class SettingsViewModelTest {
 
     @Test
     fun `when datastore is loading from disc screen state should be loading`() = runTest {
-        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
         val classUnderTest = SettingsViewModel(
             dataStore = object : DataStore<Settings> {
                 override val data: Flow<Settings> = flow { }
                 override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings =
                     transform(Settings())
             },
+            apiClient = FakeApiClient(),
             platform = Platform.Desktop,
             lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
-        val job = launch {
-            classUnderTest.settingsState.collect { emittedValues.add(it) }
-        }
-        advanceUntilIdle()
-        job.cancelAndJoin()
-        assertEquals<List<LC<SettingsScreenState>>>(
-            expected = listOf(LC.Loading),
-            actual = emittedValues
-        )
+        assertEquals(LC.Loading, latestState(classUnderTest))
     }
 
     @Test
     fun `when datastore data is loaded the value should be returned in the state`() = runTest {
-        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
         val classUnderTest = SettingsViewModel(
-            dataStore = object : DataStore<Settings> {
-                val dataStateFlow = MutableStateFlow(Settings())
-                override val data: Flow<Settings> = dataStateFlow
-                override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings =
-                    transform(dataStateFlow.value)
-            },
+            dataStore = FakeDataStore(),
+            apiClient = FakeApiClient(),
             platform = Platform.Desktop,
             lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
-        val job = launch {
-            classUnderTest.settingsState.collect { emittedValues.add(it) }
-        }
-        advanceUntilIdle()
-        job.cancelAndJoin()
-        assertEquals<List<LC<SettingsScreenState>>>(
-            expected = listOf(LC.Content(SettingsScreenState(Type.SBD))),
-            actual = emittedValues
+        assertEquals(
+            LC.Content(SettingsScreenState(tapers = LCE.Content(emptyList()))),
+            latestState(classUnderTest)
         )
     }
 
     @Test
-    fun `updatePreferredRecordingType should update saved preferred recording type`() = runTest {
-        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
+    fun `tapers should be filtered and sorted like the website`() = runTest {
         val classUnderTest = SettingsViewModel(
-            dataStore = object : DataStore<Settings> {
-                val dataStateFlow = MutableStateFlow(Settings())
-                override val data: Flow<Settings> = dataStateFlow
-                override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings {
-                    val transformed = transform(dataStateFlow.value)
-                    dataStateFlow.emit(transformed)
-                    return transformed
-                }
-            },
+            dataStore = FakeDataStore(),
+            apiClient = FakeApiClient(
+                listOf(
+                    taper(1u, "few", recordings = 2),
+                    taper(2u, "puffanug", recordings = 3),
+                    taper(3u, "Sam Joseph, Joe Santarpia", recordings = 30),
+                    taper(4u, "anon", recordings = 10, isAnon = true),
+                    taper(5u, null, recordings = 10),
+                    taper(6u, "Tora Tapes", recordings = 20),
+                ).right()
+            ),
             platform = Platform.Desktop,
             lastFmAuthManager = fakeLastFmAuthManager(),
         )
 
-        val job = launch {
-            classUnderTest.settingsState.collect { emittedValues.add(it) }
-        }
-        advanceTimeBy(500.milliseconds)
-        classUnderTest.updatePreferredRecordingType(Type.MTX)
-        advanceUntilIdle()
-        job.cancelAndJoin()
-        assertEquals<List<LC<SettingsScreenState>>>(
-            expected = listOf(
-                LC.Content(SettingsScreenState(Type.SBD)),
-                LC.Content(SettingsScreenState(Type.MTX))
-            ),
-            actual = emittedValues
+        assertEquals(
+            LCE.Content(listOf(TaperItem("Tora Tapes", 20), TaperItem("puffanug", 3))),
+            (latestState(classUnderTest) as LC.Content).content.tapers
         )
+    }
+
+    @Test
+    fun `taper load failure should be surfaced`() = runTest {
+        val error = Exception("offline")
+        val classUnderTest = SettingsViewModel(
+            dataStore = FakeDataStore(),
+            apiClient = FakeApiClient(error.left()),
+            platform = Platform.Desktop,
+            lastFmAuthManager = fakeLastFmAuthManager(),
+        )
+
+        assertEquals(LCE.Error(error), (latestState(classUnderTest) as LC.Content).content.tapers)
+    }
+
+    @Test
+    fun `ranking toggle and moves should update saved ranking`() = runTest {
+        val dataStore = FakeDataStore()
+        val classUnderTest = SettingsViewModel(dataStore, FakeApiClient(), Platform.Desktop, fakeLastFmAuthManager())
+
+        classUnderTest.updateRecordingTypesRanked(true)
+        advanceUntilIdle()
+        assertEquals(DEFAULT_RECORDING_TYPE_RANKING, dataStore.value.rankedRecordingTypes)
+
+        classUnderTest.moveRecordingType(from = 2, to = 0)
+        advanceUntilIdle()
+        assertEquals(listOf(Type.AUD, Type.SBD, Type.MTX, Type.Mixed), dataStore.value.rankedRecordingTypes)
+
+        classUnderTest.moveRecordingType(from = 0, to = -1)
+        advanceUntilIdle()
+        assertEquals(listOf(Type.AUD, Type.SBD, Type.MTX, Type.Mixed), dataStore.value.rankedRecordingTypes)
+
+        classUnderTest.updateRecordingTypesRanked(false)
+        advanceUntilIdle()
+        assertEquals(null, dataStore.value.rankedRecordingTypes)
+    }
+
+    @Test
+    fun `toggleFavouriteTaper should add then remove taper`() = runTest {
+        val dataStore = FakeDataStore()
+        val classUnderTest = SettingsViewModel(dataStore, FakeApiClient(), Platform.Desktop, fakeLastFmAuthManager())
+
+        classUnderTest.toggleFavouriteTaper("puffanug")
+        advanceUntilIdle()
+        assertEquals(setOf("puffanug"), dataStore.value.favouriteTapers)
+
+        classUnderTest.toggleFavouriteTaper("puffanug")
+        advanceUntilIdle()
+        assertEquals(emptySet(), dataStore.value.favouriteTapers)
     }
 
     @Test
     fun `updateVolumeBoostEnabled should update saved volume boost setting`() = runTest {
-        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
-        val classUnderTest = SettingsViewModel(
-            dataStore = object : DataStore<Settings> {
-                val dataStateFlow = MutableStateFlow(Settings())
-                override val data: Flow<Settings> = dataStateFlow
-                override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings {
-                    val transformed = transform(dataStateFlow.value)
-                    dataStateFlow.emit(transformed)
-                    return transformed
-                }
-            },
-            platform = Platform.Desktop,
-            lastFmAuthManager = fakeLastFmAuthManager(),
-        )
+        val dataStore = FakeDataStore()
+        val classUnderTest = SettingsViewModel(dataStore, FakeApiClient(), Platform.Desktop, fakeLastFmAuthManager())
 
-        val job = launch {
-            classUnderTest.settingsState.collect { emittedValues.add(it) }
-        }
-        advanceTimeBy(500.milliseconds)
         classUnderTest.updateVolumeBoostEnabled(true)
         advanceUntilIdle()
-        job.cancelAndJoin()
-        assertEquals<List<LC<SettingsScreenState>>>(
-            expected = listOf(
-                LC.Content(SettingsScreenState(Type.SBD, volumeBoostEnabled = false)),
-                LC.Content(SettingsScreenState(Type.SBD, volumeBoostEnabled = true))
-            ),
-            actual = emittedValues
-        )
+
+        assertEquals(true, dataStore.value.volumeBoostEnabled)
     }
 
     @Test
     fun `isVolumeBoostSupported should reflect the current platform`() = runTest {
-        val emittedValues = mutableListOf<LC<SettingsScreenState>>()
-        val classUnderTest = SettingsViewModel(
-            dataStore = object : DataStore<Settings> {
-                override val data: Flow<Settings> = MutableStateFlow(Settings())
-                override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings =
-                    transform(Settings())
-            },
-            platform = Platform.Android,
-            lastFmAuthManager = fakeLastFmAuthManager(),
-        )
+        val classUnderTest =
+            SettingsViewModel(FakeDataStore(), FakeApiClient(), Platform.Android, fakeLastFmAuthManager())
 
-        val job = launch {
-            classUnderTest.settingsState.collect { emittedValues.add(it) }
-        }
+        assertEquals(true, (latestState(classUnderTest) as LC.Content).content.isVolumeBoostSupported)
+    }
+
+    private suspend fun TestScope.latestState(viewModel: SettingsViewModel): LC<SettingsScreenState> {
+        val job = launch { viewModel.settingsState.collect { } }
         advanceUntilIdle()
+        val state = viewModel.settingsState.value
         job.cancelAndJoin()
-        assertEquals<List<LC<SettingsScreenState>>>(
-            expected = listOf(LC.Content(SettingsScreenState(Type.SBD, isVolumeBoostSupported = true))),
-            actual = emittedValues
-        )
+        return state
+    }
+
+    private fun taper(id: UInt, name: String?, recordings: Int, isAnon: Boolean = false) = Taper(
+        id = id,
+        name = name,
+        isAnon = isAnon,
+        recordings = List(recordings) { Taper.TaperRecording(id = "rec$it", showId = it.toUInt()) },
+    )
+
+    private class FakeDataStore : DataStore<Settings> {
+        private val dataStateFlow = MutableStateFlow(Settings())
+        val value: Settings get() = dataStateFlow.value
+        override val data: Flow<Settings> = dataStateFlow
+        override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings =
+            transform(dataStateFlow.value).also { dataStateFlow.value = it }
+    }
+
+    private class FakeApiClient(
+        private val tapers: Either<Exception, List<Taper>> = emptyList<Taper>().right(),
+    ) : GizzTapesApiClient {
+        override suspend fun tapers() = tapers
+        override suspend fun shows() = unused()
+        override suspend fun show(id: String) = unused()
+        override suspend fun search(query: String) = unused()
+        override suspend fun search(query: String, showTagIds: Set<UInt>) = unused()
+        override suspend fun heroPhotos() = unused()
+        override suspend fun years() = unused()
+        override suspend fun stats() = unused()
+        override suspend fun countries() = unused()
+        override suspend fun venues() = unused()
+        override suspend fun showTags() = unused()
+        override suspend fun artists() = unused()
+
+        private fun unused(): Nothing = error("not used in this test")
     }
 }

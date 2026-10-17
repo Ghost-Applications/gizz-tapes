@@ -1,4 +1,5 @@
 import SwiftUI
+import GizzTapes
 
 @main
 struct iOSApp: App {

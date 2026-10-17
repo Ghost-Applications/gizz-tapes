@@ -55,6 +55,7 @@ class SavedShowsTest {
         override suspend fun venues() = unused()
         override suspend fun showTags() = unused()
         override suspend fun artists() = unused()
+        override suspend fun tapers() = unused()
     }
 
     private val dataStore = object : DataStore<SavedShows> {

@@ -88,6 +88,11 @@ fun main() = runBlocking {
                 throw it
             }
         }.let { add(it) }
+        async {
+            api.tapers().onLeft {
+                throw it
+            }
+        }.let { add(it) }
     }
 
     deffered.joinAll()

@@ -20,6 +20,7 @@ import gizz.tapes.api.data.Recording
 import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
+import gizz.tapes.api.data.Taper
 import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
 import gizz.tapes.data.ArtistRepository
@@ -359,6 +360,10 @@ class MediaItemTreeTest {
                 listOf(
                     Artist(id = 1.toUInt(), slug = "stu-mackenzie", name = "Stu Mackenzie", showCount = 1.toUInt())
                 ).right()
+
+            override suspend fun tapers(): Either<Exception, List<Taper>> {
+                error("Not implemented")
+            }
         }
 
         data class TestData(
@@ -515,6 +520,10 @@ class MediaItemTreeTest {
                 listOf(
                     Artist(id = 1.toUInt(), slug = "stu-mackenzie", name = "Stu Mackenzie", showCount = 1.toUInt())
                 ).right()
+
+            override suspend fun tapers(): Either<Exception, List<Taper>> {
+                error("Not implemented")
+            }
         }
 
         data class TestData(

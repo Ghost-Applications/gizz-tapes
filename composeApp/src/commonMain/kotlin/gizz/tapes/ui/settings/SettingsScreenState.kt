@@ -1,13 +1,23 @@
 package gizz.tapes.ui.settings
 
 import gizz.tapes.api.data.Recording
+import gizz.tapes.data.DEFAULT_RECORDING_TYPE_RANKING
 import gizz.tapes.lastfm.LastFmAuthState
+import gizz.tapes.util.LCE
 
 data class SettingsScreenState(
-    val selectedPreferredRecordingType: Recording.Type,
+    /** null means "No preference". */
+    val rankedRecordingTypes: List<Recording.Type>? = null,
+    val favouriteTapers: Set<String> = emptySet(),
+    val tapers: LCE<List<TaperItem>, Throwable> = LCE.Loading,
     val volumeBoostEnabled: Boolean = false,
     val isVolumeBoostSupported: Boolean = false,
     val lastFmState: LastFmAuthState = LastFmAuthState.LoggedOut,
-    val preferredRecordingSelections: List<Recording.Type> = Recording.Type.entries
-        .filter { it != Recording.Type.None && it != Recording.Type.UnknownType },
+) {
+    val recordingTypeRanking: List<Recording.Type> = rankedRecordingTypes ?: DEFAULT_RECORDING_TYPE_RANKING
+}
+
+data class TaperItem(
+    val name: String,
+    val uploadCount: Int,
 )
