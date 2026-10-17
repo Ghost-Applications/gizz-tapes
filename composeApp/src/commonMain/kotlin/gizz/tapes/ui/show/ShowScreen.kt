@@ -350,11 +350,8 @@ private fun ShowContent(
                     FilledTonalButton(
                         onClick = { showRecordingMenu = true },
                     ) {
-                        val recordingText = with(state.recordingData) {
-                            "${type.name}${taper?.let { " by $it" }.orEmpty()}: $id"
-                        }
                         Text(
-                            text = recordingText,
+                            text = state.recordingData.label,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
                             style = MaterialTheme.typography.bodyMedium,
@@ -368,9 +365,9 @@ private fun ShowContent(
                     ) {
                         state.recordingData.recordings.forEach { rec ->
                             DropdownMenuItem(
-                                text = { Text(rec.id) },
+                                text = { Text(rec.label) },
                                 onClick = {
-                                    onRecordingChange(rec)
+                                    onRecordingChange(rec.id)
                                     showRecordingMenu = false
                                 }
                             )

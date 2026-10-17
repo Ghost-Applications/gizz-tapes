@@ -311,7 +311,9 @@ val showContent = Content(
         },
         recordingData = RecordingData(
             notes = null,
-            recordings = nonEmptyListOf(RecordingId("test-recording")),
+            recordings = nonEmptyListOf(
+                RecordingData.Option(RecordingId("test-recording"), Recording.Type.SBD, null)
+            ),
             taper = null,
             source = null,
             lineage = null,

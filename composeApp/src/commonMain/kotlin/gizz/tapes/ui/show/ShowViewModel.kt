@@ -249,7 +249,9 @@ class ShowViewModel(
                     }.toNonEmptyListOrNull()!!,
                     recordingData = RecordingData(
                         notes = show.notes,
-                        recordings = show.recordings.map { RecordingId(it.id) },
+                        recordings = show.recordings.map {
+                            RecordingData.Option(RecordingId(it.id), it.type, it.taper)
+                        },
                         taper = recording.taper,
                         source = recording.source,
                         lineage = recording.lineage,

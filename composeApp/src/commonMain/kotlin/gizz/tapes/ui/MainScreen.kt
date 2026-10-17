@@ -164,7 +164,8 @@ fun MainScreen(
                             }
                         },
                         icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) }
+                        label = { Text(item.label) },
+                        alwaysShowLabel = false,
                     )
                 }
             }
