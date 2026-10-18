@@ -7,6 +7,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import co.touchlab.kermit.Logger
+import com.google.android.gms.cast.framework.CastContext
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -15,13 +16,16 @@ import dev.zacsweers.metro.Inject
 @UnstableApi
 @ContributesBinding(AppScope::class)
 class CastPlayerFactory(
-    private val context: Context
+    private val context: Context,
+    private val errorReporter: PlaybackErrorReporter,
 ) : PlayerFactory {
     override fun create(exoPlayer: ExoPlayer): Player {
         return runCatching {
             val remotePlayer = RemoteCastPlayer.Builder(context)
                 .setMediaItemConverter(GizzMediaItemConverter())
                 .build()
+            runCatching { CastErrorMonitor(errorReporter).start(CastContext.getSharedInstance(context)) }
+                .onFailure { Logger.e("Error starting CastErrorMonitor", it) }
             CastPlayer.Builder(context)
                 .setLocalPlayer(exoPlayer)
                 .setRemotePlayer(remotePlayer)

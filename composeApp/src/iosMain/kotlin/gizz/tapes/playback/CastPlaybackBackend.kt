@@ -6,6 +6,7 @@ import cocoapods.google_cast_sdk.GCKMediaInformation
 import cocoapods.google_cast_sdk.GCKMediaInformationBuilder
 import cocoapods.google_cast_sdk.GCKMediaLoadRequestDataBuilder
 import cocoapods.google_cast_sdk.GCKMediaMetadata
+import cocoapods.google_cast_sdk.GCKMediaPlayerIdleReasonError
 import cocoapods.google_cast_sdk.GCKMediaPlayerStateBuffering
 import cocoapods.google_cast_sdk.GCKMediaPlayerStateIdle
 import cocoapods.google_cast_sdk.GCKMediaPlayerStatePlaying
@@ -25,6 +26,7 @@ import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
 import gizz.tapes.ui.player.MediaDurationInfo
+import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.ui.player.PlayerState
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,6 +75,7 @@ class CastPlaybackBackend : PlaybackBackend {
         get() = ((remoteMediaClient?.approximateStreamPosition() ?: 0.0) * 1000.0).toLong()
 
     private var playlist: List<PlaybackItem> = emptyList()
+    private var loadError: PlayerState.MediaLoaded.Error? = null
 
     fun attach(castSession: GCKCastSession) {
         val client = castSession.remoteMediaClient()
@@ -171,7 +174,7 @@ class CastPlaybackBackend : PlaybackBackend {
         val isPlaying = playerState == GCKMediaPlayerStatePlaying
         val isLoading = playerState == GCKMediaPlayerStateBuffering || playerState == GCKMediaPlayerStateIdle
 
-        _state.value = PlayerState.MediaLoaded(
+        val loaded = PlayerState.MediaLoaded(
             isPlaying = isPlaying,
             isLoading = isLoading,
             showId = showId,
@@ -184,6 +187,45 @@ class CastPlaybackBackend : PlaybackBackend {
             currentTrackIndex = currentItemIndex(),
             artistName = playlistItem?.artistName ?: BAND_NAME,
         )
+        _state.value = loadErrorOrNull(mediaStatus, loaded, playlistItem, info) ?: loaded
+    }
+
+    // The receiver skips a track it fails to load, so a flaky host can fail many in a row - only
+    // surface the first failure, and hold it until something plays again so the next status
+    // update doesn't replace it before the UI can show it.
+    private fun loadErrorOrNull(
+        mediaStatus: GCKMediaStatus,
+        loaded: PlayerState.MediaLoaded,
+        playlistItem: PlaybackItem?,
+        info: GCKMediaInformation?,
+    ): PlayerState.MediaLoaded.Error? {
+        if (mediaStatus.playerState() == GCKMediaPlayerStatePlaying) {
+            loadError = null
+            return null
+        }
+        val isLoadError = mediaStatus.playerState() == GCKMediaPlayerStateIdle &&
+            mediaStatus.idleReason() == GCKMediaPlayerIdleReasonError
+        if (isLoadError && loadError == null) {
+            val url = playlistItem?.remoteUrl ?: info?.contentURL()?.absoluteString ?: info?.contentID()
+            val message = if (isArchiveOrgUrl(url)) {
+                archiveOrgErrorMessage(loaded.title)
+            } else {
+                "Couldn't play \"${loaded.title}\""
+            }
+            loadError = PlayerState.MediaLoaded.Error(
+                playerError = PlayerError(message),
+                showId = loaded.showId,
+                showTitle = loaded.showTitle,
+                durationInfo = MediaDurationInfo(0L, loaded.durationInfo.duration),
+                artworkUri = loaded.artworkUri,
+                title = loaded.title,
+                albumTitle = loaded.albumTitle,
+                mediaId = loaded.mediaId,
+                currentTrackIndex = loaded.currentTrackIndex,
+                artistName = loaded.artistName,
+            )
+        }
+        return loadError
     }
 
     // Falls back to reconstructing showId/showTitle from Cast customData when this session was

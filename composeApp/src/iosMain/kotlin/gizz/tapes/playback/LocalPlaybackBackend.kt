@@ -168,7 +168,9 @@ class LocalPlaybackBackend(
 
         if (isError) {
             _state.value = PlayerState.MediaLoaded.Error(
-                playerError = PlayerError("Playback failed"),
+                playerError = PlayerError(
+                    if (isArchiveOrgUrl(item.url)) archiveOrgErrorMessage(item.title) else "Playback failed"
+                ),
                 showId = item.showId,
                 showTitle = item.showTitle,
                 durationInfo = MediaDurationInfo(positionMs, durationMs),

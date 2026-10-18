@@ -168,7 +168,9 @@ class DesktopMediaPlayer : GizzMediaPlayer {
             throw e
         } catch (e: Exception) {
             logger.e(e) { "Playback error for ${item.url}" }
-            updateStateWithError("Playback error: ${e.message}")
+            updateStateWithError(
+                if (isArchiveOrgUrl(item.url)) archiveOrgErrorMessage(item.title) else "Playback error: ${e.message}"
+            )
         }
     }
 

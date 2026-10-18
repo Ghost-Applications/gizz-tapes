@@ -18,6 +18,7 @@ import gizz.tapes.data.BAND_NAME
 import gizz.tapes.ui.player.MediaDurationInfo
 import gizz.tapes.ui.player.PlayerError
 import gizz.tapes.ui.player.PlayerState
+import gizz.tapes.util.getRemoteUrl
 import gizz.tapes.util.resolveShowDestination
 import gizz.tapes.util.toMediaItems
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +36,10 @@ import kotlin.time.Duration.Companion.milliseconds
 @Inject
 @ContributesBinding(AppScope::class)
 @SingleIn(AppScope::class)
-class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
+class AndroidMediaPlayer(
+    context: Context,
+    errorReporter: PlaybackErrorReporter,
+) : GizzMediaPlayer {
 
     private val _state = MutableStateFlow<PlayerState>(PlayerState.NoMedia)
     override val state: StateFlow<PlayerState> = _state.asStateFlow()
@@ -46,7 +50,22 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var pollingJob: Job? = null
 
+    // Reported errors (e.g. a Cast receiver failing a track) aren't sticky like ExoPlayer errors -
+    // the receiver moves straight on to the next track - so hold the error until something plays
+    // again, otherwise the next state update replaces it before the UI can show it.
+    private var heldError: PlayerState.MediaLoaded.Error? = null
+
+    // A reported error can arrive while there's briefly no current item (e.g. mid-handoff to a
+    // Cast device) - keep it until a state update can attach it to a track.
+    private var pendingErrorMessage: String? = null
+
     init {
+        scope.launch {
+            errorReporter.errors.collect { message ->
+                pendingErrorMessage = message
+                updateState()
+            }
+        }
         val appContext = context.applicationContext
         val sessionToken = SessionToken(appContext, ComponentName(appContext, "gizz.tapes.PlaybackService"))
         val controllerFuture = MediaController.Builder(appContext, sessionToken).buildAsync()
@@ -81,7 +100,16 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
                     updateState()
 
                 override fun onPlayerError(error: PlaybackException) {
-                    updateStateWithError(error.localizedMessage ?: "Playback error")
+                    val item = controller.currentMediaItem
+                    val message = if (
+                        error.errorCode == PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS &&
+                        isArchiveOrgUrl(item?.mediaMetadata?.extras?.getRemoteUrl())
+                    ) {
+                        archiveOrgErrorMessage(item?.mediaMetadata?.title?.toString())
+                    } else {
+                        error.localizedMessage ?: "Playback error"
+                    }
+                    updateStateWithError(message)
                 }
             })
         }, ContextCompat.getMainExecutor(appContext))
@@ -106,6 +134,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
 
     private fun updateState() {
         val controller = mediaController ?: return
+        if (showReportedError(controller)) return
         val cmi = controller.currentMediaItem
         if (cmi == null || cmi.mediaId.isEmpty()) {
             _state.value = PlayerState.NoMedia
@@ -139,10 +168,28 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
         )
     }
 
-    private fun updateStateWithError(message: String) {
-        val controller = mediaController ?: return
-        val cmi = controller.currentMediaItem ?: return
-        val show = cmi.resolveShowDestination() ?: return
+    // Returns true if a reported error was shown, in place of the normal state.
+    private fun showReportedError(controller: MediaController): Boolean {
+        pendingErrorMessage?.let { message ->
+            if (updateStateWithError(message)) {
+                pendingErrorMessage = null
+                heldError = _state.value as? PlayerState.MediaLoaded.Error
+                return true
+            }
+        }
+        val error = heldError ?: return false
+        if (controller.isPlaying) {
+            heldError = null
+            return false
+        }
+        _state.value = error
+        return true
+    }
+
+    private fun updateStateWithError(message: String): Boolean {
+        val controller = mediaController ?: return false
+        val cmi = controller.currentMediaItem ?: return false
+        val show = cmi.resolveShowDestination() ?: return false
         val metadata = cmi.mediaMetadata
         _state.value = PlayerState.MediaLoaded.Error(
             playerError = PlayerError(message),
@@ -155,6 +202,7 @@ class AndroidMediaPlayer(context: Context) : GizzMediaPlayer {
             mediaId = cmi.mediaId,
             currentTrackIndex = controller.currentMediaItemIndex,
         )
+        return true
     }
 
     override fun setPlaylist(items: List<PlaybackItem>, startIndex: Int) {
