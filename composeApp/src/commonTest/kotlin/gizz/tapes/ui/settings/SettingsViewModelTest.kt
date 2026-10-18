@@ -10,6 +10,7 @@ import gizz.tapes.api.data.Recording.Type
 import gizz.tapes.api.data.Taper
 import gizz.tapes.data.DEFAULT_RECORDING_TYPE_RANKING
 import gizz.tapes.data.Settings
+import gizz.tapes.data.SettingsSerializer
 import gizz.tapes.lastfm.fakeLastFmAuthManager
 import gizz.tapes.util.LC
 import gizz.tapes.util.LCE
@@ -26,6 +27,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import okio.Buffer
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -96,7 +98,7 @@ class SettingsViewModelTest {
         )
 
         assertEquals(
-            LCE.Content(listOf(TaperItem("Tora Tapes", 20), TaperItem("puffanug", 3))),
+            LCE.Content(listOf(TaperItem(6u, "Tora Tapes", 20), TaperItem(2u, "puffanug", 3))),
             (latestState(classUnderTest) as LC.Content).content.tapers
         )
     }
@@ -141,13 +143,31 @@ class SettingsViewModelTest {
         val dataStore = FakeDataStore()
         val classUnderTest = SettingsViewModel(dataStore, FakeApiClient(), Platform.Desktop, fakeLastFmAuthManager())
 
-        classUnderTest.toggleFavouriteTaper("puffanug")
+        classUnderTest.toggleFavouriteTaper(2u)
         advanceUntilIdle()
-        assertEquals(setOf("puffanug"), dataStore.value.favouriteTapers)
+        assertEquals(setOf(2u), dataStore.value.favouriteTaperIds)
 
-        classUnderTest.toggleFavouriteTaper("puffanug")
+        classUnderTest.toggleFavouriteTaper(2u)
         advanceUntilIdle()
-        assertEquals(emptySet(), dataStore.value.favouriteTapers)
+        assertEquals(emptySet(), dataStore.value.favouriteTaperIds)
+    }
+
+    @Test
+    fun `legacy favourite taper names should migrate to ids when tapers load`() = runTest {
+        val legacy = SettingsSerializer().readFrom(Buffer().writeUtf8("""{"favouriteTapers":["puffanug"]}"""))
+        val dataStore = FakeDataStore(legacy)
+        val classUnderTest = SettingsViewModel(
+            dataStore = dataStore,
+            apiClient = FakeApiClient(
+                tapers = listOf(taper(1u, "someone", recordings = 3), taper(2u, "puffanug", recordings = 3)).right()
+            ),
+            platform = Platform.Desktop,
+            lastFmAuthManager = fakeLastFmAuthManager(),
+        )
+
+        latestState(classUnderTest)
+
+        assertEquals(Settings(favouriteTaperIds = setOf(2u)), dataStore.value)
     }
 
     @Test
@@ -184,8 +204,8 @@ class SettingsViewModelTest {
         recordings = List(recordings) { Taper.TaperRecording(id = "rec$it", showId = it.toUInt()) },
     )
 
-    private class FakeDataStore : DataStore<Settings> {
-        private val dataStateFlow = MutableStateFlow(Settings())
+    private class FakeDataStore(initial: Settings = Settings()) : DataStore<Settings> {
+        private val dataStateFlow = MutableStateFlow(initial)
         val value: Settings get() = dataStateFlow.value
         override val data: Flow<Settings> = dataStateFlow
         override suspend fun updateData(transform: suspend (t: Settings) -> Settings): Settings =

@@ -73,7 +73,7 @@ fun SettingsScreen(
     state: LC<SettingsScreenState>,
     onRecordingTypesRankedChanged: (Boolean) -> Unit,
     onMoveRecordingType: (from: Int, to: Int) -> Unit,
-    onFavouriteTaperToggled: (String) -> Unit,
+    onFavouriteTaperToggled: (UInt) -> Unit,
     onVolumeBoostEnabledChanged: (Boolean) -> Unit,
     onConnectLastFm: () -> Unit,
     onCancelLastFm: () -> Unit,
@@ -112,7 +112,7 @@ private fun SettingsContent(
     state: SettingsScreenState,
     onRecordingTypesRankedChanged: (Boolean) -> Unit,
     onMoveRecordingType: (from: Int, to: Int) -> Unit,
-    onFavouriteTaperToggled: (String) -> Unit,
+    onFavouriteTaperToggled: (UInt) -> Unit,
     onVolumeBoostEnabledChanged: (Boolean) -> Unit,
     onConnectLastFm: () -> Unit,
     onCancelLastFm: () -> Unit,
@@ -154,8 +154,8 @@ private fun SettingsContent(
             is LCE.Content -> items(tapers.value) { taper ->
                 FavouriteTaperRow(
                     taper = taper,
-                    isFavourite = taper.name in state.favouriteTapers,
-                    onToggle = { onFavouriteTaperToggled(taper.name) }
+                    isFavourite = taper.id in state.favouriteTaperIds,
+                    onToggle = { onFavouriteTaperToggled(taper.id) }
                 )
             }
         }

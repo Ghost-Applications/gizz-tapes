@@ -9,10 +9,10 @@ import gizz.tapes.api.data.Recording
  */
 fun NonEmptyList<Recording>.tryAndGetPreferredRecording(
     rankedTypes: List<Recording.Type>,
-    favouriteTapers: Set<String>,
+    favouriteTaperIds: Set<UInt>,
 ): Recording {
     return sortedWith(
         compareBy<Recording> { rankedTypes.indexOf(it.type).takeIf { index -> index >= 0 } ?: rankedTypes.size }
-            .thenBy { it.taper !in favouriteTapers }
+            .thenBy { it.taperId !in favouriteTaperIds }
     ).first()
 }

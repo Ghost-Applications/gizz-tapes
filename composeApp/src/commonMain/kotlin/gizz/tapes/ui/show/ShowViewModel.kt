@@ -208,7 +208,7 @@ class ShowViewModel(
                 val recording = show.recordings.firstOrNull { it.id == selRec?.id }
                     ?: show.recordings.tryAndGetPreferredRecording(
                         rankedTypes = settings.recordingTypeRanking,
-                        favouriteTapers = settings.favouriteTapers,
+                        favouriteTaperIds = settings.favouriteTaperIds,
                     )
 
                 selectedRecording.value = RecordingId(recording.id)

@@ -47,7 +47,7 @@ class SettingsViewModel(
             LC.Content(
                 SettingsScreenState(
                     rankedRecordingTypes = settings.rankedRecordingTypes,
-                    favouriteTapers = settings.favouriteTapers,
+                    favouriteTaperIds = settings.favouriteTaperIds,
                     tapers = tapers,
                     volumeBoostEnabled = settings.volumeBoostEnabled,
                     isVolumeBoostSupported = isVolumeBoostSupported,
@@ -61,7 +61,10 @@ class SettingsViewModel(
         emit(
             apiClient.tapers().fold(
                 ifLeft = { LCE.Error(it) },
-                ifRight = { LCE.Content(it.toFavouriteCandidates()) }
+                ifRight = { tapers ->
+                    dataStore.updateData { it.migrateFavouriteTapers(tapers) }
+                    LCE.Content(tapers.toFavouriteCandidates())
+                }
             )
         )
     }
@@ -85,11 +88,11 @@ class SettingsViewModel(
         }
     }
 
-    fun toggleFavouriteTaper(name: String) {
+    fun toggleFavouriteTaper(id: UInt) {
         viewModelScope.launch {
             dataStore.updateData {
-                val favourites = it.favouriteTapers
-                it.copy(favouriteTapers = if (name in favourites) favourites - name else favourites + name)
+                val favourites = it.favouriteTaperIds
+                it.copy(favouriteTaperIds = if (id in favourites) favourites - id else favourites + id)
             }
         }
     }
@@ -117,7 +120,7 @@ private fun List<Taper>.toFavouriteCandidates(): List<TaperItem> =
         .filter { !it.isAnon && !it.name.isNullOrBlank() }
         .filterNot { it.name.orEmpty().contains("sam joseph", ignoreCase = true) }
         .filter { it.recordings.size > MIN_TAPER_RECORDINGS }
-        .map { TaperItem(name = it.name.orEmpty(), uploadCount = it.recordings.size) }
+        .map { TaperItem(id = it.id, name = it.name.orEmpty(), uploadCount = it.recordings.size) }
         .sortedByDescending { it.uploadCount }
         .toList()
 

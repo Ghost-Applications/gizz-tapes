@@ -33,12 +33,12 @@ class SettingsSerializerTest {
         val settings = serializer.readFrom(Buffer().writeUtf8("""{"preferredRecordingType":"MTX"}"""))
         val buffer = Buffer()
 
-        serializer.writeTo(settings.copy(favouriteTapers = setOf("puffanug")), buffer)
+        serializer.writeTo(settings.copy(favouriteTaperIds = setOf(2u)), buffer)
         val written = buffer.readUtf8()
 
         assertFalse("preferredRecordingType" in written)
         assertEquals(
-            settings.copy(favouriteTapers = setOf("puffanug")),
+            settings.copy(favouriteTaperIds = setOf(2u)),
             serializer.readFrom(Buffer().writeUtf8(written))
         )
     }

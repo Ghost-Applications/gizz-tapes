@@ -8,6 +8,7 @@ import gizz.tapes.api.data.Recording.Type.AUD
 import gizz.tapes.api.data.Recording.Type.MTX
 import gizz.tapes.api.data.Recording.Type.Mixed
 import gizz.tapes.api.data.Recording.Type.SBD
+import gizz.tapes.api.data.Taper
 import gizz.tapes.data.SortOrder.Ascending
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -28,7 +29,10 @@ data class Settings(
     private val legacyPreferredRecordingType: Recording.Type? = null,
     /** null means "No preference". */
     val rankedRecordingTypes: List<Recording.Type>? = null,
-    val favouriteTapers: Set<String> = emptySet(),
+    /** Pre-id favourites stored by taper name, migrated once the taper list loads. */
+    @SerialName("favouriteTapers")
+    private val legacyFavouriteTaperNames: Set<String> = emptySet(),
+    val favouriteTaperIds: Set<UInt> = emptySet(),
     val yearSortOrder: SortOrder = Ascending,
     val showSortOrder: SortOrder = Ascending,
     val volumeBoostEnabled: Boolean = false,
@@ -42,6 +46,15 @@ data class Settings(
             legacyPreferredRecordingType = null,
             rankedRecordingTypes = rankedRecordingTypes
                 ?: (listOf(legacyPreferredRecordingType) + DEFAULT_RECORDING_TYPE_RANKING).distinct(),
+        )
+    }
+
+    internal fun migrateFavouriteTapers(tapers: List<Taper>): Settings {
+        if (legacyFavouriteTaperNames.isEmpty()) return this
+        return copy(
+            legacyFavouriteTaperNames = emptySet(),
+            favouriteTaperIds = favouriteTaperIds +
+                tapers.filter { it.name in legacyFavouriteTaperNames }.map { it.id },
         )
     }
 }

@@ -49,11 +49,11 @@ class RecordingKtTest {
     @Test
     fun `should prefer favourite taper within the same type`() {
         val testData = nonEmptyListOf(
-            createTestRecording("test1", SBD, taper = "someone"),
-            createTestRecording("test2", SBD, taper = "puffanug"),
+            createTestRecording("test1", SBD, taperId = 1u),
+            createTestRecording("test2", SBD, taperId = 2u),
         )
 
-        val result = testData.tryAndGetPreferredRecording(ranking, setOf("puffanug"))
+        val result = testData.tryAndGetPreferredRecording(ranking, setOf(2u))
 
         assertEquals("test2", result.id)
     }
@@ -61,11 +61,11 @@ class RecordingKtTest {
     @Test
     fun `type ranking should win over favourite taper`() {
         val testData = nonEmptyListOf(
-            createTestRecording("test1", AUD, taper = "puffanug"),
+            createTestRecording("test1", AUD, taperId = 2u),
             createTestRecording("test2", SBD),
         )
 
-        val result = testData.tryAndGetPreferredRecording(ranking, setOf("puffanug"))
+        val result = testData.tryAndGetPreferredRecording(ranking, setOf(2u))
 
         assertEquals("test2", result.id)
     }
@@ -73,7 +73,7 @@ class RecordingKtTest {
     private fun createTestRecording(
         id: String,
         type: Recording.Type,
-        taper: String? = null,
+        taperId: UInt? = null,
     ): Recording {
         return Recording(
             id = id,
@@ -81,7 +81,8 @@ class RecordingKtTest {
             type = type,
             source = null,
             lineage = null,
-            taper = taper,
+            taper = null,
+            taperId = taperId,
             files =
             KglwFile(
                 filename = "filename",
