@@ -4,10 +4,23 @@
 
 - Added artist names for non-KGWL shows
 - fixed crashing when try to view shows with "/" in the name
+- Added Last.fm scrobbling
+- New "My Content" tab with downloaded, favorite and recently played shows, and you can now mark shows as favorites
+- Settings redesign: sort recording-type preferences and pick favorite tapers
+- Better error messages when archive.org is down
+- Tapping the show poster in the player now opens the show
+- Recording type is now shown in the source dropdown
+- Fixed My Content getting squished on narrow screens
+- Fixed show and venue names showing HTML codes, e.g. &#039;s-Hertogenbosch (issue #150)
+- Fixed a crash when opening show-note links that start with a space
 
 ### Desktop 
 
 - Added media notifications for pausing / playing for Windows, Linux, and macOS 
+
+### Android
+
+- Fixed media-button crashes
 
 ## LeRisque 2026-09-26
 
