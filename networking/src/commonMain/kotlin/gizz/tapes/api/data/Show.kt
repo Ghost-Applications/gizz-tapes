@@ -2,6 +2,7 @@ package gizz.tapes.api.data
 
 import arrow.core.NonEmptyList
 import arrow.core.serialization.NonEmptyListSerializer
+import gizz.tapes.api.serializer.HtmlEntityStringSerializer
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,6 +15,7 @@ data class Show(
     @SerialName("poster_url")
     val posterUrl: String?,
     val notes: String?,
+    @Serializable(HtmlEntityStringSerializer::class)
     val title: String?,
     @SerialName("kglw_net")
     val kglwNet: KglwNet,
