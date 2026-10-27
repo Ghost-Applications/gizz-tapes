@@ -5,9 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.interop.UIKitView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
+import androidx.compose.ui.viewinterop.UIKitView
 import cocoapods.google_cast_sdk.GCKUICastButton
 import gizz.tapes.playback.GizzCastContext
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -39,7 +39,8 @@ fun CastButton() {
         // state), so clearing it once in `factory` loses that race - `update` re-runs on every
         // recomposition and gives us another shot to override it after the SDK's own changes.
         update = { it.clearBackground() },
-        background = Color.Transparent,
+        // The deprecated UIKitView exposed the button to VoiceOver by default; the new one doesn't.
+        properties = UIKitInteropProperties(isInteractive = true, isNativeAccessibilityEnabled = true),
     )
 }
 

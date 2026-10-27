@@ -1,4 +1,4 @@
-val defaultBuildNumber: String = properties["gizz.tapes.defaultBuildNumber"] as String
+val defaultBuildNumber: String = property("gizz.tapes.defaultBuildNumber") as String
 
 loadPropertyIntoExtra(
     extraKey = "buildNumber",

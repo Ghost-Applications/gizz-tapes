@@ -12,13 +12,10 @@ plugins {
     alias(libs.plugins.metro)
     alias(libs.plugins.sqldelight)
 
-    id("signing-config")
-    id("build-number")
+    id("kotlin-conventions")
 }
 
 kotlin {
-    jvmToolchain(21)
-
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
@@ -33,7 +30,6 @@ kotlin {
             enable = true
         }
 
-        compileSdk = libs.versions.android.sdk.get().toInt()
         minSdk = libs.versions.android.min.sdk.get().toInt()
 
         withHostTest { }
@@ -99,11 +95,9 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.compose.ui.tooling.preview)
 
-            implementation(libs.ktor.client)
-
             api(libs.androidx.datastore)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
             implementation(libs.multiplatform.compose.navigation)
             implementation(libs.kotlinx.serialization)
 

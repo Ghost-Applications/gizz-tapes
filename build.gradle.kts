@@ -1,5 +1,4 @@
 import io.gitlab.arturbosch.detekt.Detekt
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -28,12 +27,6 @@ detekt {
 
 dependencies {
     detektPlugins(libs.detekt.formatting)
-}
-
-subprojects {
-    tasks.withType<Test> {
-        testLogging.exceptionFormat = TestExceptionFormat.FULL
-    }
 }
 
 tasks.withType<Detekt>().configureEach {

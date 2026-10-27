@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
     kotlin("multiplatform")
+    id("kotlin-conventions")
 }
 
 kotlin {
-    jvmToolchain(21)
-
     jvm {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         mainRun {
@@ -41,5 +41,7 @@ kotlin {
 tasks.register("runIntegrationTests") {
     group = "verification"
     description = "runs the api with live data on all available platforms"
-    dependsOn("jvmRun", "jsNodeProductionRun", "runReleaseExecutableMacosArm64")
+    // KGP has no public provider for the JVM and JS run tasks, so those are referenced by name.
+    dependsOn("jvmRun", "jsNodeProductionRun")
+    kotlin.macosArm64().binaries.getExecutable(NativeBuildType.RELEASE).runTaskProvider?.let { dependsOn(it) }
 }

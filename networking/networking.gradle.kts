@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform")
     alias(libs.plugins.serialization)
+    id("kotlin-conventions")
 }
 
 kotlin {
@@ -14,8 +15,6 @@ kotlin {
         browser()
         nodejs()
     }
-
-    jvmToolchain(21)
 
     sourceSets {
         commonMain.dependencies {

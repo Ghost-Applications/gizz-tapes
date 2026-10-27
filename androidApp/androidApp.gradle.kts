@@ -14,10 +14,7 @@ plugins {
 
     id("signing-config")
     id("build-number")
-}
-
-kotlin {
-    jvmToolchain(21)
+    id("kotlin-conventions")
 }
 
 android {
@@ -26,10 +23,10 @@ android {
 
 
     signingConfigs {
-        val keystoreLocation: String by project
-        val keystorePassword: String by project
-        val storeKeyAlias: String by project
-        val aliasKeyPassword: String by project
+        val keystoreLocation = project.property("keystoreLocation") as String
+        val keystorePassword = project.property("keystorePassword") as String
+        val storeKeyAlias = project.property("storeKeyAlias") as String
+        val aliasKeyPassword = project.property("aliasKeyPassword") as String
 
         getByName("debug") {
             storeFile = rootProject.file("keys/debug.keystore")
@@ -47,11 +44,11 @@ android {
 
     // done
     defaultConfig {
-        val buildNumber: String by project
+        val buildNumber = project.property("buildNumber") as String
         minSdk = libs.versions.android.min.sdk.get().toInt()
         targetSdk = libs.versions.android.sdk.get().toInt()
         versionCode = buildNumber.toInt()
-        versionName = properties["gizz.tapes.versionName"] as String
+        versionName = project.property("gizz.tapes.versionName") as String
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         base.archivesName = "gizz-tapes-$versionName-$buildNumber"
     }
@@ -62,16 +59,15 @@ android {
     }
 
     buildTypes {
-        val debug by getting {
+        getByName("debug") {
             applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
-            isShrinkResources = false
             (this as ExtensionAware).configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
             }
         }
-        val release by getting {
+        getByName("release") {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
@@ -98,9 +94,6 @@ android {
         }
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-    }
     testOptions.unitTests.isReturnDefaultValues = true
     testOptions.unitTests.isIncludeAndroidResources = true
     testOptions.unitTests.all {
@@ -175,11 +168,18 @@ dependencies {
     "fullImplementation"(libs.media3.cast)
 
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlinx.datetime)
     testImplementation(libs.truth)
     testImplementation(libs.robolectric)
 }
 
 tasks.withType<GoogleServicesTask> {
     enabled = name.contains("full", ignoreCase = true)
+}
+
+// Crashlytics injects a random mapping file id into every variant. Keep it out of foss so the
+// GitHub foss APK matches F-Droid's build (which strips the Firebase plugins).
+tasks.configureEach {
+    if (name.startsWith("injectCrashlytics") && name.contains("foss", ignoreCase = true)) {
+        enabled = false
+    }
 }

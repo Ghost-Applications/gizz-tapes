@@ -7,7 +7,13 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        google()
+        google {
+            mavenContent {
+                includeGroupAndSubgroups("androidx")
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("com.google")
+            }
+        }
         mavenCentral()
     }
 
@@ -18,5 +24,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "buildSrc"
-rootProject.buildFileName = "buildSrc.gradle.kts"
+rootProject.name = "build-logic"
+rootProject.buildFileName = "build-logic.gradle.kts"

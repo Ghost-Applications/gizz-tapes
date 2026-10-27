@@ -20,7 +20,7 @@ internal fun Project.loadPropertyIntoExtra(
     val namespacedSystemProperty = "${systemNamespace}_$systemPropertyKey"
 
     extra[extraKey] = when {
-        hasProperty(namespacedProjectProperty) -> properties[namespacedProjectProperty]
+        hasProperty(namespacedProjectProperty) -> property(namespacedProjectProperty)
         System.getenv(namespacedSystemProperty) != null -> System.getenv(namespacedSystemProperty)
         else -> System.getProperty(namespacedProjectProperty) ?: defaultValue
     }
