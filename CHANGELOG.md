@@ -1,6 +1,8 @@
 # Changelog
 
-## MarsForTheRich
+## Nein
+
+## MarsForTheRich 2026-10-27
 
 - Added artist names for non-KGWL shows
 - fixed crashing when try to view shows with "/" in the name
