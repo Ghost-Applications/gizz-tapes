@@ -70,10 +70,11 @@ jobs:
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTES: ${{ steps.changelog.outputs.notes }}
         run: |
           gh release create "${{ inputs.tag }}" \
             --title "${{ inputs.tag }}" \
-            --notes "${{ steps.changelog.outputs.notes }}" \
+            --notes "$NOTES" \
             androidApp/build/outputs/apk/foss/release/*.apk \
             androidApp/build/outputs/apk/full/release/*.apk \
             androidApp/build/outputs/bundle/fossRelease/*.aab \
