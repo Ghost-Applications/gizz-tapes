@@ -77,7 +77,7 @@ fun main() = application {
         }
 
         CompositionLocalProvider(LocalMetroViewModelFactory provides appGraph.metroViewModelFactory) {
-            GizzTapesApp()
+            GizzTapesApp(appGraph.deepLinkHandler)
         }
     }
 }

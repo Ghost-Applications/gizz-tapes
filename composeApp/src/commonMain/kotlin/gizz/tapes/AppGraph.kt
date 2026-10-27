@@ -26,6 +26,7 @@ import gizz.tapes.lastfm.ScrobbleQueue
 import gizz.tapes.lastfm.ScrobbleQueueSerializer
 import gizz.tapes.lastfm.Scrobbler
 import gizz.tapes.lastfm.createLastFmSessionStore
+import gizz.tapes.nav.DeepLinkHandler
 import gizz.tapes.playback.CurrentlyPlayingSaver
 import gizz.tapes.playback.StoredMediaSession
 import gizz.tapes.playback.StoredMediaSessionSerializer
@@ -45,6 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 interface AppGraph : ViewModelGraph {
     val scrobbler: Scrobbler
     val lastFmAuthManager: LastFmAuthManager
+    val deepLinkHandler: DeepLinkHandler
 
     @Provides
     fun providePlatform(appContext: AppContext): Platform = appContext.platform

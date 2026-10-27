@@ -75,6 +75,14 @@ sealed interface Destination {
         }
     }
 
+    // a show opened from a tapes.kglw.net link - resolves the title, then replaces itself with Show
+    @Serializable
+    data class ShowLink(val id: ShowId) : Destination {
+        companion object {
+            val typeMap = mapOf(typeOf<ShowId>() to ShowId.navType)
+        }
+    }
+
     @Serializable
     data class Player(val showTitle: FullShowTitle) : Destination {
         companion object {

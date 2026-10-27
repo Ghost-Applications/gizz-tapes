@@ -23,7 +23,7 @@ fun MainViewController(): UIViewController {
             LocalMetroViewModelFactory provides appGraph.metroViewModelFactory,
             LocalPlatformActions provides { CastButton() },
         ) {
-            GizzTapesApp()
+            GizzTapesApp(appGraph.deepLinkHandler)
         }
     }.also { RootViewControllerHolder.current = it }
 }
@@ -35,5 +35,7 @@ private var currentAppGraph: IosAppGraph? = null
 fun handleOpenUrl(url: String) {
     if (url.startsWith(LastFmAuthManager.CALLBACK_URL)) {
         currentAppGraph?.lastFmAuthManager?.onCallback()
+    } else {
+        currentAppGraph?.deepLinkHandler?.handle(url)
     }
 }
