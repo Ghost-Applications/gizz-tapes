@@ -304,7 +304,7 @@ platform :android do
 
     set_github_release(
       repository_name: 'Ghost-Applications/gizz-tapes',
-      api_token: ENV['GITHUB_TOKEN'],
+      api_bearer: ENV['GITHUB_TOKEN'],
       name: version_name,
       tag_name: version_name,
       description: description,
