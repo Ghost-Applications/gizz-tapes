@@ -84,6 +84,18 @@ fun main() = runBlocking {
         }.let { add(it) }
 
         async {
+            api.recordingTypes().onLeft {
+                throw it
+            }
+        }.let { add(it) }
+
+        async {
+            api.search("red rocks", showTagIds = emptySet(), recordingTypeIds = setOf(1u, 3u)).onLeft {
+                throw it
+            }
+        }.let { add(it) }
+
+        async {
             api.artists().onLeft {
                 throw it
             }

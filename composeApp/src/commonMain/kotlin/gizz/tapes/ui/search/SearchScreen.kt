@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import gizz.tapes.api.data.PartialShowData
+import gizz.tapes.api.data.RecordingType
 import gizz.tapes.api.data.ShowTag
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.PosterUrl
@@ -59,6 +60,7 @@ fun SearchScreen(
         modifier = modifier,
         state = setTypes,
         onSetTypeSelection = { viewModel.toggleSetTypeId(it) },
+        onRecordingTypeSelection = { viewModel.toggleRecordingTypeId(it) },
         onSearch = { viewModel.updateSearchQuery(it) },
         onShowClicked = onShowClicked,
         onViewDownloadsClicked = onViewDownloadsClicked,
@@ -71,6 +73,7 @@ fun SearchScreen(
     modifier: Modifier = Modifier,
     state: SearchViewModel.State,
     onSetTypeSelection: (UInt) -> Unit,
+    onRecordingTypeSelection: (UInt) -> Unit,
     onSearch: (String) -> Unit,
     onShowClicked: ShowClick,
     onViewDownloadsClicked: () -> Unit,
@@ -133,6 +136,23 @@ fun SearchScreen(
                                     selected = it.id in state.selectedSetTypeIds,
                                     text = "${it.name} (${it.showCount})",
                                     onClick = { onSetTypeSelection(it.id) },
+                                )
+                            }
+                        }
+                    }
+
+                    LC.Loading -> Unit
+                }
+            }
+            item {
+                when (state.recordingTypes) {
+                    is LC.Content<List<RecordingType>> -> {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            state.recordingTypes.content.fastForEach {
+                                FilterChip(
+                                    selected = it.id in state.selectedRecordingTypeIds,
+                                    text = it.name,
+                                    onClick = { onRecordingTypeSelection(it.id) },
                                 )
                             }
                         }

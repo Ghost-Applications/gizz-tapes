@@ -28,4 +28,6 @@ data class PartialShowData(
     val tags: List<UInt>,
     @SerialName("artist_name")
     val artistName: String,
+    @SerialName("recording_type_ids")
+    val recordingTypeIds: List<UInt?>? = null,
 )

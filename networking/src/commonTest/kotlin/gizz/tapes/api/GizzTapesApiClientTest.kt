@@ -3,6 +3,7 @@ package gizz.tapes.api
 import gizz.tapes.api.data.Country
 import gizz.tapes.api.data.HeroPhoto
 import gizz.tapes.api.data.PartialShowData
+import gizz.tapes.api.data.RecordingType
 import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.Stats
 import gizz.tapes.api.data.Taper
@@ -72,6 +73,46 @@ class GizzTapesApiClientTest {
         val result = client.search("red rocks")
         assertIs<List<PartialShowData>>(result.getOrNull())
         assertEquals("red rocks", capturedQuery)
+    }
+
+    @Test
+    fun search_with_filters_sends_repeated_ids() = runTest {
+        var capturedTagIds: List<String>? = null
+        var capturedRecordingTypeIds: List<String>? = null
+        val mockEngine = MockEngine { request ->
+            capturedTagIds = request.url.parameters.getAll("show_tag_id")
+            capturedRecordingTypeIds = request.url.parameters.getAll("recording_type_id")
+            respond(
+                content = showsJson,
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+
+        val client = GizzTapesApiClient(HttpClient(mockEngine))
+        val result = client.search("red rocks", showTagIds = setOf(7u), recordingTypeIds = setOf(1u, 3u))
+        assertIs<List<PartialShowData>>(result.getOrNull())
+        assertEquals(listOf("7"), capturedTagIds)
+        assertEquals(listOf("1", "3"), capturedRecordingTypeIds)
+    }
+
+    @Test
+    fun getRecordingTypes() = runTest {
+        val mockEngine = MockEngine {
+            respond(
+                content = """[{"id":1,"name":"AUD"},{"id":2,"name":"SBD"}]""",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+
+        val client = GizzTapesApiClient(HttpClient(mockEngine))
+
+        val result = client.recordingTypes()
+        assertEquals(
+            listOf(RecordingType(id = 1u, name = "AUD"), RecordingType(id = 2u, name = "SBD")),
+            result.getOrNull()
+        )
     }
 
     @Test

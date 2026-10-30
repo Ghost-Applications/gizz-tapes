@@ -9,6 +9,7 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import gizz.tapes.api.GizzTapesApiClient
 import gizz.tapes.api.data.PartialShowData
+import gizz.tapes.api.data.RecordingType
 import gizz.tapes.api.data.ShowTag
 import gizz.tapes.util.ForViewModel
 import gizz.tapes.util.LC
@@ -34,6 +35,8 @@ class SearchViewModel(
     data class State(
         val showTags: LC<List<ShowTag>>,
         val selectedSetTypeIds: Set<UInt>,
+        val recordingTypes: LC<List<RecordingType>>,
+        val selectedRecordingTypeIds: Set<UInt>,
         val searchResults: LCE<List<PartialShowData>, Exception>,
         val query: String,
     )
@@ -54,17 +57,38 @@ class SearchViewModel(
         initialValue = LC.Loading
     )
 
+    private val recordingTypesLce = flow {
+        val recordingTypesLce = retryUntilSuccessful(
+            action = {
+                apiClient.recordingTypes()
+            },
+            onErrorAfter3SecondsAction = { error ->
+                logger.e(error) { "Error loading recording types" }
+            }
+        )
+        emit(LC.Content(recordingTypesLce.value))
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.ForViewModel,
+        initialValue = LC.Loading
+    )
+
     private val searchQueryStateFlow = MutableStateFlow("")
     private val searchShowTagIds = MutableStateFlow(emptySet<UInt>())
+    private val searchRecordingTypeIds = MutableStateFlow(emptySet<UInt>())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val searchResultsLce = combine(searchQueryStateFlow, searchShowTagIds) { searchQuery, showTagIds ->
-        searchQuery to showTagIds
-    }.flatMapLatest { (searchQuery, showTagIds) ->
+    private val searchResultsLce = combine(
+        searchQueryStateFlow,
+        searchShowTagIds,
+        searchRecordingTypeIds,
+    ) { searchQuery, showTagIds, recordingTypeIds ->
+        Triple(searchQuery, showTagIds, recordingTypeIds)
+    }.flatMapLatest { (searchQuery, showTagIds, recordingTypeIds) ->
         flow {
             val searchResultsLce = retryUntilSuccessful(
                 action = {
-                    apiClient.search(searchQuery, showTagIds)
+                    apiClient.search(searchQuery, showTagIds, recordingTypeIds)
                 },
                 onErrorAfter3SecondsAction = { error ->
                     logger.e(error) { "Error getting search results" }
@@ -75,15 +99,22 @@ class SearchViewModel(
         }
     }
 
+    private val recordingTypeFilter = combine(recordingTypesLce, searchRecordingTypeIds) { types, selectedIds ->
+        types to selectedIds
+    }
+
     val state = combine(
         searchResultsLce,
         showTagsLce,
         searchShowTagIds,
+        recordingTypeFilter,
         searchQueryStateFlow
-    ) { search, showTags, selectedIds, query ->
+    ) { search, showTags, selectedIds, (recordingTypes, selectedRecordingTypeIds), query ->
         State(
             showTags = showTags,
             selectedSetTypeIds = selectedIds,
+            recordingTypes = recordingTypes,
+            selectedRecordingTypeIds = selectedRecordingTypeIds,
             searchResults = search,
             query = query,
         )
@@ -93,6 +124,8 @@ class SearchViewModel(
         initialValue = State(
             showTags = LC.Loading,
             selectedSetTypeIds = emptySet(),
+            recordingTypes = LC.Loading,
+            selectedRecordingTypeIds = emptySet(),
             searchResults = LCE.Loading,
             query = ""
         )
@@ -104,6 +137,16 @@ class SearchViewModel(
                 it - showTypeId
             } else {
                 it + showTypeId
+            }
+        }
+    }
+
+    fun toggleRecordingTypeId(recordingTypeId: UInt) {
+        searchRecordingTypeIds.update {
+            if (it.contains(recordingTypeId)) {
+                it - recordingTypeId
+            } else {
+                it + recordingTypeId
             }
         }
     }
