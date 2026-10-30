@@ -47,13 +47,14 @@ class SavedShowsTest {
 
         override suspend fun show(id: String) = unused()
         override suspend fun search(query: String) = unused()
-        override suspend fun search(query: String, showTagIds: Set<UInt>) = unused()
+        override suspend fun search(query: String, showTagIds: Set<UInt>, recordingTypeIds: Set<UInt>) = unused()
         override suspend fun heroPhotos() = unused()
         override suspend fun years() = unused()
         override suspend fun stats() = unused()
         override suspend fun countries() = unused()
         override suspend fun venues() = unused()
         override suspend fun showTags() = unused()
+        override suspend fun recordingTypes() = unused()
         override suspend fun artists() = unused()
         override suspend fun tapers() = unused()
     }

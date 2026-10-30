@@ -17,6 +17,7 @@ import gizz.tapes.api.data.KglwFile
 import gizz.tapes.api.data.KglwNet
 import gizz.tapes.api.data.PartialShowData
 import gizz.tapes.api.data.Recording
+import gizz.tapes.api.data.RecordingType
 import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
@@ -327,7 +328,8 @@ class MediaItemTreeTest {
 
             override suspend fun search(
                 query: String,
-                showTagIds: Set<UInt>
+                showTagIds: Set<UInt>,
+                recordingTypeIds: Set<UInt>,
             ): Either<Exception, List<PartialShowData>> {
                 error("Not implemented")
             }
@@ -353,6 +355,10 @@ class MediaItemTreeTest {
             }
 
             override suspend fun showTags(): Either<Exception, List<ShowTag>> {
+                error("Not implemented")
+            }
+
+            override suspend fun recordingTypes(): Either<Exception, List<RecordingType>> {
                 error("Not implemented")
             }
 
@@ -487,7 +493,8 @@ class MediaItemTreeTest {
 
             override suspend fun search(
                 query: String,
-                showTagIds: Set<UInt>
+                showTagIds: Set<UInt>,
+                recordingTypeIds: Set<UInt>,
             ): Either<Exception, List<PartialShowData>> {
                 error("Not implemented")
             }
@@ -513,6 +520,10 @@ class MediaItemTreeTest {
             }
 
             override suspend fun showTags(): Either<Exception, List<ShowTag>> {
+                error("Not implemented")
+            }
+
+            override suspend fun recordingTypes(): Either<Exception, List<RecordingType>> {
                 error("Not implemented")
             }
 

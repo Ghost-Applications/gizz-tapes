@@ -5,6 +5,7 @@ import gizz.tapes.api.data.Artist
 import gizz.tapes.api.data.Country
 import gizz.tapes.api.data.HeroPhoto
 import gizz.tapes.api.data.PartialShowData
+import gizz.tapes.api.data.RecordingType
 import gizz.tapes.api.data.Show
 import gizz.tapes.api.data.ShowTag
 import gizz.tapes.api.data.Stats
@@ -43,6 +44,7 @@ interface GizzTapesApiClient {
     suspend fun search(
         query: String,
         showTagIds: Set<UInt>,
+        recordingTypeIds: Set<UInt> = emptySet(),
     ): Either<Exception, List<PartialShowData>>
 
     suspend fun heroPhotos(): Either<Exception, List<HeroPhoto>>
@@ -51,6 +53,7 @@ interface GizzTapesApiClient {
     suspend fun countries(): Either<Exception, List<Country>>
     suspend fun venues(): Either<Exception, List<Venue>>
     suspend fun showTags(): Either<Exception, List<ShowTag>>
+    suspend fun recordingTypes(): Either<Exception, List<RecordingType>>
     suspend fun artists(): Either<Exception, List<Artist>>
     suspend fun tapers(): Either<Exception, List<Taper>>
 }
@@ -89,12 +92,16 @@ private class RealGizzTapesApiClient(
 
     override suspend fun search(
         query: String,
-        showTagIds: Set<UInt>
+        showTagIds: Set<UInt>,
+        recordingTypeIds: Set<UInt>,
     ): Either<Exception, List<PartialShowData>> = Either.catchOrThrow {
         client.get("${api.url}/api/v1/search") {
             parameter("q", query)
             showTagIds.forEach { id ->
                 parameter("show_tag_id", id)
+            }
+            recordingTypeIds.forEach { id ->
+                parameter("recording_type_id", id)
             }
         }.body()
     }
@@ -121,6 +128,10 @@ private class RealGizzTapesApiClient(
 
     override suspend fun showTags(): Either<Exception, List<ShowTag>> = Either.catchOrThrow {
         client.get("${api.url}/api/v1/show_tags.json").body()
+    }
+
+    override suspend fun recordingTypes(): Either<Exception, List<RecordingType>> = Either.catchOrThrow {
+        client.get("${api.url}/api/v1/recording_types.json").body()
     }
 
     override suspend fun artists(): Either<Exception, List<Artist>> = Either.catchOrThrow {
