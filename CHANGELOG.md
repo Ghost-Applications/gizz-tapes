@@ -6,6 +6,7 @@
 - Added share button to share a show
 - Crop and fit images so they no longer stretch
 - Adds link to IA in show description
+- Update "album" to include show date (fixes last.fm grouping)
 
 ## MarsForTheRich 2026-10-27
 

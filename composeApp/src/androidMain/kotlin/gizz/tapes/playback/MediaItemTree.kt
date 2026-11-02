@@ -23,6 +23,7 @@ import gizz.tapes.data.ShowId
 import gizz.tapes.data.Title
 import gizz.tapes.data.Year
 import gizz.tapes.nav.Destination
+import gizz.tapes.storage.DownloadedShow
 import gizz.tapes.storage.DownloadedShowsSource
 import gizz.tapes.util.putRemoteUrl
 import gizz.tapes.util.realMediaId
@@ -127,8 +128,8 @@ class MediaItemTree(
         } else {
             logger.w { "loadChildrenForRoot() couldn't reach the network - falling back to downloaded shows" }
             downloadedShows()
-                .groupBy { it.date.year }
-                .map { (key, value) -> Year(key) to PosterUrl(value.random().posterUrl) }
+                .groupBy { it.show.date.year }
+                .map { (key, value) -> Year(key) to PosterUrl(value.random().show.posterUrl) }
                 .reversed()
                 .map { (year, posterUrl) -> createYearMediaItem(MediaId.YearId(year.value), posterUrl) }
         }
@@ -150,10 +151,10 @@ class MediaItemTree(
     // without waiting for a restart.
     private fun loadChildrenForDownloadedShows(): ImmutableList<MediaItem> {
         val downloaded = downloadedShows()
-        logger.d { "loadChildrenForDownloadedShows() downloaded.size=${downloaded.size} ids=${downloaded.map { it.id }}" }
+        logger.d { "loadChildrenForDownloadedShows() downloaded.size=${downloaded.size} ids=${downloaded.map { it.show.id }}" }
 
         val showNodes = downloaded
-            .sortedByDescending { it.date }
+            .sortedByDescending { it.show.date }
             .map { createShowMediaItemFromCached(it) }
             .map { MediaItemNode(it) }
 
@@ -189,7 +190,7 @@ class MediaItemTree(
             } else {
                 logger.w { "loadChildrenForYear() couldn't reach the network - falling back to downloaded shows" }
                 downloadedShows()
-                    .filter { it.date.year.toString() == year.mediaId.year }
+                    .filter { it.show.date.year.toString() == year.mediaId.year }
                     .reversed()
                     .map { createShowMediaItemFromCached(it) }
                     .map { MediaItemNode(item = it) }
@@ -287,6 +288,7 @@ class MediaItemTree(
         // only build a Uri (file://) when there's a local download to point to - passing the
         // remote URL through as a plain String, like before, avoids parsing it into a Uri here.
         if (localPath != null) builder.setUri(localPath.toLocalOrRemoteUri()) else builder.setUri(remoteUrl)
+        val fullShowTitle = FullShowTitle(title = Title(show.item.title), date = showData.date)
         return builder
             .setMediaId(MediaId.TrackId(show = showData, file = track, recording = recording))
             .setMediaMetadata(
@@ -296,15 +298,13 @@ class MediaItemTree(
                     .setExtras(
                         Destination.Show(
                             id = ShowId(checkNotNull(show.mediaId.showId) { "Show media id is null" }),
-                            title = FullShowTitle(
-                                title = Title(show.item.title),
-                                date = showData.date
-                            )
+                            title = fullShowTitle
                         ).toExtrasBundle().putRemoteUrl(remoteUrl)
                     )
                     .setArtist(artistName)
                     .setAlbumArtist(artistName)
-                    .setAlbumTitle(show.item.title)
+                    // date prefix keeps repeat venues as separate albums when scrobbled
+                    .setAlbumTitle(fullShowTitle.fullShowTitle.value)
                     .setTitle(track.title)
                     .setRecordingYear(showData.date.year)
                     .setRecordingMonth(showData.date.month.number)
@@ -339,22 +339,22 @@ class MediaItemTree(
 
     // cached/downloaded-show case: the Downloaded Shows folder, or a root/year fallback when the
     // network listing failed - only the full cached Show is available here, not PartialShowData
-    // (which comes from a separate listing endpoint).
-    private fun createShowMediaItemFromCached(show: gizz.tapes.api.data.Show) = MediaItem.Builder()
+    // (which comes from a separate listing endpoint), plus the full title saved at download time.
+    private fun createShowMediaItemFromCached(downloaded: DownloadedShow) = MediaItem.Builder()
         .setMediaMetadata(
             MediaMetadata.Builder()
-                .setTitle(show.title.orEmpty())
-                .setDisplayTitle("${show.date.toAlbumFormat()} ${show.title.orEmpty()}")
-                .setReleaseYear(show.date.year)
-                .setReleaseDay(show.date.day)
-                .setReleaseMonth(show.date.month.number)
+                .setTitle(downloaded.title.value)
+                .setDisplayTitle("${downloaded.show.date.toAlbumFormat()} ${downloaded.title}")
+                .setReleaseYear(downloaded.show.date.year)
+                .setReleaseDay(downloaded.show.date.day)
+                .setReleaseMonth(downloaded.show.date.month.number)
                 .setIsPlayable(false)
                 .setIsBrowsable(true)
                 .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
-                .setArtworkUri(PosterUrl(show.posterUrl).toUri())
+                .setArtworkUri(PosterUrl(downloaded.show.posterUrl).toUri())
                 .build()
         )
-        .setMediaId(MediaId.ShowId(show))
+        .setMediaId(MediaId.ShowId(downloaded.show))
         .build()
 
     private fun createDownloadedShowsMediaItem(): MediaItem = MediaItem.Builder()
@@ -392,7 +392,7 @@ class MediaItemTree(
     private fun PosterUrl.toUri() = Uri.parse(value)
 
     // shows with at least one downloaded track - what the Downloaded Shows folder lists.
-    private fun downloadedShows(): List<gizz.tapes.api.data.Show> = downloadedShowsSource.loadDownloadedShows()
+    private fun downloadedShows(): List<DownloadedShow> = downloadedShowsSource.loadDownloadedShows()
 
     // root/year listing has no complete cached catalog to prefer (only downloaded shows are
     // cached, which is a subset), so unlike loadShow() below it can't just wait forever - a

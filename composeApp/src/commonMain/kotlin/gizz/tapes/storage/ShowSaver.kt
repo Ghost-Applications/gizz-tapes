@@ -13,6 +13,7 @@ import gizz.tapes.data.ArtistRepository
 import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.RecordingId
 import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
 import gizz.tapes.db.Database
 import gizz.tapes.db.Files
 import gizz.tapes.db.Recordings
@@ -209,8 +210,10 @@ class ShowSaver(
 
     // shows with at least one downloaded track - used as an offline fallback (e.g. Android Auto
     // browsing) when the network is unavailable to fetch the full show list/detail.
-    override fun loadDownloadedShows(): List<Show> =
-        db.showsQueries.selectDownloadedShows().executeAsList().mapNotNull { it.decodeShowData() }
+    override fun loadDownloadedShows(): List<DownloadedShow> =
+        db.showsQueries.selectDownloadedShows().executeAsList().mapNotNull { row ->
+            row.decodeShowData()?.let { show -> DownloadedShow(show, Title(row.title ?: show.title.orEmpty())) }
+        }
 
     private fun Shows.decodeShowData(): Show? =
         showData?.let { runCatching { Json.decodeFromString<Show>(it) }.getOrNull() }

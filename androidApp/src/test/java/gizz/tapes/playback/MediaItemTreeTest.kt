@@ -26,6 +26,8 @@ import gizz.tapes.api.data.Venue
 import gizz.tapes.api.data.YearData
 import gizz.tapes.data.ArtistRepository
 import gizz.tapes.data.ShowId
+import gizz.tapes.data.Title
+import gizz.tapes.storage.DownloadedShow
 import gizz.tapes.storage.DownloadedShowsSource
 import gizz.tapes.stub
 import kotlinx.coroutines.test.runTest
@@ -40,7 +42,7 @@ class MediaItemTreeTest {
 
     // no downloaded shows in these tests - they only exercise the live-network path.
     private val noDownloads = object : DownloadedShowsSource {
-        override fun loadDownloadedShows(): List<Show> = emptyList()
+        override fun loadDownloadedShows(): List<DownloadedShow> = emptyList()
         override fun loadCachedShow(showId: ShowId): Show? = null
         override fun localFileIfDownloaded(recording: Recording, filename: String): String? = null
     }
@@ -583,7 +585,7 @@ class MediaItemTreeTest {
                 "root/2021/1/kglw2024-11-20archie/01-Intro.mp3",
                 "Intro",
                 "Stu Mackenzie",
-                "Title 1",
+                "2021/5/20 Title 1",
                 "Stu Mackenzie",
                 10000L,
                 Uri.parse(
@@ -600,7 +602,7 @@ class MediaItemTreeTest {
                 "root/2021/1/kglw2024-11-20archie/02-Rattlesnake.mp3",
                 "Rattlesnake",
                 "Stu Mackenzie",
-                "Title 1",
+                "2021/5/20 Title 1",
                 "Stu Mackenzie",
                 629000L,
                 Uri.parse(
@@ -617,7 +619,7 @@ class MediaItemTreeTest {
                 "root/2021/1/kglw2024-11-20archie/03-O.N.E..mp3",
                 "O.N.E.",
                 "Stu Mackenzie",
-                "Title 1",
+                "2021/5/20 Title 1",
                 "Stu Mackenzie",
                 229000L,
                 Uri.parse(
@@ -631,5 +633,50 @@ class MediaItemTreeTest {
                 MediaMetadata.MEDIA_TYPE_MUSIC
             )
         )
+    }
+
+    @Test
+    fun `downloaded shows use the full title saved at download time`() = runTest {
+        // the cached Show JSON's own title is blank here - the venue/location only live in the saved title
+        val show = Show(
+            id = "1",
+            date = LocalDate(2021, 5, 20),
+            title = null,
+            posterUrl = "https://example.com/poster.jpg",
+            order = 1U,
+            notes = null,
+            kglwNet = KglwNet(id = 10U, permalink = "http://example.com"),
+            venueId = 10U,
+            tourId = 1U,
+            averageRating = 0f,
+            countRatings = 0f,
+            weightedRating = 0f,
+            tags = emptyList(),
+            recordings = nonEmptyListOf(
+                Recording(
+                    id = "rec",
+                    uploadedAt = Instant.fromEpochMilliseconds(0),
+                    type = Recording.Type.SBD,
+                    source = null,
+                    lineage = null,
+                    taper = null,
+                    files = nonEmptyListOf(KglwFile("01.mp3", 10.seconds, "Intro")),
+                    filesPathPrefix = "https://example.com/",
+                    internetArchive = InternetArchive(isLma = true)
+                )
+            )
+        )
+        val downloads = object : DownloadedShowsSource {
+            override fun loadDownloadedShows() = listOf(DownloadedShow(show, Title("Venue • Location")))
+            override fun loadCachedShow(showId: ShowId): Show? = null
+            override fun localFileIfDownloaded(recording: Recording, filename: String): String? = null
+        }
+        val apiClient = stub<GizzTapesApiClient>()
+
+        val result = MediaItemTree(apiClient, downloads, ArtistRepository(apiClient))
+            .getChildren(MediaId.DownloadedShowsId)
+            .map { it.mediaMetadata.title.toString() to it.mediaMetadata.displayTitle.toString() }
+
+        assertThat(result).containsExactly("Venue • Location" to "2021/5/20 Venue • Location")
     }
 }
