@@ -184,6 +184,14 @@ private fun SettingsContent(
                 )
             }
         }
+
+        item { SectionHeader("About") }
+        item {
+            ListItem(
+                headlineContent = { Text("Version") },
+                supportingContent = { Text(rememberAppVersion()) }
+            )
+        }
     }
 }
 
