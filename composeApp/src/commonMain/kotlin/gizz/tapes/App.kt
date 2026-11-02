@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -14,7 +15,10 @@ import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
+import gizz.tapes.nav.DeepLinkHandler
+import gizz.tapes.nav.Destination
 import gizz.tapes.nav.GizzTapesNavController
+import kotlinx.coroutines.flow.filterNotNull
 
 val Primary80 = Color(0xFFB5C4FF)
 val Secondary80 = Color(0xFF81D4DC)
@@ -61,7 +65,7 @@ fun GizzTapesTheme(
 }
 
 @Composable
-fun GizzTapesApp() {
+fun GizzTapesApp(deepLinkHandler: DeepLinkHandler) {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context)
             .components { add(SvgDecoder.Factory()) }
@@ -82,6 +86,12 @@ fun GizzTapesApp() {
 
     GizzTapesTheme {
         val navController = rememberNavController()
+        LaunchedEffect(deepLinkHandler) {
+            deepLinkHandler.pendingShow.filterNotNull().collect { id ->
+                navController.navigate(Destination.ShowLink(id))
+                deepLinkHandler.consume()
+            }
+        }
         GizzTapesNavController(
             navController = navController
         )

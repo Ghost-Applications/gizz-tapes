@@ -20,6 +20,7 @@ import gizz.tapes.ui.saved.FavoriteShowsScreen
 import gizz.tapes.ui.saved.RecentShowsScreen
 import gizz.tapes.ui.selection.ShowSelectionScreen
 import gizz.tapes.ui.settings.SettingsScreen
+import gizz.tapes.ui.show.ShowLinkScreen
 import gizz.tapes.ui.show.ShowScreen
 import gizz.tapes.ui.venue.VenueSelectionScreen
 
@@ -96,6 +97,20 @@ fun GizzTapesNavController(navController: NavHostController) {
                 },
                 onPlayerClick = { title ->
                     navController.navigate(Destination.Player(title))
+                },
+                onViewDownloadsClicked = { navController.navigate(Destination.DownloadedShows) },
+            )
+        }
+
+        composable<Destination.ShowLink>(
+            typeMap = Destination.ShowLink.typeMap
+        ) {
+            ShowLinkScreen(
+                navigateUp = { navController.navigateUp() },
+                onShowResolved = { id, title ->
+                    navController.navigate(Destination.Show(id, title)) {
+                        popUpTo<Destination.ShowLink> { inclusive = true }
+                    }
                 },
                 onViewDownloadsClicked = { navController.navigate(Destination.DownloadedShows) },
             )

@@ -26,6 +26,35 @@ run = "./gradlew assembleFullDebug"
 description = "Install a full debug APK on a connected device"
 run = "./gradlew installFullDebug"
 
+[tasks.test-deeplinks]
+description = "Open a few tapes.kglw.net show links in the running app (android|ios, default android)"
+run = """
+#!/usr/bin/env bash
+set -e
+PLATFORM="${1:-android}"
+PACKAGE="gizz.tapes.full.debug"
+URLS=(
+  "https://tapes.kglw.net/2026-10-17"      # regular show
+  "https://tapes.kglw.net/2026-08-14stu"   # one of two shows on the same date
+  "https://tapes.kglw.net/2023-06-08early" # early/late shows
+  "https://tapes.kglw.net/2099-01-01"      # unknown show -> "Show not found"
+)
+
+if [[ "$PLATFORM" == "android" ]]; then
+  # debug builds aren't in assetlinks.json, so approve the domain by hand
+  adb shell pm set-app-links-user-selection --user cur --package "$PACKAGE" true tapes.kglw.net
+fi
+
+for url in "${URLS[@]}"; do
+  read -rp "Press Enter to open $url "
+  if [[ "$PLATFORM" == "ios" ]]; then
+    xcrun simctl openurl booted "$url"
+  else
+    adb shell am start -a android.intent.action.VIEW -c android.intent.category.BROWSABLE -d "$url" > /dev/null
+  fi
+done
+"""
+
 [tasks.build-ios]
 description = "Archive the iOS app for release"
 run = """
