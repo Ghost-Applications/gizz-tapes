@@ -2,6 +2,9 @@
 
 ## Nein
 
+- Add ability to deeplink from tapes.kglw.net
+- Added share button to share a show
+
 ## MarsForTheRich 2026-10-27
 
 - Added artist names for non-KGWL shows
