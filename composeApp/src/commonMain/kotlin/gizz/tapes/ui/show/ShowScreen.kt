@@ -316,7 +316,7 @@ private fun ShowContent(
             ) {
                 PosterImage(
                     posterUrl = state.showPosterUrl,
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize()
                 )
                 Box(

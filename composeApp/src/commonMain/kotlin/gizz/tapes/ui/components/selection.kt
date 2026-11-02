@@ -141,7 +141,7 @@ fun SelectionRow(
         ) {
             PosterImage(
                 posterUrl = posterUrl,
-                contentScale = ContentScale.FillBounds,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .width(80.dp)
                     .fillMaxHeight()

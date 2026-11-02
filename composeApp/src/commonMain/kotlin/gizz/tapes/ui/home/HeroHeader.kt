@@ -47,7 +47,7 @@ fun HeroHeader(
                 .matchParentSize(),
             model = header.heroPhoto,
             contentDescription = null,
-            contentScale = ContentScale.FillBounds,
+            contentScale = ContentScale.Crop,
             placeholder = rememberPainterBrush(),
             onError = {
                 logger.e(it.result.throwable) {
