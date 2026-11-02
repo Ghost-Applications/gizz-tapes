@@ -11,7 +11,7 @@ permissions:
 jobs:
   android:
     name: Android Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # ruby 3.3.6 has no prebuilt binary for ubuntu-26.04 (ubuntu-latest)
     concurrency:
       group: play-store
       cancel-in-progress: false
