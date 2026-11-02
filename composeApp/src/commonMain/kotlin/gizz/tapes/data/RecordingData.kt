@@ -15,6 +15,7 @@ data class RecordingData(
     val type: Recording.Type
 ) {
     val label: String get() = recordingLabel(id, type, taper)
+    val internetArchiveLink: String get() = "https://archive.org/details/${id.id}"
 
     data class Option(
         val id: RecordingId,

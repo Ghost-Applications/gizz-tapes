@@ -5,6 +5,7 @@
 - Add ability to deeplink from tapes.kglw.net
 - Added share button to share a show
 - Crop and fit images so they no longer stretch
+- Adds link to IA in show description
 
 ## MarsForTheRich 2026-10-27
 

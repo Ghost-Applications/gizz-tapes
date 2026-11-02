@@ -511,20 +511,24 @@ private fun ShowMetadata(recordingData: RecordingData) {
         Text("Identifier: ${recordingData.id}", style = MaterialTheme.typography.bodySmall)
         Text("Uploaded: ${recordingData.uploadDate}", style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(4.dp))
+        val linkStyles = TextLinkStyles(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        )
         Text(
             buildAnnotatedString {
-                withLink(
-                    LinkAnnotation.Url(
-                        recordingData.kglwNetShowLink,
-                        TextLinkStyles(
-                            SpanStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        )
-                    )
-                ) {
+                withLink(LinkAnnotation.Url(recordingData.kglwNetShowLink, linkStyles)) {
                     append("View show on kglw.net")
+                }
+            },
+            style = MaterialTheme.typography.bodySmall
+        )
+        Text(
+            buildAnnotatedString {
+                withLink(LinkAnnotation.Url(recordingData.internetArchiveLink, linkStyles)) {
+                    append("View recording on the Internet Archive")
                 }
             },
             style = MaterialTheme.typography.bodySmall
