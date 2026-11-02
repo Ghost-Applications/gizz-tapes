@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
@@ -84,6 +85,7 @@ import gizz.tapes.ui.components.LoadingScreen
 import gizz.tapes.ui.components.PosterImage
 import gizz.tapes.ui.components.TopAppBarText
 import gizz.tapes.ui.components.navigationUpIcon
+import gizz.tapes.ui.components.rememberShareText
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerActions
 import gizz.tapes.ui.player.PlayerState
@@ -108,6 +110,7 @@ fun ShowScreen(
 
     ShowScreen(
         title = viewModel.title,
+        shareUrl = viewModel.shareUrl,
         showState = showState,
         playerState = playerState,
         navigateUp = navigateUp,
@@ -130,6 +133,7 @@ fun ShowScreen(
 @Composable
 fun ShowScreen(
     title: FullShowTitle,
+    shareUrl: String,
     showState: LCE<ShowScreenState, Throwable>,
     playerState: PlayerState,
     navigateUp: NavigateUp,
@@ -147,6 +151,7 @@ fun ShowScreen(
     onViewDownloadsClicked: () -> Unit,
 ) {
     val platformActions = LocalPlatformActions.current
+    val shareText = rememberShareText()
     val lazyListState = rememberLazyListState()
     var showOverflowMenu by remember { mutableStateOf(false) }
 
@@ -181,6 +186,12 @@ fun ShowScreen(
                 actions = {
                     platformActions()
 
+                    if (downloadStatus == RecordingDownloadStatus.NOT_DOWNLOADED) {
+                        IconButton(onClick = saveShow) {
+                            Icon(Icons.Default.Download, contentDescription = "Download this show for offline playback")
+                        }
+                    }
+
                     IconButton(onClick = toggleFavorite) {
                         if (isFavorite) {
                             Icon(Icons.Filled.Star, contentDescription = "Remove from favorites")
@@ -189,10 +200,8 @@ fun ShowScreen(
                         }
                     }
 
-                    if (downloadStatus == RecordingDownloadStatus.NOT_DOWNLOADED) {
-                        IconButton(onClick = saveShow) {
-                            Icon(Icons.Default.Download, contentDescription = "Download this show for offline playback")
-                        }
+                    IconButton(onClick = { shareText(shareUrl) }) {
+                        Icon(Icons.Default.Share, contentDescription = "Share this show")
                     }
 
                     // the overflow only holds actions for an already-downloaded show.
