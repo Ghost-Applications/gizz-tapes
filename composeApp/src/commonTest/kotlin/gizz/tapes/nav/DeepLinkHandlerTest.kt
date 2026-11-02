@@ -19,6 +19,13 @@ class DeepLinkHandlerTest {
     }
 
     @Test
+    fun `show urls round trip`() {
+        val id = ShowId("2026-10-18orbrose")
+        assertEquals("https://tapes.kglw.net/2026-10-18orbrose", showUrl(id))
+        assertEquals(id, showIdFromUrl(showUrl(id)))
+    }
+
+    @Test
     fun `ignores non show urls`() {
         assertNull(showIdFromUrl("https://tapes.kglw.net/"))
         assertNull(showIdFromUrl("https://tapes.kglw.net/2026"))

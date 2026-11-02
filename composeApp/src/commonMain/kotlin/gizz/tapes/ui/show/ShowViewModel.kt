@@ -29,6 +29,7 @@ import gizz.tapes.data.ShowId
 import gizz.tapes.data.TrackDuration
 import gizz.tapes.data.TrackTitle
 import gizz.tapes.nav.Destination
+import gizz.tapes.nav.showUrl
 import gizz.tapes.playback.GizzMediaPlayer
 import gizz.tapes.playback.PlaybackItem
 import gizz.tapes.storage.DownloadsExporter
@@ -72,6 +73,7 @@ class ShowViewModel(
     private val showRoute = savedStateHandle.toRoute<Destination.Show>(Destination.Show.typeMap)
     private val showId: ShowId = showRoute.id
     val title: FullShowTitle = showRoute.title
+    val shareUrl: String = showUrl(showId)
 
     private val logger = Logger.withTag("ShowViewModel")
     private val cachedShowData = MutableStateFlow<LCE<Show, Nothing>>(LCE.Loading)

@@ -15,6 +15,8 @@ private val showUrlRegex = Regex("""^https://tapes\.kglw\.net/(\d{4}-\d{2}-\d{2}
 fun showIdFromUrl(url: String): ShowId? =
     showUrlRegex.matchEntire(url)?.groupValues?.get(1)?.let(::ShowId)
 
+fun showUrl(id: ShowId): String = "https://tapes.kglw.net/${id.value}"
+
 /**
  * Holds a show opened from a tapes.kglw.net link until the UI navigates to it. A StateFlow so a
  * link received before the UI is composed (cold start) isn't lost.
