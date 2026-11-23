@@ -40,6 +40,11 @@ sealed interface Destination {
             data class ByVenue(val venueName: String) : SelectionType {
                 override val title = venueName
             }
+
+            @Serializable
+            data object TopShows : SelectionType {
+                override val title = "Top Shows"
+            }
         }
 
         companion object {
@@ -112,7 +117,7 @@ sealed interface Destination {
     data object DownloadedShows : Destination
 
     @Serializable
-    data object MyContent : Destination
+    data object More : Destination
 
     @Serializable
     data object RecentShows : Destination

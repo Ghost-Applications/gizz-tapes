@@ -1,4 +1,4 @@
-package gizz.tapes.ui.mycontent
+package gizz.tapes.ui.more
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -17,16 +18,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-fun MyContentScreen(
+fun MoreScreen(
     modifier: Modifier = Modifier,
     onFavoritesClicked: () -> Unit,
+    onTopShowsClicked: () -> Unit,
     onHistory: () -> Unit,
     onDownloadsClicked: () -> Unit,
 ) {
     val rows = listOf(
-        MyContentRow("Favorites", Icons.Filled.Favorite, onFavoritesClicked),
-        MyContentRow("History", Icons.Filled.History, onHistory),
-        MyContentRow("Downloads", Icons.Filled.Download, onDownloadsClicked),
+        MoreRow("Top Shows", Icons.Filled.Star, onTopShowsClicked),
+        MoreRow("Favorites", Icons.Filled.Favorite, onFavoritesClicked),
+        MoreRow("History", Icons.Filled.History, onHistory),
+        MoreRow("Downloads", Icons.Filled.Download, onDownloadsClicked),
     )
 
     LazyColumn(modifier = modifier) {
@@ -44,7 +47,7 @@ fun MyContentScreen(
     }
 }
 
-private data class MyContentRow(
+private data class MoreRow(
     val title: String,
     val icon: ImageVector,
     val onClick: () -> Unit,

@@ -61,13 +61,14 @@ class ShowSelectionViewModel(
         val state = retryUntilSuccessful(
             action = {
                 apiClient.shows().map { shows ->
-                    shows.filter {
-                        when (selectionType) {
-                            is SelectionType.ByVenue -> it.venueName == selectionType.venueName
-                            is SelectionType.ByYear -> {
-                                it.date.year.toString() == selectionType.year.toString()
-                            }
+                    when (selectionType) {
+                        is SelectionType.ByVenue -> shows.filter { it.venueName == selectionType.venueName }
+                        is SelectionType.ByYear -> shows.filter {
+                            it.date.year.toString() == selectionType.year.toString()
                         }
+                        SelectionType.TopShows -> shows
+                            .filter { it.weightedRating != null }
+                            .sortedByDescending { it.weightedRating }
                     }.map { show ->
                         val title = Title(show.showTitle)
                         ShowSelectionData(
@@ -98,6 +99,7 @@ class ShowSelectionViewModel(
         sortOrder
     ) { showsLce, sortOrder ->
         showsLce.map { shows ->
+            if (selectionType == SelectionType.TopShows) return@map shows
             when (sortOrder) {
                 SortOrder.Ascending -> shows.sortedWith(
                     compareBy<ShowSelectionData> { it.fullShowTitle.date }

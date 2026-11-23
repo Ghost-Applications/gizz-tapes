@@ -48,7 +48,7 @@ import gizz.tapes.ui.components.TopAppBarText
 import gizz.tapes.ui.components.gizzIcon
 import gizz.tapes.ui.home.BottomNavBarItem
 import gizz.tapes.ui.home.HomeScreen
-import gizz.tapes.ui.mycontent.MyContentScreen
+import gizz.tapes.ui.more.MoreScreen
 import gizz.tapes.ui.player.MiniPlayer
 import gizz.tapes.ui.player.PlayerActions
 import gizz.tapes.ui.player.PlayerViewModel
@@ -212,10 +212,11 @@ fun MainScreen(
                             onViewDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
                         )
                     }
-                    composable<Destination.MyContent> {
-                        MyContentScreen(
+                    composable<Destination.More> {
+                        MoreScreen(
                             modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
                             onFavoritesClicked = navigation.navigateToFavoriteShowsScreen,
+                            onTopShowsClicked = navigation.navigateToTopShowsScreen,
                             onHistory = navigation.navigateToRecentShowsScreen,
                             onDownloadsClicked = navigation.navigateToDownloadedShowsScreen,
                         )
