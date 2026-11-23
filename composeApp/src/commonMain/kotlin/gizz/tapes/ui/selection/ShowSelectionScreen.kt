@@ -15,6 +15,7 @@ import gizz.tapes.data.FullShowTitle
 import gizz.tapes.data.ShowId
 import gizz.tapes.data.ShowSelectionData
 import gizz.tapes.data.Title
+import gizz.tapes.nav.Destination.ShowSelection.SelectionType
 import gizz.tapes.nav.NavigateUp
 import gizz.tapes.ui.components.SelectionData
 import gizz.tapes.ui.components.SelectionScreen
@@ -48,8 +49,10 @@ internal fun ShowSelectionScreen(
             play = playerViewModel::play,
         ),
         actions = {
-            IconButton(onClick = { viewModel.toggleSortOrder() }) {
-                Icon(Icons.Default.SortByAlpha, contentDescription = "Sort by date")
+            if (viewModel.selectionType != SelectionType.TopShows) {
+                IconButton(onClick = { viewModel.toggleSortOrder() }) {
+                    Icon(Icons.Default.SortByAlpha, contentDescription = "Sort by date")
+                }
             }
         },
         onViewDownloadsClicked = onViewDownloadsClicked,

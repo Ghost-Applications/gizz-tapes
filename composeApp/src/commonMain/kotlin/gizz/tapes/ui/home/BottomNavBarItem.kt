@@ -18,5 +18,5 @@ enum class BottomNavBarItem(
     Years("Years", Icons.Filled.CalendarToday, Destination.YearSelection),
     Venues("Venues", Icons.Filled.Festival, Destination.Venues),
     Search("Search", Icons.Filled.Search, Destination.Search),
-    MyContent("My Content", Icons.Filled.Folder, Destination.MyContent),
+    More("More", Icons.Filled.Folder, Destination.More),
 }

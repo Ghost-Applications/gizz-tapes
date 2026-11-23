@@ -44,6 +44,9 @@ fun GizzTapesNavController(navController: NavHostController) {
                     navigateToFavoriteShowsScreen = {
                         navController.navigate(Destination.FavoriteShows)
                     },
+                    navigateToTopShowsScreen = {
+                        navController.navigate(Destination.ShowSelection(SelectionType.TopShows))
+                    },
                     navigateToShow = { id, title ->
                         navController.navigate(
                             Destination.Show(
