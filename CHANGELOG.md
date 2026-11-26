@@ -7,6 +7,7 @@
 - Crop and fit images so they no longer stretch
 - Adds link to IA in show description
 - Update "album" to include show date (fixes last.fm grouping)
+- Added Top Shows based on user reviews on kglw.net
 
 ## MarsForTheRich 2026-10-27
 
